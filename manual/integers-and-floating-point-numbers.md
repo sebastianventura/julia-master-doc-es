@@ -122,14 +122,11 @@ julia> typeof(ans)
 UInt64
 ```
 
-This behavior is based on the observation that when one uses unsigned hex literals for integer
-values, one typically is using them to represent a fixed numeric byte sequence, rather than just
-an integer value.
+Este comportamiento está basado en la observación de que cuando uno usa literales hexadecimales sin signo para valores enteros, se los suele utilizar para representar una secuencia de bytes numéricos fijos en lugar de un valor entero.
 
-Recall that the variable [`ans`](@ref) is set to the value of the last expression evaluated in
-an interactive session. This does not occur when Julia code is run in other ways.
+Recuerde que la variable [`ans`](@ref) se establece en el valor de la última expresión evaluada en una sesión interactiva. Esto no ocurre cuando el código Julia se ejecuta de otras maneras.
 
-Binary and octal literals are also supported:
+Los literales binarios y octales también están soportados:
 
 ```jldoctest
 julia> 0b10
@@ -145,8 +142,7 @@ julia> typeof(ans)
 UInt8
 ```
 
-The minimum and maximum representable values of primitive numeric types such as integers are given
-by the [`typemin()`](@ref) and [`typemax()`](@ref) functions:
+Los valores máximo y mínimo de tipos primitivos numéricos representables como enteros vienen dados por las funciones  [`typemin()`](@ref) y [`typemax()`](@ref):
 
 ```jldoctest
 julia> (typemin(Int32), typemax(Int32))
@@ -167,14 +163,12 @@ julia> for T in [Int8,Int16,Int32,Int64,Int128,UInt8,UInt16,UInt32,UInt64,UInt12
 UInt128: [0,340282366920938463463374607431768211455]
 ```
 
-The values returned by [`typemin()`](@ref) and [`typemax()`](@ref) are always of the given argument
-type. (The above expression uses several features we have yet to introduce, including [for loops](@ref man-loops),
-[Strings](@ref man-strings), and [Interpolation](@ref), but should be easy enough to understand for users
-with some existing programming experience.)
+Los valores devueltos por [`typemin()`](@ref) y [`typemax()`](@ref) siempre son del tipo de argumento dado. (La expresión anterior utiliza varias características que todavía tenemos que introducir, incluyendo [blucles for](@ref man-loops),
+[Cadenas](@ref man-strings), e [Interpolación](@ref), pero debería ser lo suficientemente fácil de entender para los usuarios con cierta experiencia en programación).)
 
-### Overflow behavior
+### Comportamiento ante el Desbordamiento
 
-In Julia, exceeding the maximum representable value of a given type results in a wraparound behavior:
+En Julia, superar el valor máximo representable de un tipo dado da como resultado un comportamiento envolvente:
 
 ```jldoctest
 julia> x = typemax(Int64)
@@ -187,13 +181,10 @@ julia> x + 1 == typemin(Int64)
 true
 ```
 
-Thus, arithmetic with Julia integers is actually a form of [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic).
-This reflects the characteristics of the underlying arithmetic of integers as implemented on modern
-computers. In applications where overflow is possible, explicit checking for wraparound produced
-by overflow is essential; otherwise, the [`BigInt`](@ref) type in [Arbitrary Precision Arithmetic](@ref)
-is recommended instead.
+Así, la aritmética con enteros de Julia es en realidad una forma de [aritmética modular](https://en.wikipedia.org/wiki/Modular_arithmetic).
+Esto refleja las características de la aritmética subyacente de números enteros tal como se implementa en las computadoras modernas. En aplicaciones donde es posible el desbordamiento, es esencial comprobar explícitamente el envolvente producido por el desbordamiento. De lo contrario, se recomienda el tipo [`BigInt`](@ref) en [Aritmética de Precisión Arbitraria](@ref).
 
-### Division errors
+### Errores de división
 
 Integer division (the `div` function) has two exceptional cases: dividing by zero, and dividing
 the lowest negative number ([`typemin()`](@ref)) by -1. Both of these cases throw a [`DivideError`](@ref).
