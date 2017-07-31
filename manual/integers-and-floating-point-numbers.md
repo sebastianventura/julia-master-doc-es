@@ -186,14 +186,15 @@ Esto refleja las características de la aritmética subyacente de números enter
 
 ### Errores de división
 
-Integer division (the `div` function) has two exceptional cases: dividing by zero, and dividing
-the lowest negative number ([`typemin()`](@ref)) by -1. Both of these cases throw a [`DivideError`](@ref).
-The remainder and modulus functions (`rem` and `mod`) throw a [`DivideError`](@ref) when their
-second argument is zero.
+La división entera (la función `div`) tiene dos casos excepcionales: dividir por cero, y dividir 
+el número  negativo más bajo  ([`typemin()`](@ref)) por -1. Ambos casos lanzan un 
+[`DivideError`](@ref).
+El resto y las funciones de módulo (`rem` y `mod`) lanzan un  [`DivideError`](@ref) cuando su 
+segundo argumento es cero.
 
 ## Floating-Point Numbers
 
-Literal floating-point numbers are represented in the standard formats:
+Los literales de números en punto flotante son representados en las formas estándar:
 
 ```jldoctest
 julia> 1.0
@@ -218,8 +219,8 @@ julia> 2.5e-4
 0.00025
 ```
 
-The above results are all [`Float64`](@ref) values. Literal [`Float32`](@ref) values can be
-entered by writing an `f` in place of `e`:
+Los resultados anteriores son todos valores [`Float64`](@ref). Los valores literales [`Float32`](@ref) pueden
+introducirse escribiendo `f` en lugar de `e`:
 
 ```jldoctest
 julia> 0.5f0
@@ -232,7 +233,7 @@ julia> 2.5f-4
 0.00025f0
 ```
 
-Values can be converted to [`Float32`](@ref) easily:
+Los valores pueden ser convertidos a `Float32` fácilmente:
 
 ```jldoctest
 julia> Float32(-1.5)
@@ -242,7 +243,7 @@ julia> typeof(ans)
 Float32
 ```
 
-Hexadecimal floating-point literals are also valid, but only as [`Float64`](@ref) values:
+También son válidos los literales de punto flotante en formato hexadecimal, pero sólo sobre valores [`Float64`](@ref):
 
 ```jldoctest
 julia> 0x1p0
@@ -258,8 +259,8 @@ julia> typeof(ans)
 Float64
 ```
 
-Half-precision floating-point numbers are also supported ([`Float16`](@ref)), but they are
-implemented in software and use [`Float32`](@ref) for calculations.
+También esta soportados los números en punto flotante de media precisión ([`Float16`](@ref)), pero sólo 
+como un formato de almacenamiento. En los cálculos son convertidos a [`Float32`](@ref).
 
 ```jldoctest
 julia> sizeof(Float16(4.))
@@ -269,18 +270,18 @@ julia> 2*Float16(4.)
 Float16(8.0)
 ```
 
-The underscore `_` can be used as digit separator:
+El guión bajo (*underscore*) puede usarse como separador de dígitos:
 
 ```jldoctest
 julia> 10_000, 0.000_000_005, 0xdead_beef, 0b1011_0010
 (10000, 5.0e-9, 0xdeadbeef, 0xb2)
 ```
 
-### Floating-point zero
+### Cero en punto flotante
 
-Floating-point numbers have [two zeros](https://en.wikipedia.org/wiki/Signed_zero), positive zero
-and negative zero. They are equal to each other but have different binary representations, as
-can be seen using the `bits` function: :
+Los números en punto flotante tienen [dos ceros](https://en.wikipedia.org/wiki/Signed_zero), 
+positivo y negativo. Ellos son iguales entre sí, pero tienen distintas representaciones, 
+como puede verse si usamos la función `bits()`:
 
 ```jldoctest
 julia> 0.0 == -0.0
@@ -293,10 +294,10 @@ julia> bits(-0.0)
 "1000000000000000000000000000000000000000000000000000000000000000"
 ```
 
-### Special floating-point values
+### Valores especiales en punto flotante
 
-There are three specified standard floating-point values that do not correspond to any point on
-the real number line:
+Hay tres valores especificados en el estándar de punto flotante para valores que no se corresponden 
+con ningún punto en la línea de números reales:
 
 | `Float16` | `Float32` | `Float64` | Name              | Description                                                     |
 |:--------- |:--------- |:--------- |:----------------- |:--------------------------------------------------------------- |
@@ -304,9 +305,9 @@ the real number line:
 | `-Inf16`  | `-Inf32`  | `-Inf`    | negative infinity | a value less than all finite floating-point values              |
 | `NaN16`   | `NaN32`   | `NaN`     | not a number      | a value not `==` to any floating-point value (including itself) |
 
-For further discussion of how these non-finite floating-point values are ordered with respect
-to each other and other floats, see [Numeric Comparisons](@ref). By the [IEEE 754 standard](https://en.wikipedia.org/wiki/IEEE_754-2008),
-these floating-point values are the results of certain arithmetic operations:
+Para más información sobre cómo estos valores de punto flotante no finitos están ordenados entre 
+sí y otros flotantes, vea [Comparaciones Numéricas](@ref). Mediante [estándar IEEE 754](https://en.wikipedia.org/wiki/IEEE_754-2008), estos valores de punto flotante son el resultado 
+de ciertas operaciones aritméticas:
 
 ```jldoctest
 julia> 1/Inf
@@ -346,7 +347,7 @@ julia> 0 * Inf
 NaN
 ```
 
-The [`typemin()`](@ref) and [`typemax()`](@ref) functions also apply to floating-point types:
+Las funciones [`typemin()`](@ref) y [`typemax()`](@ref) también se aplican a los tipos en punto flotante:
 
 ```jldoctest
 julia> (typemin(Float16),typemax(Float16))
