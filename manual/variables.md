@@ -1,7 +1,7 @@
 # Variables
 
-A variable, in Julia, is a name associated (or bound) to a value. It's useful when you want to
-store a value (that you obtained after some math, for example) for later use. For example:
+Una variable en Julia es un nombre asociado a un valor. Esto es útil cuando pretendemos almacenar un valor. 
+Por ejemplo:
 
 ```julia-repl
 # Assign the value 10 to the variable x
@@ -21,9 +21,9 @@ julia> x = "Hello World!"
 "Hello World!"
 ```
 
-Julia provides an extremely flexible system for naming variables. Variable names are case-sensitive,
-and have no semantic meaning (that is, the language will not treat variables differently based
-on their names).
+Julia proporciona un sistema muy flexible para nombrar las variables. Los nombres de variable son 
+sensibles a las mayúsculas, y no tienen significado semántico (es decir, que el lenguaje no trata 
+de modo distinto  a las variables basándose en sus nombres).
 
 ```jldoctest
 julia> x = 1.0
@@ -42,7 +42,7 @@ julia> UniversalDeclarationOfHumanRightsStart = "人人生而自由，在尊严�
 "人人生而自由，在尊严和权利上一律平等。"
 ```
 
-Unicode names (in UTF-8 encoding) are allowed:
+Los nombres Unicode (usando codificacin UTF-8) están permitidos:
 
 ```jldoctest
 julia> δ = 0.00001
@@ -52,14 +52,12 @@ julia> 안녕하세요 = "Hello"
 "Hello"
 ```
 
-In the Julia REPL and several other Julia editing environments, you can type many Unicode math
-symbols by typing the backslashed LaTeX symbol name followed by tab. For example, the variable
-name `δ` can be entered by typing `\delta`-*tab*, or even `α̂₂` by `\alpha`-*tab*-`\hat`-
+En el REPL y otros entornos Julia se pueden introducir símbolos matemáticos Unicode usando la notación de *Latex* precedido de backslash y seguido de un tabulador. Por ejemplo, podemos crear el nombre de variable `δ` tecleando `\delta`-*tab*, o incluso `α̂₂` by `\alpha`-*tab*-`\hat`-
 *tab*-`\_2`-*tab*. (If you find a symbol somewhere, e.g. in someone else's code,
 that you don't know how to type, the REPL help will tell you: just type `?` and
 then paste the symbol.)
 
-Julia will even let you redefine built-in constants and functions if needed:
+Julia también permite redefinir constantes predefinidas su fuera necesario:
 
 ```jldoctest
 julia> pi
@@ -80,7 +78,7 @@ WARNING: imported binding for sqrt overwritten in module Main
 4
 ```
 
-However, this is obviously not recommended to avoid potential confusion.
+Sin embargo, esto no se recomienta para evitar una potencial confusión.
 
 ## Allowed Variable Names
 
