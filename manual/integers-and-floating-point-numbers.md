@@ -360,14 +360,14 @@ julia> (typemin(Float64),typemax(Float64))
 (-Inf, Inf)
 ```
 
-### Machine epsilon
+### Epsilon de máquina
 
-Most real numbers cannot be represented exactly with floating-point numbers, and so for many purposes
-it is important to know the distance between two adjacent representable floating-point numbers,
-which is often known as [machine epsilon](https://en.wikipedia.org/wiki/Machine_epsilon).
+La mayoría de los números reales no pueden representarse exactamente con números de coma flotante, 
+por lo que para muchos propósitos es importante conocer la distancia entre dos números de punto 
+flotante representables adyacentes, que a menudo se conoce como [epsilon de máquina](https://en.wikipedia.org/wiki/Machine_epsilon).
 
-Julia provides [`eps()`](@ref), which gives the distance between `1.0` and the next larger representable
-floating-point value:
+Julia proporciona [`eps()`](@ref), que da la distancia entre 1,0 y el siguiente valor de punto 
+flotante representable más grande:
 
 ```jldoctest
 julia> eps(Float32)
@@ -380,11 +380,11 @@ julia> eps() # same as eps(Float64)
 2.220446049250313e-16
 ```
 
-These values are `2.0^-23` and `2.0^-52` as [`Float32`](@ref) and [`Float64`](@ref) values,
-respectively. The [`eps()`](@ref) function can also take a floating-point value as an
-argument, and gives the absolute difference between that value and the next representable
-floating point value. That is, `eps(x)` yields a value of the same type as `x` such that
-`x + eps(x)` is the next representable floating-point value larger than `x`:
+Estos valores son `2.0^-23` y `2.0^-52` como valores [`Float32`](@ref) y [`Float64`](@ref), 
+respectivamente. La función [`eps()`](@ref) también puede tomar un valor de punto flotante 
+como un argumento y da la diferencia absoluta entre ese valor y el siguiente valor de punto 
+flotante representable. Es decir, `eps(x)` produce un valor del mismo tipo que `x` tal que
+`x` + `eps(x)` es el siguiente valor de punto flotante representable mayor que `x`:
 
 ```jldoctest
 julia> eps(1.0)
@@ -400,14 +400,16 @@ julia> eps(0.0)
 5.0e-324
 ```
 
-The distance between two adjacent representable floating-point numbers is not constant, but is
-smaller for smaller values and larger for larger values. In other words, the representable floating-point
-numbers are densest in the real number line near zero, and grow sparser exponentially as one moves
-farther away from zero. By definition, `eps(1.0)` is the same as `eps(Float64)` since `1.0` is
-a 64-bit floating-point value.
+La distancia entre dos números de punto flotante representables adyacentes no es constante, 
+pero es menor para valores más pequeños y mayor para valores mayores. En otras palabras, 
+los números de punto flotante representables son más densos en la línea de números reales 
+cerca de cero, y crecen exponencialmente dispersos a medida que uno se aleja de cero. Por
+definición, `eps(1.0)` es el mismo que `eps(Float64)` ya que `1.0` es un valor de coma 
+flotante de 64 bits.
 
-Julia also provides the [`nextfloat()`](@ref) and [`prevfloat()`](@ref) functions which return
-the next largest or smallest representable floating-point number to the argument respectively:
+Julia también proporciona las funciones [`nextfloat()`](@ref) y [`prevfloat()`](@ref) que 
+devuelven el siguiente número de punto flotante representable más grande o más pequeño al 
+argumento, respectivamente:
 
 ```jldoctest
 julia> x = 1.25f0
@@ -429,14 +431,15 @@ julia> bits(nextfloat(x))
 "00111111101000000000000000000001"
 ```
 
-This example highlights the general principle that the adjacent representable floating-point numbers
-also have adjacent binary integer representations.
+Este ejemplo resalta el principio general de que los números de punto flotante representables 
+adyacentes también tienen representaciones binarias enteras adyacentes.
 
 ### Rounding modes
 
-If a number doesn't have an exact floating-point representation, it must be rounded to an appropriate
-representable value, however, if wanted, the manner in which this rounding is done can be changed
-according to the rounding modes presented in the [IEEE 754 standard](https://en.wikipedia.org/wiki/IEEE_754-2008).
+Si un número no tiene una representación de punto flotante exacta, debe redondearse a un valor 
+representable apropiado. Sin embargo, si se desea, la forma en que se realiza este redondeo puede 
+cambiarse de acuerdo con los modos de redondeo presentados en el 
+[IEEE 754 standard](https://en.wikipedia.org/wiki/IEEE_754-2008).
 
 ```jldoctest
 julia> x = 1.1; y = 0.1;
@@ -450,14 +453,14 @@ julia> setrounding(Float64,RoundDown) do
 1.2
 ```
 
-The default mode used is always [`RoundNearest`](@ref), which rounds to the nearest representable
-value, with ties rounded towards the nearest value with an even least significant bit.
+El modo predeterminado utilizado siempre es [`RoundNearest`](@ref), , que redondea al valor representable 
+más cercano, con arcos redondeados hacia el valor más cercano con un bit menos significativo.
 
 !!! warning
-    Rounding is generally only correct for basic arithmetic functions ([`+()`](@ref), [`-()`](@ref),
-    [`*()`](@ref), [`/()`](@ref) and [`sqrt()`](@ref)) and type conversion operations. Many other
-    functions assume the default [`RoundNearest`](@ref) mode is set, and can give erroneous results
-    when operating under other rounding modes.
+    El redondeo generalmente sólo es correcto para las funciones aritméticas básicas ([`+()`](@ref), 
+    [`-()`](@ref), [`*()`](@ref), [`/()`](@ref) and [`sqrt()`](@ref)) y las operaciones de conversión 
+    de tipos. Muchas otras funciones asumen que el modo por defecto [`RoundNearest`](@ref) está 
+    establecido y pueden dar resultados erróneos al operar bajo otros modos de redondeo.
 
 ### Background and References
 
