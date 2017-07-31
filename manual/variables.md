@@ -128,4 +128,4 @@ siguientes convenciones:
   Estas suelen ser llamadas funciones "mutadoras" o funciones "*in-place*" debido a que pretenden producir 
   cambios en sus argumentos después de que la función sea invocada, no solo devolver un valor.
   
-Para más informacin sobre convenciones de estilo, ver la [Guía de Estilo](@ref).
+Para más información sobre convenciones de estilo, ver la [Guía de Estilo](@ref).
