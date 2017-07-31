@@ -552,11 +552,9 @@ julia> setprecision(40) do
 1.1000000000004
 ```
 
-## [Numeric Literal Coefficients](@id man-numeric-literal-coefficients)
+## [Coeficientes Literales Numéricos](@id man-numeric-literal-coefficients)
 
-To make common numeric formulas and expressions clearer, Julia allows variables to be immediately
-preceded by a numeric literal, implying multiplication. This makes writing polynomial expressions
-much cleaner:
+Para hacer más claras fórmulas numéricas y expresiones, Julia permite que las variables sean precedidas inmediatamente por un literal numérico, implicando la multiplicación. Esto hace que la escritura de las expresiones polinómicas sea mucho más limpias:
 
 ```jldoctest numeric-coefficients
 julia> x = 3
@@ -569,33 +567,30 @@ julia> 1.5x^2 - .5x + 1
 13.0
 ```
 
-It also makes writing exponential functions more elegant:
+También hace que escribir funciones exponenciales sea más elegante:
 
 ```jldoctest numeric-coefficients
 julia> 2^2x
 64
 ```
 
-The precedence of numeric literal coefficients is the same as that of unary operators such as
-negation. So `2^3x` is parsed as `2^(3x)`, and `2x^3` is parsed as `2*(x^3)`.
+La precedencia de los coeficientes literales numéricos es la misma que la de los operadores unarios como la negación. Así que `2^3x` se analiza como `2^(3x)`, y `2x^3` se analiza como `2*(x ^ 3)`.
 
-Numeric literals also work as coefficients to parenthesized expressions:
+Los literales numéricos también funcionan como coeficientes de las expresiones entre paréntesis:
 
 ```jldoctest numeric-coefficients
 julia> 2(x-1)^2 - 3(x-1) + 1
 3
 ```
 
-Additionally, parenthesized expressions can be used as coefficients to variables, implying multiplication
-of the expression by the variable:
+Además, las expresiones entre paréntesis se pueden utilizar como coeficientes a las variables, lo que implica la multiplicación de la expresión por la variable:
 
 ```jldoctest numeric-coefficients
 julia> (x-1)x
 6
 ```
 
-Neither juxtaposition of two parenthesized expressions, nor placing a variable before a parenthesized
-expression, however, can be used to imply multiplication:
+Sin embargo, ni la yuxtaposición de dos expresiones entre paréntesis, ni la colocación de una variable antes de una expresión entre paréntesis puede ser usada para implicar multiplicación:
 
 ```jldoctest numeric-coefficients
 julia> (x-1)(x+1)
@@ -605,45 +600,35 @@ julia> x(x+1)
 ERROR: MethodError: objects of type Int64 are not callable
 ```
 
-Both expressions are interpreted as function application: any expression that is not a numeric
-literal, when immediately followed by a parenthetical, is interpreted as a function applied to
-the values in parentheses (see [Functions](@ref) for more about functions). Thus, in both of these
-cases, an error occurs since the left-hand value is not a function.
+Ambas expresiones se interpretan como la aplicación de una función: cualquier expresión que no sea un literal numérico, inmediatamente seguida de una entre paréntesis, se interpreta como una función aplicada a los valores entre paréntesis (ver [Functions](@ref) para más información sobre las funciones). Por lo tanto, en ambos casos, se produce un error, ya que el valor de la izquierda no es una función.
 
-The above syntactic enhancements significantly reduce the visual noise incurred when writing common
-mathematical formulae. Note that no whitespace may come between a numeric literal coefficient
-and the identifier or parenthesized expression which it multiplies.
+Las mejoras sintácticas anteriores reducen significativamente el ruido visual producido al escribir fórmulas matemáticas comunes. Obsérvese que ningún espacio en blanco puede encontrarse entre un coeficiente literal numérico y el identificador o la expresión entre paréntesis que multiplica.
 
-### Syntax Conflicts
+### Conflictos de Sintaxis
 
-Juxtaposed literal coefficient syntax may conflict with two numeric literal syntaxes: hexadecimal
-integer literals and engineering notation for floating-point literals. Here are some situations
-where syntactic conflicts arise:
+La sintaxis de los coeficientes literales yuxtapuestos puede entrar en conflicto con dos sintaxis numéricas literales: literales enteros hexadecimales y notación ingenieril para literales de punto flotante. Aquí hay algunas situaciones donde surgen conflictos sintácticos:
 
-  * The hexadecimal integer literal expression `0xff` could be interpreted as the numeric literal
-    `0` multiplied by the variable `xff`.
-  * The floating-point literal expression `1e10` could be interpreted as the numeric literal `1` multiplied
-    by the variable `e10`, and similarly with the equivalent `E` form.
+* La expresión literal de enteros hexadecimales `0xff` podría interpretarse como el literal numérico `0` multiplicado por la variable `xff`.
+* La expresión literal de punto flotante `1e10` podría interpretarse como el literal numérico `1` multiplicado por la variable `e10`, e igualmente con la forma `E` equivalente
 
-In both cases, we resolve the ambiguity in favor of interpretation as a numeric literals:
+En ambos casos, resolvemos la ambigüedad a favor de la interpretación como literales numéricos:
 
-  * Expressions starting with `0x` are always hexadecimal literals.
-  * Expressions starting with a numeric literal followed by `e` or `E` are always floating-point literals.
+* Las expresiones que comienzan con `0x` siempre son literales hexadecimales.
+* Las expresiones que empiezan con un literal numérico seguido por e o E siempre son literales de coma flotante.
 
 ## Literal zero and one
 
-Julia provides functions which return literal 0 and 1 corresponding to a specified type or the
-type of a given variable.
+Julia proporciona funciones que devuelven los literales `0` y `1` correspondientes a un tipo especificado o al tipo de una variable dada.
 
-| Function          | Description                                      |
-|:----------------- |:------------------------------------------------ |
-| [`zero(x)`](@ref) | Literal zero of type `x` or type of variable `x` |
-| [`one(x)`](@ref)  | Literal one of type `x` or type of variable `x`  |
+| Function          | Description                                            |
+|:----------------- |:------------------------------------------------------ |
+| [`zero(x)`](@ref) | Literal cero del tipo `x` o del tipo de la variable `x`|
+| [`one(x)`](@ref)  | Literal uno del tipo `x` o del tipo de la variable `x` |
 
-These functions are useful in [Numeric Comparisons](@ref) to avoid overhead from unnecessary
-[type conversion](@ref conversion-and-promotion).
+Estas funciones son útiles en [Comparaciones Numéricas](@ref) para evitar la sobrecarga de una
+[conversión de tipo](@ref conversion-and-promotion) innecesaria.
 
-Examples:
+Ejemplos:
 
 ```jldoctest
 julia> zero(Float32)
