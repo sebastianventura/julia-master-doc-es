@@ -1,37 +1,33 @@
-# Mathematical Operations and Elementary Functions
+# Operaciones Matemáticas y Funciones Elementales
 
-Julia provides a complete collection of basic arithmetic and bitwise operators across all of its
-numeric primitive types, as well as providing portable, efficient implementations of a comprehensive
-collection of standard mathematical functions.
+Julia proporciona una colección completa de operadores aritméticos básicos y de operadores de bits para todos sus tipos numéricos primitivos, así como implementaciones portables y eficientes de una colección comprensiva de funciones matemática estándar.
 
 ## Arithmetic Operators
 
-The following [arithmetic operators](https://en.wikipedia.org/wiki/Arithmetic#Arithmetic_operations)
-are supported on all primitive numeric types:
+Los siguientes [operadores aritméticos](https://en.wikipedia.org/wiki/Arithmetic#Arithmetic_operations)
+están soportados sobre todos los tipos primitivos:
 
-| Expression | Name           | Description                            |
-|:---------- |:-------------- |:-------------------------------------- |
-| `+x`       | unary plus     | the identity operation                 |
-| `-x`       | unary minus    | maps values to their additive inverses |
-| `x + y`    | binary plus    | performs addition                      |
-| `x - y`    | binary minus   | performs subtraction                   |
-| `x * y`    | times          | performs multiplication                |
-| `x / y`    | divide         | performs division                      |
-| `x \ y`    | inverse divide | equivalent to `y / x`                  |
-| `x ^ y`    | power          | raises `x` to the `y`th power          |
-| `x % y`    | remainder      | equivalent to `rem(x,y)`               |
+| Expression | Name             | Description                            |
+|:---------- |:---------------- |:-------------------------------------- |
+| `+x`       | más unario       | Operación identidad                    |
+| `-x`       | menos unario     | maps values to their additive inverses |
+| `x + y`    | suma binaria     | performs addition                      |
+| `x - y`    | menos binario    | performs subtraction                   |
+| `x * y`    | producto         | performs multiplication                |
+| `x / y`    | división         | performs division                      |
+| `x \ y`    | división inversa | equivalent to `y / x`                  |
+| `x ^ y`    | potencia         | raises `x` to the `y`th power          |
+| `x % y`    | resto            | equivalent to `rem(x,y)`               |
 
-as well as the negation on [`Bool`](@ref) types:
+así como la negación sobre tipos [`Bool`](@ref):
 
 | Expression | Name     | Description                              |
 |:---------- |:-------- |:---------------------------------------- |
 | `!x`       | negation | changes `true` to `false` and vice versa |
 
-Julia's promotion system makes arithmetic operations on mixtures of argument types "just work"
-naturally and automatically. See [Conversion and Promotion](@ref conversion-and-promotion) for details of the promotion
-system.
+El sistema de promoción de Julia hace que las operaciones aritméticas sobre mezclas de tipos de argumentos funcione de forma natural y automáticamente. Ver [Conversión y Promoción](@ref conversion-and-promotion) para los detalles del sistema de promoción.
 
-Here are some simple examples using arithmetic operators:
+He aquí algunos ejemplos simples de usar operadores aritméticos:
 
 ```jldoctest
 julia> 1 + 2 + 3
