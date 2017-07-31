@@ -1,20 +1,10 @@
-# Integers and Floating-Point Numbers
+# Números enteros y en punto flotante
 
-Integers and floating-point values are the basic building blocks of arithmetic and computation.
-Built-in representations of such values are called numeric primitives, while representations of
-integers and floating-point numbers as immediate values in code are known as numeric literals.
-For example, `1` is an integer literal, while `1.0` is a floating-point literal; their binary
-in-memory representations as objects are numeric primitives.
+Los valores enteros y punto flotante son los bloques constructivos básicos de la aritmética y la computación. Las representaciones construidas para estos valores son denominadas *tipos primitivos*, mientras que las reprentacionesde números enteros y en punto flotante como valores inmediatos en código se conocen como *literales numéricos*. Por ejemplo, `1` es un literal entero, mientras que `1.0` es un literal en punto flotante; sus representaciones binarias en memoria como objetos son los tipos primitivos.
 
-Julia provides a broad range of primitive numeric types, and a full complement of arithmetic and
-bitwise operators as well as standard mathematical functions are defined over them. These map
-directly onto numeric types and operations that are natively supported on modern computers, thus
-allowing Julia to take full advantage of computational resources. Additionally, Julia provides
-software support for [Arbitrary Precision Arithmetic](@ref), which can handle operations on numeric
-values that cannot be represented effectively in native hardware representations, but at the cost
-of relatively slower performance.
+Julia proporciona un amplio rango de tipos primitivos numéricos, y un complemento complemento de operadores aritmétidos y de bits así como funciones matemáticas estándar definidas sobre ellos. Los operadores establecen una correspondencia enre los tipos numéricos y las operaciones que son soportadas de forma nativa sobre los ordenadores modernos, permitiendo a Julia sacar plena ventaja de los recursos computacionales. Además, Julia proporciona soporte software para *aritmética de precisión arbitraria* que puede manejar operaciones sobre valores numéricos que no puede ser representada de forma efectiva en representaciones hardware nativas, pero al coste de un rendimiento relativamente menor.
 
-The following are Julia's primitive numeric types:
+Los tipos primitivos de Julia son los siguientes:
 
   * **Integer types:**
 
@@ -36,17 +26,15 @@ The following are Julia's primitive numeric types:
 
 | Type              | Precision                                                                      | Number of bits |
 |:----------------- |:------------------------------------------------------------------------------ |:-------------- |
-| [`Float16`](@ref) | [half](https://en.wikipedia.org/wiki/Half-precision_floating-point_format)     | 16             |
-| [`Float32`](@ref) | [single](https://en.wikipedia.org/wiki/Single_precision_floating-point_format) | 32             |
+| [`Float16`](@ref) | [media](https://en.wikipedia.org/wiki/Half-precision_floating-point_format)     | 16             |
+| [`Float32`](@ref) | [sencilla](https://en.wikipedia.org/wiki/Single_precision_floating-point_format) | 32             |
 | [`Float64`](@ref) | [double](https://en.wikipedia.org/wiki/Double_precision_floating-point_format) | 64             |
 
-Additionally, full support for [Complex and Rational Numbers](@ref) is built on top of these primitive
-numeric types. All numeric types interoperate naturally without explicit casting, thanks to a
-flexible, user-extensible [type promotion system](@ref conversion-and-promotion).
+Adicionalmente, se ha construído un soporte completo para [Números Complejos y Racionales](@ref) encima de estos tipos primitivos. Todos los tipos primitivos interoperan de forma natural sin tener que realizar conversiones específicas, gracias a un [sistema de promoción de tipos](@ref conversion-and-promotion) flexible y extensible por el usuario..
 
-## Integers
+## Enteros
 
-Literal integers are represented in the standard manner:
+Los literales enteros se representan del modo estándar:
 
 ```jldoctest
 julia> 1
@@ -56,8 +44,8 @@ julia> 1234
 1234
 ```
 
-The default type for an integer literal depends on whether the target system has a 32-bit architecture
-or a 64-bit architecture:
+El tipo por defecto para un literal entero depende de su el sistema objetivo tiene una aquitectura de 
+32 o de 64 bits:
 
 ```julia-repl
 # 32-bit system:
@@ -69,8 +57,8 @@ julia> typeof(1)
 Int64
 ```
 
-The Julia internal variable [`Sys.WORD_SIZE`](@ref) indicates whether the target system is 32-bit
-or 64-bit:
+La variable interna de Julia [`Sys.WORD_SIZE`](@ref) indica si el sistema objetivo es de 32 bits 
+o de 64 bits:
 
 ```julia-repl
 # 32-bit system:
@@ -82,8 +70,7 @@ julia> Sys.WORD_SIZE
 64
 ```
 
-Julia also defines the types `Int` and `UInt`, which are aliases for the system's signed and unsigned
-native integer types respectively:
+Julia también define los tipos `Int` y `UInt`, que son aliases para los tipos enteros nativos del sistema con y sin signo:
 
 ```julia-repl
 # 32-bit system:
@@ -99,8 +86,7 @@ julia> UInt
 UInt64
 ```
 
-Larger integer literals that cannot be represented using only 32 bits but can be represented in
-64 bits always create 64-bit integers, regardless of the system type:
+Los enteros mayores que no pueden ser representados usando sólo 32 bits pero pueden ser representados en 64 bits se crean como enteros de 64 bits, independientemente del tipo que tenga el sistema por defecto:w
 
 ```jldoctest
 # 32-bit or 64-bit system:
@@ -108,9 +94,7 @@ julia> typeof(3000000000)
 Int64
 ```
 
-Unsigned integers are input and output using the `0x` prefix and hexadecimal (base 16) digits
-`0-9a-f` (the capitalized digits `A-F` also work for input). The size of the unsigned value is
-determined by the number of hex digits used:
+Los enteros sin signo son introducidos y mostrados usando el prefijo `0x` y los dígitos hexadecimales `0-9a-f` (los dígitos capitalizados `A-F` también funcionan para la entrada). El tamaño de un valor sin signo está determinado por el número de dígitos hexadecimales usados:
 
 ```jldoctest
 julia> 0x1
