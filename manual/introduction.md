@@ -1,18 +1,8 @@
 # [Introduction](@id man-introduction)
 
-Scientific computing has traditionally required the highest performance, yet domain experts have
-largely moved to slower dynamic languages for daily work. We believe there are many good reasons
-to prefer dynamic languages for these applications, and we do not expect their use to diminish.
-Fortunately, modern language design and compiler techniques make it possible to mostly eliminate
-the performance trade-off and provide a single environment productive enough for prototyping and
-efficient enough for deploying performance-intensive applications. The Julia programming language
-fills this role: it is a flexible dynamic language, appropriate for scientific and numerical computing,
-with performance comparable to traditional statically-typed languages.
+La computación científica ha requerido tradicionalmente el máximo rendimiento, aunque los expertos de los distintos  dominios se hayan movido en gran parte a los idiomas dinámicos más lentos para el trabajo diario. Creemos que hay muchas buenas razones para preferir lenguajes dinámicos para estas aplicaciones, y no esperamos que su uso disminuya. Afortunadamente, el diseño de lenguajes y las técnicas de compilación modernos permiten casi eliminar el compromiso del rendimiento y proporcionar un solo entorno suficientemente productivo para la creación de prototipos y suficientemente eficiente para implementar aplicaciones de alto rendimiento. El lenguaje de programación de Julia cumple este papel: es un lenguaje dinámico y flexible, apropiado para la computación científica y numérica, con un rendimiento comparable al de los lenguajes tradicionales de tipo estático.
 
-Because Julia's compiler is different from the interpreters used for languages like Python or
-R, you may find that Julia's performance is unintuitive at first. If you find that something is
-slow, we highly recommend reading through the [Performance Tips](@ref man-performance-tips) section before trying anything
-else. Once you understand how Julia works, it's easy to write code that's nearly as fast as C.
+Debido a que el compilador de Julia es diferente de los intérpretes utilizados para lenguajes como Python o R, podría parecer al principio que el rendimiento de Julia no es intuitivo. Si encuentra que algo es lento, le recomendamos que lea la sección [Consejos de Rendimiento](@ref man-performance-tips) antes de intentar otra cosa. Una vez que entienda cómo funciona Julia, será fácil escribir código que casi tan rápido como el código C.
 
 Julia features optional typing, multiple dispatch, and good performance, achieved using type inference
 and [just-in-time (JIT) compilation](https://en.wikipedia.org/wiki/Just-in-time_compilation),
@@ -35,41 +25,23 @@ The most significant departures of Julia from typical dynamic languages are:
   * Automatic generation of efficient, specialized code for different argument types
   * Good performance, approaching that of statically-compiled languages like C
 
-Although one sometimes speaks of dynamic languages as being "typeless", they are definitely not:
-every object, whether primitive or user-defined, has a type. The lack of type declarations in
-most dynamic languages, however, means that one cannot instruct the compiler about the types of
-values, and often cannot explicitly talk about types at all. In static languages, on the other
-hand, while one can -- and usually must -- annotate types for the compiler, types exist only at
-compile time and cannot be manipulated or expressed at run time. In Julia, types are themselves
-run-time objects, and can also be used to convey information to the compiler.
+Aunque a veces se habla de lenguajes dinámicos como "sin tipo", definitivamente no son: cada objeto, ya sea primitivo o definido por el usuario, tiene un tipo. La falta de declaraciones de tipos en la mayoría de los idiomas dinámicos, sin embargo, significa que uno no puede instruir al compilador acerca de los tipos de valores y, a menudo, no puede hablar explícitamente de tipos en absoluto. En lenguajes estáticos, por otro lado, aunque uno puede -y normalmente debe- anotar tipos para el compilador, los tipos sólo existen en tiempo de compilación y no pueden ser manipulados o expresados en tiempo de ejecución. En Julia, los tipos son objetos en tiempo de ejecución y también se pueden utilizar para transmitir información al compilador.
 
-While the casual programmer need not explicitly use types or multiple dispatch, they are the core
-unifying features of Julia: functions are defined on different combinations of argument types,
-and applied by dispatching to the most specific matching definition. This model is a good fit
-for mathematical programming, where it is unnatural for the first argument to "own" an operation
-as in traditional object-oriented dispatch. Operators are just functions with special notation
--- to extend addition to new user-defined data types, you define new methods for the `+` function.
-Existing code then seamlessly applies to the new data types.
+Aunque el programador casual no necesita usar explícitamente los tipos o el despacho múltiple, son las características centrales unificadoras de Julia: las funciones se definen en diferentes combinaciones de tipos de argumentos y se aplican despachando a la definición concordante más específica. Este modelo se ajusta bien a la programación matemática, donde no es natural que el primer argumento "posea" una operación como en la programación orientada a objetos tradicional. Los operadores son sólo funciones con notación especial - para ampliar la adición a nuevos tipos de datos definidos por el usuario, se definen nuevos métodos para la función +. El código existente se aplica sin problemas a los nuevos tipos de datos.
 
-Partly because of run-time type inference (augmented by optional type annotations), and partly
-because of a strong focus on performance from the inception of the project, Julia's computational
-efficiency exceeds that of other dynamic languages, and even rivals that of statically-compiled
-languages. For large scale numerical problems, speed always has been, continues to be, and probably
-always will be crucial: the amount of data being processed has easily kept pace with Moore's Law
-over the past decades.
+En parte debido a la inferencia de tipo en tiempo de ejecución (aumentada por anotaciones de tipos opcionales), y en parte debido a enfoque muy basado en el rendimiento desde el inicio del proyecto, la eficiencia computacional de Julia supera la de otros lenguajes dinámicos e incluso rivaliza con la de lenguajes de compilación estática. Para los problemas numéricos a gran escala, la velocidad siempre ha sido, continúa siendo, y probablemente siempre será crucial: la cantidad de datos procesados se ha mantenido fácilmente al ritmo de la Ley de Moore durante las últimas décadas.
 
-Julia aims to create an unprecedented combination of ease-of-use, power, and efficiency in a single
-language. In addition to the above, some advantages of Julia over comparable systems include:
+Julia tiene como objetivo crear una combinación sin precedentes de facilidad de uso, potencia y eficiencia en un solo idioma. Además de lo anterior, algunas ventajas de Julia sobre sistemas comparables incluyen:
 
-  * Free and open source ([MIT licensed](https://github.com/JuliaLang/julia/blob/master/LICENSE.md))
-  * User-defined types are as fast and compact as built-ins
-  * No need to vectorize code for performance; devectorized code is fast
-  * Designed for parallelism and distributed computation
-  * Lightweight "green" threading ([coroutines](https://en.wikipedia.org/wiki/Coroutine))
-  * Unobtrusive yet powerful type system
-  * Elegant and extensible conversions and promotions for numeric and other types
-  * Efficient support for [Unicode](https://en.wikipedia.org/wiki/Unicode), including but not limited
-    to [UTF-8](https://en.wikipedia.org/wiki/UTF-8)
-  * Call C functions directly (no wrappers or special APIs needed)
-  * Powerful shell-like capabilities for managing other processes
-  * Lisp-like macros and other metaprogramming facilities
+  * Libre y de código abierto ([con licencia MIT](https://github.com/JuliaLang/julia/blob/master/LICENSE.md))
+  * Los tipos definidos por el usuario son tan rápidos y compactos como los predefinidos.
+  * No hay necesidad de vectorizar código para el rendimiento; el código devectorizado es rápido
+  * Diseñado para el paralelismo y la computación distribuida.
+  * Hilos "verdes" de peso ligero ([coroutinas](https://en.wikipedia.org/wiki/Coroutine)).
+  * Sistema de tipos discreto pero potente.
+  * Conversiones y promociones elegantes y extensibles para números y otros tipos.
+  * Soporte eficiente para [Unicode](https://en.wikipedia.org/wiki/Unicode), incluyendo pero no 
+  limitado a [UTF-8](https://en.wikipedia.org/wiki/UTF-8)
+  * Llamada a las funciones C directamente (no se necesitan envolturas o API especiales).
+  * Poderosas capacidades tipo shell para administrar otros procesos.
+  * Macros similares a Lisp y otras instalaciones de metaprogramación.
