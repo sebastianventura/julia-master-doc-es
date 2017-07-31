@@ -462,37 +462,32 @@ más cercano, con arcos redondeados hacia el valor más cercano con un bit menos
     de tipos. Muchas otras funciones asumen que el modo por defecto [`RoundNearest`](@ref) está 
     establecido y pueden dar resultados erróneos al operar bajo otros modos de redondeo.
 
-### Background and References
+### Antecedentes y referencias
 
-Floating-point arithmetic entails many subtleties which can be surprising to users who are unfamiliar
-with the low-level implementation details. However, these subtleties are described in detail in
-most books on scientific computation, and also in the following references:
+La aritmética de punto flotante supone muchas sutilezas que pueden sorprender a los usuarios que no 
+están familiarizados con los detalles de implementación de bajo nivel. Sin embargo, estas sutilezas 
+se describen en detalle en la mayoría de los libros sobre computación científica, y también en las 
+siguientes referencias:
 
-  * The definitive guide to floating point arithmetic is the [IEEE 754-2008 Standard](http://standards.ieee.org/findstds/standard/754-2008.html);
-    however, it is not available for free online.
-  * For a brief but lucid presentation of how floating-point numbers are represented, see John D.
-    Cook's [article](https://www.johndcook.com/blog/2009/04/06/anatomy-of-a-floating-point-number/)
-    on the subject as well as his [introduction](https://www.johndcook.com/blog/2009/04/06/numbers-are-a-leaky-abstraction/)
-    to some of the issues arising from how this representation differs in behavior from the idealized
-    abstraction of real numbers.
-  * Also recommended is Bruce Dawson's [series of blog posts on floating-point numbers](https://randomascii.wordpress.com/2012/05/20/thats-not-normalthe-performance-of-odd-floats/).
-  * For an excellent, in-depth discussion of floating-point numbers and issues of numerical accuracy
-    encountered when computing with them, see David Goldberg's paper [What Every Computer Scientist Should Know About Floating-Point Arithmetic](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.22.6768&rep=rep1&type=pdf).
-  * For even more extensive documentation of the history of, rationale for, and issues with floating-point
-    numbers, as well as discussion of many other topics in numerical computing, see the [collected writings](https://people.eecs.berkeley.edu/~wkahan/)
-    of [William Kahan](https://en.wikipedia.org/wiki/William_Kahan), commonly known as the "Father
-    of Floating-Point". Of particular interest may be [An Interview with the Old Man of Floating-Point](https://people.eecs.berkeley.edu/~wkahan/ieee754status/754story.html).
+  * La guía definitiva para la aritmética de coma flotante es el estándar [IEEE 754-2008 (http://standards.ieee.org/findstds/standard/754-2008.html); Sin embargo, no está disponible 
+  en línea gratis.
+  * Para una presentación breve pero lúcida de cómo los números de punto flotante están 
+  representados, vea el [artículo de John D. Cook](https://www.johndcook.com/blog/2009/04/06/anatomy-of-a-floating-point-number/) sobre el tema, así como su [introduction](https://www.johndcook.com/blog/2009/04/06/numbers-are-a-leaky-abstraction/)
+    a algunas de las cuestiones que surgen de cómo esta representación difiere en el comportamiento de la abstracción idealizada de números reales.
+    abstraction of real numbers.
+  * También se recomienda la serie de [publicaciones de Bruce Dawson sobre números en punto flotante](https://randomascii.wordpress.com/2012/05/20/thats-not-normalthe-performance-of-odd-floats/).
+  * Para un excelente y profundo análisis de los números de coma flotante y los problemas de precisión numérica encontrados al calcular con ellos, vea el artículo de David Goldberg [What Every Computer Scientist Should Know About Floating-Point Arithmetic](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.22.6768&rep=rep1&type=pdf).
+  * Para una documentación aún más extensa de la historia de, la razón y las cuestiones con los números de punto flotante, así como la discusión de muchos otros temas en la computación numérica, ver los [escritos recolectados](https://people.eecs.berkeley.edu/~wkahan/)
+    de [William Kahan](https://en.wikipedia.org/wiki/William_Kahan), comúnmente conocido como el "Padre de punto flotante". De interés particular puede ser [An Interview with the Old Man of Floating-Point](https://people.eecs.berkeley.edu/~wkahan/ieee754status/754story.html).
 
 ## Arbitrary Precision Arithmetic
 
-To allow computations with arbitrary-precision integers and floating point numbers, Julia wraps
-the [GNU Multiple Precision Arithmetic Library (GMP)](https://gmplib.org) and the [GNU MPFR Library](http://www.mpfr.org),
-respectively. The [`BigInt`](@ref) and [`BigFloat`](@ref) types are available in Julia for arbitrary
-precision integer and floating point numbers respectively.
+Para permitir cálculos con enteros y números de coma flotante de precisión arbitraria, Julia envuelve la [Biblioteca Aritmética de Precisión Múltiple GNU (GMP)](https://gmplib.org) y la [biblioteca GNU MPFR](http://www.mpfr.org),
+respectivamente. Los tipos [`BigInt`](@ref) y [`BigFloat`](@ref) están disponibles en Julia para números enteros de precisión arbitraria y números de coma flotante, respectivamente.
 
-Constructors exist to create these types from primitive numerical types, and [`parse()`](@ref)
-can be used to construct them from `AbstractString`s.  Once created, they participate in arithmetic
-with all other numeric types thanks to Julia's [type promotion and conversion mechanism](@ref conversion-and-promotion):
+Existen constructores para crear estos tipos de tipos numéricos primitivos, y podemos también 
+utilizar [`parse()`](@ref)
+para construirlos a partir de `AbstractString`s.  Una vez creados, participan en la aritmética con todos los demás tipos numéricos gracias al [mecanismo de promotion y conversion de tipos](@ref conversion-and-promotion) de Julia:
 
 ```jldoctest
 julia> BigInt(typemax(Int64)) + 1
@@ -511,8 +506,8 @@ julia> factorial(BigInt(40))
 815915283247897734345611269596115894272000000000
 ```
 
-However, type promotion between the primitive types above and [`BigInt`](@ref)/[`BigFloat`](@ref)
-is not automatic and must be explicitly stated.
+Sin embargo, la promoción de tipos entre los tipos primitivos ya vistos y [`BigInt`](@ref)/[`BigFloat`](@ref) 
+no es automática y debe ser establecida explícitamente: 
 
 ```jldoctest
 julia> x = typemin(Int64)
@@ -534,11 +529,11 @@ julia> typeof(y)
 BigInt
 ```
 
-The default precision (in number of bits of the significand) and rounding mode of [`BigFloat`](@ref)
-operations can be changed globally by calling [`setprecision()`](@ref) and [`setrounding()`](@ref),
-and all further calculations will take these changes in account.  Alternatively, the precision
-or the rounding can be changed only within the execution of a particular block of code by using
-the same functions with a `do` block:
+La precisión predeterminada (en número de bits del significado) y el modo de redondeo de las operaciones 
+de [`BigFloat`](@ref) pueden cambiarse globalmente llamando [`setprecision()`](@ref) and [`setrounding()`](@ref),
+y todos los cálculos adicionales tomarán en cuenta estos cambios. Alternativamente, la precisión o 
+el redondeo se puede cambiar dentro sólo de la ejecución de un bloque particular de código 
+utilizando las mismas funciones dentro de un bloque `do`:
 
 ```jldoctest
 julia> setrounding(BigFloat, RoundUp) do
