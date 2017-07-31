@@ -1,11 +1,8 @@
 # Getting Started
 
-Julia installation is straightforward, whether using precompiled binaries or compiling from source.
-Download and install Julia by following the instructions at [https://julialang.org/downloads/](https://julialang.org/downloads/).
+La instalación de Julia es sencilla, ya sea utilizando binarios precompilados o compilando desde la fuente. Descargue e instale Julia siguiendo las instrucciones en [https://julialang.org/downloads/](https://julialang.org/downloads/).
 
-The easiest way to learn and experiment with Julia is by starting an interactive session (also
-known as a read-eval-print loop or "repl") by double-clicking the Julia executable or running
-`julia` from the command line:
+La forma más fácil de aprender y experimentar con Julia es iniciando una sesión interactiva (también conocida como *read-eval-print loop* o "REPL") haciendo doble clic en el ejecutable de Julia o ejecutando `julia` desde la línea de órdenes:
 
 ```
 $ julia
@@ -25,28 +22,28 @@ julia> ans
 3
 ```
 
-To exit the interactive session, type `^D` -- the control key together with the `d` key or type
-`quit()`. When run in interactive mode, `julia` displays a banner and prompts the user for input.
-Once the user has entered a complete expression, such as `1 + 2`, and hits enter, the interactive
-session evaluates the expression and shows its value. If an expression is entered into an interactive
-session with a trailing semicolon, its value is not shown. The variable `ans` is bound to the
-value of the last evaluated expression whether it is shown or not. The `ans` variable is only
-bound in interactive sessions, not when Julia code is run in other ways.
+Para salir de la sesión interactiva, escriba `^D` (la tecla de control junto con la tecla `D`) o escriba
+`quit()`. Cuando se ejecuta en modo interactivo, Julia muestra un banner y solicita al usuario la entrada. 
+Una vez que el usuario ha introducido una expresión completa, como `1 + 2`, y pulsa *Enter*, la sesión 
+interactiva evalúa la expresión y muestra su valor. Si se introduce una expresión en una sesión interactiva 
+con un punto y coma al final, no se muestra su valor. La variable `ans` está enlazada al valor de la última 
+expresión evaluada, sea mostrada o no. La variable `ans` sólo está enlazada a las sesiones interactivas, 
+no cuando el código Julia se ejecuta de otras maneras.
 
-To evaluate expressions written in a source file `file.jl`, write `include("file.jl")`.
+Para evaluar expresiones escritas en un archivo de origen `file.jl`, escriba `include ("file.jl")`.
 
-To run code in a file non-interactively, you can give it as the first argument to the `julia`
-command:
+Para ejecutar código en un archivo de forma no interactiva, puede darlo como el primer argumento al mandato Julia:
 
 ```
 $ julia script.jl arg1 arg2...
 ```
 
-As the example implies, the following command-line arguments to `julia` are taken as command-line
-arguments to the program `script.jl`, passed in the global constant `ARGS`. The name of the script
-itself is passed in as the global `PROGRAM_FILE`. Note that `ARGS` is also set when script code
-is given using the `-e` option on the command line (see the `julia` help output below) but `PROGRAM_FILE`
-will be empty. For example, to just print the arguments given to a script, you could do this:
+Como indica el ejemplo, los siguientes argumentos de línea de órdenes de Julia se toman como argumentos de 
+línea de comandos al programa `script.jl` del programa, pasado a través de la constante global `ARGS`. El 
+nombre del propio *script* se pasa como la variable global `PROGRAM_FILE`. Tenga en cuenta que `ARGS` 
+también se establece cuando se da el código de script usando la opción `-e` en la línea de órdenes (vea 
+la salida de ayuda de `julia` más abajo) pero `PROGRAM_FILE` estará vacío. Por ejemplo, para imprimir 
+los argumentos que se le dan a un script, puede hacer esto:
 
 ```
 $ julia -e 'println(PROGRAM_FILE); for x in ARGS; println(x); end' foo bar
@@ -55,7 +52,7 @@ foo
 bar
 ```
 
-Or you could put that code into a script and run it:
+O puede poner ese código en un script y ejecutarlo:
 
 ```
 $ echo 'println(PROGRAM_FILE); for x in ARGS; println(x); end' > script.jl
@@ -65,7 +62,8 @@ foo
 bar
 ```
 
-The `--` delimiter can be used to separate command-line args to the scriptfile from args to Julia:
+El delimitador `--` puede usarse para separar argumentos en línea de mandatos al fichero del 
+*script* a los argumentos de Julia:
 
 ```
 $ julia --color=yes -O -- foo.jl arg1 arg2..
