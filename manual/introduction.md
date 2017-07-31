@@ -1,4 +1,4 @@
-# [Introduction](@id man-introduction)
+# [Introducción](@id man-introduction)
 
 La computación científica ha requerido tradicionalmente el máximo rendimiento, aunque los expertos de los distintos  dominios se hayan movido en gran parte a los idiomas dinámicos más lentos para el trabajo diario. Creemos que hay muchas buenas razones para preferir lenguajes dinámicos para estas aplicaciones, y no esperamos que su uso disminuya. Afortunadamente, el diseño de lenguajes y las técnicas de compilación modernos permiten casi eliminar el compromiso del rendimiento y proporcionar un solo entorno suficientemente productivo para la creación de prototipos y suficientemente eficiente para implementar aplicaciones de alto rendimiento. El lenguaje de programación de Julia cumple este papel: es un lenguaje dinámico y flexible, apropiado para la computación científica y numérica, con un rendimiento comparable al de los lenguajes tradicionales de tipo estático.
 
@@ -17,13 +17,11 @@ and [Ruby](https://en.wikipedia.org/wiki/Ruby_(programming_language)).
 
 The most significant departures of Julia from typical dynamic languages are:
 
-  * The core language imposes very little; the standard library is written in Julia itself, including
-    primitive operations like integer arithmetic
-  * A rich language of types for constructing and describing objects, that can also optionally be
-    used to make type declarations
-  * The ability to define function behavior across many combinations of argument types via [multiple dispatch](https://en.wikipedia.org/wiki/Multiple_dispatch)
-  * Automatic generation of efficient, specialized code for different argument types
-  * Good performance, approaching that of statically-compiled languages like C
+  * El lenguaje básico impone muy poco; La biblioteca estándar se ha escritop en el propio Julia, incluyendo operaciones primitivas como la aritmética entera.
+  * Un lenguaje enriquecido de tipos para construir y describir objetos, que también se puede utilizar opcionalmente para hacer declaraciones de tipo.
+  * La capacidad de definir el comportamiento de la función a través de muchas combinaciones de tipos de argumentos mediante el [despacho múltiple](https://en.wikipedia.org/wiki/Multiple_dispatch)
+  * Generación automática de código eficiente y especializado para diferentes tipos de argumentos.
+  * Buen rendimiento, aproximándose al de los lenguajes compilados estáticamente como C.
 
 Aunque a veces se habla de lenguajes dinámicos como "sin tipo", definitivamente no son: cada objeto, ya sea primitivo o definido por el usuario, tiene un tipo. La falta de declaraciones de tipos en la mayoría de los idiomas dinámicos, sin embargo, significa que uno no puede instruir al compilador acerca de los tipos de valores y, a menudo, no puede hablar explícitamente de tipos en absoluto. En lenguajes estáticos, por otro lado, aunque uno puede -y normalmente debe- anotar tipos para el compilador, los tipos sólo existen en tiempo de compilación y no pueden ser manipulados o expresados en tiempo de ejecución. En Julia, los tipos son objetos en tiempo de ejecución y también se pueden utilizar para transmitir información al compilador.
 
