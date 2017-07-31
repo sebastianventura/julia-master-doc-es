@@ -4,18 +4,12 @@ La computación científica ha requerido tradicionalmente el máximo rendimiento
 
 Debido a que el compilador de Julia es diferente de los intérpretes utilizados para lenguajes como Python o R, podría parecer al principio que el rendimiento de Julia no es intuitivo. Si encuentra que algo es lento, le recomendamos que lea la sección [Consejos de Rendimiento](@ref man-performance-tips) antes de intentar otra cosa. Una vez que entienda cómo funciona Julia, será fácil escribir código que casi tan rápido como el código C.
 
-Julia features optional typing, multiple dispatch, and good performance, achieved using type inference
-and [just-in-time (JIT) compilation](https://en.wikipedia.org/wiki/Just-in-time_compilation),
-implemented using [LLVM](https://en.wikipedia.org/wiki/Low_Level_Virtual_Machine). It is multi-paradigm,
-combining features of imperative, functional, and object-oriented programming. Julia provides
-ease and expressiveness for high-level numerical computing, in the same way as languages such
-as R, MATLAB, and Python, but also supports general programming. To achieve this, Julia builds
-upon the lineage of mathematical programming languages, but also borrows much from popular dynamic
-languages, including [Lisp](https://en.wikipedia.org/wiki/Lisp_(programming_language)), [Perl](https://en.wikipedia.org/wiki/Perl_(programming_language)),
+Julia ofrece tipado opcional, despacho múltiple, y buen desempeño, logrado usando la inferencia de tipo y la [compilación *just-in-time* (JIT)](https://en.wikipedia.org/wiki/Just-in-time_compilation),
+implementada usando [LLVM](https://en.wikipedia.org/wiki/Low_Level_Virtual_Machine). Es multi-paradigma, combinando características de programación imperativa, funcional y orientada a objetos. Julia proporciona facilidad y expresividad para la computación numérica de alto nivel, de la misma manera que idiomas como R, MATLAB y Python, pero también soporta la programación general. Para conseguirlo, Julia se basa en el linaje de los lenguajes de programación matemáticos, pero también toma prestado mucho de los lenguajes dinámicos populares, incluyendo [Lisp](https://en.wikipedia.org/wiki/Lisp_(programming_language)), [Perl](https://en.wikipedia.org/wiki/Perl_(programming_language)),
 [Python](https://en.wikipedia.org/wiki/Python_(programming_language)), [Lua](https://en.wikipedia.org/wiki/Lua_(programming_language)),
-and [Ruby](https://en.wikipedia.org/wiki/Ruby_(programming_language)).
+y [Ruby](https://en.wikipedia.org/wiki/Ruby_(programming_language)).
 
-The most significant departures of Julia from typical dynamic languages are:
+Las diferencias más significativas de Julia de los idiomas dinámicos típicos son:
 
   * El lenguaje básico impone muy poco; La biblioteca estándar se ha escritop en el propio Julia, incluyendo operaciones primitivas como la aritmética entera.
   * Un lenguaje enriquecido de tipos para construir y describir objetos, que también se puede utilizar opcionalmente para hacer declaraciones de tipo.
