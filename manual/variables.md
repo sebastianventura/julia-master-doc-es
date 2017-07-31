@@ -82,21 +82,25 @@ Sin embargo, esto no se recomienta para evitar una potencial confusión.
 
 ## Allowed Variable Names
 
-Variable names must begin with a letter (A-Z or a-z), underscore, or a subset of Unicode code
-points greater than 00A0; in particular, [Unicode character categories](http://www.fileformat.info/info/unicode/category/index.htm)
-Lu/Ll/Lt/Lm/Lo/Nl (letters), Sc/So (currency and other symbols), and a few other letter-like characters
-(e.g. a subset of the Sm math symbols) are allowed. Subsequent characters may also include ! and
-digits (0-9 and other characters in categories Nd/No), as well as other Unicode code points: diacritics
-and other modifying marks (categories Mn/Mc/Me/Sk), some punctuation connectors (category Pc),
-primes, and a few other characters.
+Los nombres de variable deben comenzar con una letra (`A`-`Z` o `a`-`z`), símblo de subrayado, o 
+un subconjunto de puntos Unicode mayores que `00A0`. En particular, se permiten las 
+[categorías de caracteres Unicode](http://www.fileformat.info/info/unicode/category/index.htm) 
+Lu/Ll/Lt/Lm/Lo/Nl (letras), Sc/So (monedas y otros símbolos), y otros pocos caracteres 
+(por ejemplo, un subconjunto de los símbolos matemáticos Sm) are allowed. Entre los caracteres 
+subsecuentes se pueden también incluir `!` y los dígitos (`0`-`9` y otros caracteres en las 
+categorías Nd/No), así como otros puntos de código Unicode: diacríticas y otras marcas de 
+modificación (categorías Mn/Mc/Me/Sk), algunos conectores de puntuación (category Pc), 
+primos, and otros pocos caracteres.
 
-Operators like `+` are also valid identifiers, but are parsed specially. In some contexts, operators
-can be used just like variables; for example `(+)` refers to the addition function, and `(+) = f`
-will reassign it. Most of the Unicode infix operators (in category Sm), such as `⊕`, are parsed
-as infix operators and are available for user-defined methods (e.g. you can use `const ⊗ = kron`
-to define `⊗` as an infix Kronecker product).
+Los operadores como `+` son también identificadores válidos, pero son analizados sintácticamente 
+de un modeo especial. En algunos contextos, los operadores pueden ser usados justo como variables; 
+por ejemplo `(+)` se refiere a la función de suma, y `(+) = f` la reasignará. La mayoría de los 
+operadores infijos Unicode (en la categoría Sm), tal como `⊕`, son analizados como operadores 
+infijos y están disponibles para métodos definidos por el usuario (por ejemplo, podemos usar 
+`const ⊗ = kron` para definir `⊗` como un operador infijo producto de Kronecker).
 
-The only explicitly disallowed names for variables are the names of built-in statements:
+Los únicos nombres específicamente prohibidos para nombres de variables son los nombres de las 
+instrucciones predefinidas:
 
 ```julia-repl
 julia> else = false
