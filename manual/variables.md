@@ -113,19 +113,19 @@ The Unicode characters `ɛ` (U+025B: Latin small letter open e)
 and `µ` (U+00B5: micro sign) are treated as equivalent to the corresponding
 Greek letters, because the former are easily accessible via some input methods.
 
-## Stylistic Conventions
+## Convenciones de Estilo
 
-While Julia imposes few restrictions on valid names, it has become useful to adopt the following
-conventions:
+Aunque Julia impone pocas restricciones a los nombres válidos, se ha vuelto útil adoptar las 
+siguientes convenciones:
 
-  * Names of variables are in lower case.
-  * Word separation can be indicated by underscores (`'_'`), but use of underscores is discouraged
-    unless the name would be hard to read otherwise.
-  * Names of `Type`s and `Module`s begin with a capital letter and word separation is shown with upper
-    camel case instead of underscores.
-  * Names of `function`s and `macro`s are in lower case, without underscores.
-  * Functions that write to their arguments have names that end in `!`. These are sometimes called
-    "mutating" or "in-place" functions because they are intended to produce changes in their arguments
-    after the function is called, not just return a value.
-
-For more information about stylistic conventions, see the [Style Guide](@ref).
+* Los nombres de variable van en minúsculas.
+* La separación enre palabras puede indicarse mediante el símbolo de guión bajo, aunque se desaconseja 
+  su uso a menos que los símbolos sean difíciles de leer.
+* Los nombres de tipos y módulos comienzan con mayúscula y la separación entre palabras se representa 
+  con el formato *camel case*.
+* Los nombres de funciones y macros van en minúscula, sin símbolos de guión bajo.
+* Las funciones que escriben en sus argumentos tienen nombres que finalizan con el símbolo de admiración `!`.
+  Estas suelen ser llamadas funciones "mutadoras" o funciones "*in-place*" debido a que pretenden producir 
+  cambios en sus argumentos después de que la función sea invocada, no solo devolver un valor.
+  
+Para más informacin sobre convenciones de estilo, ver la [Guía de Estilo](@ref).
