@@ -1,4 +1,4 @@
-# Getting Started
+# Empezando
 
 La instalación de Julia es sencilla, ya sea utilizando binarios precompilados o compilando desde la fuente. Descargue e instale Julia siguiendo las instrucciones en [https://julialang.org/downloads/](https://julialang.org/downloads/).
 
@@ -69,16 +69,17 @@ El delimitador `--` puede usarse para separar argumentos en línea de mandatos a
 $ julia --color=yes -O -- foo.jl arg1 arg2..
 ```
 
-Julia can be started in parallel mode with either the `-p` or the `--machinefile` options. `-p n`
-will launch an additional `n` worker processes, while `--machinefile file` will launch a worker
-for each line in file `file`. The machines defined in `file` must be accessible via a passwordless
-`ssh` login, with Julia installed at the same location as the current host. Each machine definition
-takes the form `[count*][user@]host[:port] [bind_addr[:port]]` . `user` defaults to current user,
-`port` to the standard ssh port. `count` is the number of workers to spawn on the node, and defaults
-to 1. The optional `bind-to bind_addr[:port]` specifies the ip-address and port that other workers
-should use to connect to this worker.
+Julia se puede iniciar en modo paralelo con las opciones `-p` o `--machinefile`. `-p n` pondrá en 
+marcha un `n` procesos *worker* adicionales, mientras que `--machinefile archivo` iniciará un 
+*worker* para cada línea en el archivo de archivo. Las máquinas definidas en el archivo deben ser 
+accesibles a través de un login ssh sin contraseña, con Julia instalado en la misma ubicación que 
+el host actual. Cada definición de máquina toma la forma 
+`[count *] [user @] host [: port] [bind_addr [: port]]`. El valor por defecto de `user` es el 
+usuario actual, y el de `port` el puerto ssh estándar. Las variables opcionales
+`bind_to` `bind_addr` `[: port]` especifican la dirección IP y el puerto que otros *workers* 
+deberían usar para conectarse a este *worker*.
 
-If you have code that you want executed whenever Julia is run, you can put it in `~/.juliarc.jl`:
+Si tiene código que desea ejecutar cada vez que Julia se inicia, puede ponerlo en `~/.juliarc.jl`:
 
 ```
 $ echo 'println("Greetings! 你好! 안녕하세요?")' > ~/.juliarc.jl
@@ -88,8 +89,8 @@ Greetings! 你好! 안녕하세요?
 ...
 ```
 
-There are various ways to run Julia code and provide options, similar to those available for the
-`perl` and `ruby` programs:
+Hay varias formas de ejecutar el código Julia y proporcionar opciones, similares a las disponibles para los 
+programas `perl` y `ruby:
 
 ```
 julia [switches] -- [programfile] [args...]
@@ -139,8 +140,8 @@ julia [switches] -- [programfile] [args...]
 
 ## Resources
 
-In addition to this manual, there are various other resources that may help new users get started
-with Julia:
+Adems de este manual, hay otros recursos que pueden ayudar a los usuarios nuevos cuanto empiezan 
+con Julia:
 
   * [Julia and IJulia cheatsheet](http://math.mit.edu/~stevenj/Julia-cheatsheet.pdf)
   * [Learn Julia in a few minutes](https://learnxinyminutes.com/docs/julia/)
