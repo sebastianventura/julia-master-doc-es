@@ -20,20 +20,12 @@ El sistema de tipos de Julia está diseñado para ser potente y expresivo, adem�
 
 ## Type Declarations
 
-The `::` operator can be used to attach type annotations to expressions and variables in programs.
-There are two primary reasons to do this:
+El operador `::` puede usarse para adjuntar declaraciones de tipo a expresiones y variables en los programas. Hay dos razones principales para esto:
 
-1. As an assertion to help confirm that your program works the way you expect,
-2. To provide extra type information to the compiler, which can then improve performance in some
-   cases
+1. Como una aserción para ayudar a confirmar que nuestro programa funciona como se esperaba.
+2. Para proporcionar al compilador información extra sobre tipos, que puede mejorar el rendimiento en algunos casos.
 
-When appended to an expression computing a value, the `::` operator is read as "is an instance
-of". It can be used anywhere to assert that the value of the expression on the left is an instance
-of the type on the right. When the type on the right is concrete, the value on the left must have
-that type as its implementation -- recall that all concrete types are final, so no implementation
-is a subtype of any other. When the type is abstract, it suffices for the value to be implemented
-by a concrete type that is a subtype of the abstract type. If the type assertion is not true,
-an exception is thrown, otherwise, the left-hand value is returned:
+Cuando se añade a una expresión que calcula un valor, el operador `::`se lee como "es una instancia de". Puede ser utilizado en cualquier parte para asertar que el valor de la expresión de la izquierda es una instancia del tipo de la derecha. Cuando el tipo de la derecha es concreto, el valor  sobre la izquierda debe tener ese tipo como su implementación (recuerde que todos los tipos concretos son finales, por lo que no hay implementaciones que sean subtipos de otros). Cuando el tipo es abstracto, basta que el valor sea implementado por un tipo concreto que sea un subtipo del tipo abstracto. Si la aserción de tipo no es `true` se lanza una excepción. En caso contrario, se devuelve el valor del lado izquierdo.
 
 ```jldoctest
 julia> (1+2)::AbstractFloat
@@ -45,10 +37,9 @@ julia> (1+2)::Int
 
 This allows a type assertion to be attached to any expression in-place.
 
-When appended to a variable on the left-hand side of an assignment, or as part of a `local` declaration,
-the `::` operator means something a bit different: it declares the variable to always have the
-specified type, like a type declaration in a statically-typed language such as C. Every value
-assigned to the variable will be converted to the declared type using [`convert()`](@ref):
+Esto permite que la aserción de tipo sea adjuntada a cualquier expresión *in situ*.
+
+Cuando se añade a una variable sobre el lado izquierdo de una asignación, o como parte de una declaración `local`, el operador `::` significa algo un poco diferente: declara que la variable siempre tendrá el tipo especificado, como una declaración de tipo de los lenguajes tipados estáticamente como C. Cada valor asignado a la variable será convertido al tipo declarado usando [`convert()`](@ref):
 
 ```jldoctest
 julia> function foo()
@@ -64,21 +55,18 @@ julia> typeof(ans)
 Int8
 ```
 
-This feature is useful for avoiding performance "gotchas" that could occur if one of the assignments
-to a variable changed its type unexpectedly.
+Esta característica es útil para evitar las trampas de rendimiento que podrían tener lugar si una de las asignaciones a varible cambia su tipo inesperadamente. 
 
-This "declaration" behavior only occurs in specific contexts:
+Este comportamiento "declaración" sólo ocurre en contextos específicos:
 
 ```julia
 local x::Int8  # in a local declaration
 x::Int8 = 10   # as the left-hand side of an assignment
 ```
 
-and applies to the whole current scope, even before the declaration. Currently, type declarations
-cannot be used in global scope, e.g. in the REPL, since Julia does not yet have constant-type
-globals.
+y se aplica al ámbito actual completo, incluso antes de la declaración. Actualmente, las declaraciones de tipo no pueden ser usadas en un espacio global, como en el REPL, ya que Julia no tiene aún globales de tipo constante.
 
-Declarations can also be attached to function definitions:
+Las declaraciones pueden también ser enlazadas a las definiciones de función:
 
 ```julia
 function sinc(x)::Float64
@@ -89,51 +77,31 @@ function sinc(x)::Float64
 end
 ```
 
-Returning from this function behaves just like an assignment to a variable with a declared type:
-the value is always converted to `Float64`.
+Retornar de esta función se comporta justo como una asignación a una variable con un tipo declarado: el tipo será siempre convertido a `Float64`.
 
-## Abstract Types
+## Tipos Abstractos
 
-Abstract types cannot be instantiated, and serve only as nodes in the type graph, thereby describing
-sets of related concrete types: those concrete types which are their descendants. We begin with
-abstract types even though they have no instantiation because they are the backbone of the type
-system: they form the conceptual hierarchy which makes Julia's type system more than just a collection
-of object implementations.
+Los tipos abstractos no puede ser instanciados, y sólo sirven como nodos en el grafo de tipos, describiendo de este mundo conjuntos de tipos concretos relacionados: aquellos tipos concretos que son sus descendientes. Comenzamos con tipos abstractos incluso aunque no tienen instanciación debido a que ellos son la espina dorsal del sistema de tipos: ellos forman la jerarquí conceptual qu hace al sistema de tipos de Julia más que una colección de implementaciones de objetos. 
 
-Recall that in [Integers and Floating-Point Numbers](@ref), we introduced a variety of concrete
-types of numeric values: [`Int8`](@ref), [`UInt8`](@ref), [`Int16`](@ref), [`UInt16`](@ref),
+Recuerde que en [Números Enteros y en Punto Flotante](@ref), introdujimos una variedad de tipos de valores numéricos concretos: [`Int8`](@ref), [`UInt8`](@ref), [`Int16`](@ref), [`UInt16`](@ref),
 [`Int32`](@ref), [`UInt32`](@ref), [`Int64`](@ref), [`UInt64`](@ref), [`Int128`](@ref),
-[`UInt128`](@ref), [`Float16`](@ref), [`Float32`](@ref), and [`Float64`](@ref). Although
-they have different representation sizes, `Int8`, `Int16`, `Int32`, `Int64` and `Int128`
-all have in common that they are signed integer types. Likewise `UInt8`, `UInt16`, `UInt32`,
-`UInt64` and `UInt128` are all unsigned integer types, while `Float16`, `Float32` and
-`Float64` are distinct in being floating-point types rather than integers. It is common for
-a piece of code to make sense, for example, only if its arguments are some kind of integer,
-but not really depend on what particular *kind* of integer. For example, the greatest common
-denominator algorithm works for all kinds of integers, but will not work for floating-point
-numbers. Abstract types allow the construction of a hierarchy of types, providing a context
-into which concrete types can fit. This allows you, for example, to easily program to any type
-that is an integer, without restricting an algorithm to a specific type of integer.
+[`UInt128`](@ref), [`Float16`](@ref), [`Float32`](@ref), and [`Float64`](@ref). Aunque todos ellos tienen diferentes tamaños en representación,  `Int8`, `Int16`, `Int32`, `Int64` and `Int128`
+tienen en común que son tipos enteros con signo. Del mismo modo, `UInt8`, `UInt16`, `UInt32`,
+`UInt64` and `UInt128` son enteros sin signo, mientras que `Float16`, `Float32` and
+`Float64` son tipos en punto flotante. Es común para una pieza de código que ésta tenga sentido, por ejemplo, sólo si sus argumentos son algún tipo de entero, pero no que dependa de un tipo de entero particular. Por ejemplo, el algoritmo del máximo común denominador funciona para todas las clases de enteros, pero no funcionará para los números en punto flotante. Los tipos abstractos permiten la construcción de una jerarquía de tipos, proporcionando un contexto en el cuál los tipos concretos pueden ajustarse. Esto te permite, por ejemplo, programar fácilmente a cualquier tipo que sea un entero, sin restringir el algoritmo a un tipo de entero específico.
 
-Abstract types are declared using the `abstract type` keyword. The general syntaxes for declaring an
-abstract type are:
+Los tipos abstractos se declaran usando la palabra clave `abstract`. Las sintaxis generales para declarar un tipo abstracto son:
 
 ```
 abstract type «name» end
 abstract type «name» <: «supertype» end
 ```
 
-The `abstract type` keyword introduces a new abstract type, whose name is given by `«name»`. This
-name can be optionally followed by `<:` and an already-existing type, indicating that the newly
-declared abstract type is a subtype of this "parent" type.
+La palabra clave `abstract type` introduce un nuevo tipo abstracto, cuyo nombre viene dado por `«name»`. Este nombre puede ir seguido opcionalmente de `<:` y un nombre de tipo ya existente, lo cuál indica que este tipo abstracto es un subtipo del ya existente..
 
-When no supertype is given, the default supertype is `Any` -- a predefined abstract type that
-all objects are instances of and all types are subtypes of. In type theory, `Any` is commonly
-called "top" because it is at the apex of the type graph. Julia also has a predefined abstract
-"bottom" type, at the nadir of the type graph, which is written as `Union{}`. It is the exact
-opposite of `Any`: no object is an instance of `Union{}` and all types are supertypes of `Union{}`.
+Cuando no se proporciona supertipo, el supertipo por defecto es `Any` (un tipo `abstract` predefinido del que todos los objetos son instancias y todos los tipos son subtipos). En teoría de tipos, `Any` suele ser denominado *top* porque es la cúspide del grafo de los tipos. Julia tiene también un tipo abstracto *bottom*, en el punto más bajo del grafo de tipos, que se escribe como `Union{}`. Es el opuesto exacto de `Any`: ningún objeto es instancia de `Union{}` y todos los tipos son sus supertipos.
 
-Let's consider some of the abstract types that make up Julia's numerical hierarchy:
+Consideremos algunos de los tipos abstractos que forman parte de la jerarquía numérica de Julia:
 
 ```julia
 abstract type Number end
