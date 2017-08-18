@@ -1,54 +1,22 @@
-# [Types](@id man-types)
+# [Tipos](@id man-types)
 
-Type systems have traditionally fallen into two quite different camps: static type systems, where
-every program expression must have a type computable before the execution of the program, and
-dynamic type systems, where nothing is known about types until run time, when the actual values
-manipulated by the program are available. Object orientation allows some flexibility in statically
-typed languages by letting code be written without the precise types of values being known at
-compile time. The ability to write code that can operate on different types is called polymorphism.
-All code in classic dynamically typed languages is polymorphic: only by explicitly checking types,
-or when objects fail to support operations at run-time, are the types of any values ever restricted.
+Los sistemas de tipos han caído tradicionalmente en dos categorías muy diferentes: los *sistemas de tipos estáticos*, donde cada expresión del programa debe tener un tipo computable antes de la ejecución del programa, y los *sistemas de tipos dinámicos*, donde nada es sabido sobre los tipos hasta el momento de la ejecución, cuando los valores actuales manipulados por el programa están disponibles. La orientación a objetos permite una flexibilidad en los lenguajes tipados estáticamente dejando que el código sea escrito sin que se conozcan los tipos precisos de los valores en tiempo de compilación. La capacidad de escribir código que pueda operar sobre diferentes tipos se denomina polimorfismo. Todo el código en los lenguajes clásicos tipados dinámicamente es polimórfico: sólo mediante comprobación de equipos explícita o cuando los objetos fallan para soportar las operaciones en tiempo de ejecución, están los tipos de cualquier valor siempre restringidos.
 
-Julia's type system is dynamic, but gains some of the advantages of static type systems by making
-it possible to indicate that certain values are of specific types. This can be of great assistance
-in generating efficient code, but even more significantly, it allows method dispatch on the types
-of function arguments to be deeply integrated with the language. Method dispatch is explored in
-detail in [Methods](@ref), but is rooted in the type system presented here.
+El sistema de tipos de Julia es dinámico, pero tiene algunas de las ventajas de los sistemas de tipos estáticos haciendo posible indicar que ciertos valores son de tipos específicos. Esto puede ser de gran ayuda en la generación de código eficiente, pero incluso más significativamente, permite que el despacho de métodos sobre los tipos de los argumentos a función este profundamente integrado con el lenguaje. El despacho de métodos se explorará en detalle en la sección [Methods](@ref), pero está enraizado en el sistema de equipos presentado en este capítulo..
 
-The default behavior in Julia when types are omitted is to allow values to be of any type. Thus,
-one can write many useful Julia programs without ever explicitly using types. When additional
-expressiveness is needed, however, it is easy to gradually introduce explicit type annotations
-into previously "untyped" code. Doing so will typically increase both the performance and robustness
-of these systems, and perhaps somewhat counterintuitively, often significantly simplify them.
+El comportamiento por defecto en Julia cuando se omiten los tipos es permitir que los valores sean de cualquier tipo. Por tanto, uno puede escribir muchos programa Julia útiles sin siquiera usar explícitamente los tipos. Cuando se necesita una expresividad adicional, sin embargo, es fácil introducir gradualmente anotaciones de tipo explícitas en código previamente no tipado. Hacer eso suele incrementar el rendimiento y la robustez de estos sistemas, y quizás algo contra intuitivo: simplificarlos frecuentemente.
 
-Describing Julia in the lingo of [type systems](https://en.wikipedia.org/wiki/Type_system), it
-is: dynamic, nominative and parametric. Generic types can be parameterized, and the hierarchical
-relationships between types are [explicitly declared](https://en.wikipedia.org/wiki/Nominal_type_system),
-rather than [implied by compatible structure](https://en.wikipedia.org/wiki/Structural_type_system).
-One particularly distinctive feature of Julia's type system is that concrete types may not subtype
-each other: all concrete types are final and may only have abstract types as their supertypes.
-While this might at first seem unduly restrictive, it has many beneficial consequences with surprisingly
-few drawbacks. It turns out that being able to inherit behavior is much more important than being
-able to inherit structure, and inheriting both causes significant difficulties in traditional
-object-oriented languages. Other high-level aspects of Julia's type system that should be mentioned
-up front are:
+Describir Julia en el lingo de los [sistemas de tipos](https://en.wikipedia.org/wiki/Type_system), es decir que es: *dinámico*, *nominativo* y *paramétrico*. Los tipos genéricos pueden ser parametrizados, y las relaciones jerárquicas entre tipos son [declaradas explítamente](https://en.wikipedia.org/wiki/Nominal_type_system),
+en lugar de ser [implicadas mediante una estructura compatible](https://en.wikipedia.org/wiki/Structural_type_system).
+Una característica particularmente distintiva del sistema de tipos de Julia es que los tipos concretos no pueden tener subtipos. Todos los tiempos completos son finales y sólo pueden tener tipos abstractos como supertipos. Aunque esto puede parecer excesivamente restrictivo al principio, tiene muchas consecuencias beneficiosas con sorprendentemente pocos inconveniente. Resulta que ser capaz de heredar comportamientos es mucho más importante que seas capaz de heredar estructura, y heredar ambas cosas causa dificultades significativas en los lenguajes orientados a objetos tradicionales. Otros aspectos de alto nivel del sistema del tipo de Julia que Debería ser mencionados son:
 
-  * There is no division between object and non-object values: all values in Julia are true objects
-    having a type that belongs to a single, fully connected type graph, all nodes of which are equally
-    first-class as types.
-  * There is no meaningful concept of a "compile-time type": the only type a value has is its actual
-    type when the program is running. This is called a "run-time type" in object-oriented languages
-    where the combination of static compilation with polymorphism makes this distinction significant.
-  * Only values, not variables, have types -- variables are simply names bound to values.
-  * Both abstract and concrete types can be parameterized by other types. They can also be parameterized
-    by symbols, by values of any type for which [`isbits()`](@ref) returns true (essentially, things
-    like numbers and bools that are stored like C types or structs with no pointers to other objects),
-    and also by tuples thereof. Type parameters may be omitted when they do not need to be referenced
-    or restricted.
+  * No hay división entre los valores objetos y no objetos. Todos los valores en Julia son verdaderos objetos que tienen un tipo que pertenece a un solo grafo de tipos totalmente conectado, todos los nodos del cual son de primera clase como tipos.
+  * No hay un concepto significativo de tiempo en tiempo de compilación. El único tipo que tiene un valor es su tipo actual cuando el programa está corriendo. Esto se denomina tipo en tiempo de ejecución en los lenguajes orientados a objetos, donde la combinación de complicación estática con polimorfismo hace esta distinción significativa.
+  * Sólo los valores, no las variables, tienen tipos. Las variables son siempre nombres enlazados a valores.
 
-Julia's type system is designed to be powerful and expressive, yet clear, intuitive and unobtrusive.
-Many Julia programmers may never feel the need to write code that explicitly uses types. Some
-kinds of programming, however, become clearer, simpler, faster and more robust with declared types.
+  * Tanto los tipos abstractos como concretos pueden ser paralizados por otros tipos. Ellos pueden ser parametrizados mediante símbolos, mediante valores de cualquier tipo para los cuáles [`isbits()`](@ref) devuelve `true` (esencialmente, cosas como números y booleanos que son almacenados como tipos C o estructuras sin punteros a otros objetos), y también mediante tuplas. Los parámetros de tipo pueden ser omitidos cuando no necesitan ser referenciados o restringidos.
+
+El sistema de tipos de Julia está diseñado para ser potente y expresivo, además de claro, intuitivo y no obstructivo. Muchos programadores Julia nunca sentirán la necesidad de escribir código que use los tipos explícitamente. Algunas clases de programación, sin embargo, se vuelven más claras, rápidas y robustas usando tipos declarados.
 
 ## Type Declarations
 
