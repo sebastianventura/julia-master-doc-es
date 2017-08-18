@@ -2,8 +2,8 @@
 
 ## [Iteration](@id lib-collections-iteration)
 
-Sequential iteration is implemented by the methods [`start()`](@ref), [`done()`](@ref), and [`next()`](@ref).
-The general `for` loop:
+La iteración secuencial es implementada por los métodos [`start()`](@ref), [`done()`](@ref) y [`next()`](@ref).
+El bucle `for` general:
 
 ```julia
 for i = I   # or  "for i in I"
@@ -11,7 +11,7 @@ for i = I   # or  "for i in I"
 end
 ```
 
-is translated into:
+es traducido a:
 
 ```julia
 state = start(I)
@@ -21,9 +21,9 @@ while !done(I, state)
 end
 ```
 
-The `state` object may be anything, and should be chosen appropriately for each iterable type.
-See the [manual section on the iteration interface](@ref man-interface-iteration) for more details about defining a custom
-iterable type.
+El objeto `state` puede ser cualquier cosa, y debería ser elegido apropiadamente para cada tipo iterable. 
+Ver la [sección de manual sobre la interfaz de iteración](@ref man-interface-iteration) para ms detalles 
+sobre detinir un tipo iterable personalizado.
 
 ```@docs
 Base.start
