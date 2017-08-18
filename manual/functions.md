@@ -1,8 +1,9 @@
-# [Functions](@id man-functions)
+# [Funciones](@id man-functions)
 
-In Julia, a function is an object that maps a tuple of argument values to a return value. Julia
-functions are not pure mathematical functions, in the sense that functions can alter and be affected
-by the global state of the program. The basic syntax for defining functions in Julia is:
+En Julia, una función es un objeto que hace corresponde una tupla de valores argumentos en
+un valor de retorno. Las funciones de Julia no son funciones matemáticas puras, en el sentido 
+de que pueden alterar y ser afectadas por el estado global del programa. La sintaxis básica 
+a definir funciones en Julia es:
 
 ```jldoctest
 julia> function f(x,y)
@@ -11,8 +12,9 @@ julia> function f(x,y)
 f (generic function with 1 method)
 ```
 
-There is a second, more terse syntax for defining a function in Julia. The traditional function
-declaration syntax demonstrated above is equivalent to the following compact "assignment form":
+Hay una segunda sintaxis, más concisa, para definir una función en Julia. La declaración de 
+función tradicional mostrada anteriormente es equivalente a la denominada "forma de asignación". 
+Por ejemplo:
 
 ```jldoctest fofxy
 julia> f(x,y) = x + y
