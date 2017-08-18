@@ -1,35 +1,35 @@
-# Style Guide
+# Guía de Estilo
 
-The following sections explain a few aspects of idiomatic Julia coding style. None of these rules
-are absolute; they are only suggestions to help familiarize you with the language and to help
-you choose among alternative designs.
+Las siguientes secciones Explica unos cuantos aspectos del estilo de codificación idiomático de 
+Julia. Ninguna de estas reglas son absolutas; sólo son sugerencias para ayudar a familiarizarte 
+con el lenguaje y ayudarte a elegir entre diseños alternativos.
 
-## Write functions, not just scripts
+## Escribe funciones, no sólo *scripts*
 
-Writing code as a series of steps at the top level is a quick way to get started solving a problem,
-but you should try to divide a program into functions as soon as possible. Functions are more
-reusable and testable, and clarify what steps are being done and what their inputs and outputs
-are. Furthermore, code inside functions tends to run much faster than top level code, due to how
-Julia's compiler works.
+Escribir código como una serie de pasos a nivel superior Es una forma rápida de empezar a 
+resolver un problema, pero uno debería intentar dividir un programa en funciones tan pronto como 
+sea posible. La función son más reusabes y testables, y clarifican qué pasos se están dando y 
+cuáles son sus entradas y sus salidas. Además, el código dentro de las funciones tiende a ejecutar 
+mucho más rápido que el código de nivel superior debido a cómo funciona el compilador de Julia.
 
-It is also worth emphasizing that functions should take arguments, instead of operating directly
-on global variables (aside from constants like [`pi`](@ref)).
+También merece la pena señalar que las funciones deberían tomar argumentos, en lugar de operar
+directamente sobre las variables globales (aparte de constantes como [`pi`](@ref)).
 
-## Avoid writing overly-specific types
+## Evita escribir tipos demasiado específicos
 
-Code should be as generic as possible. Instead of writing:
+El código debería ser tan genérico como sea posible. En lugar de escribir:
 
 ```julia
 convert(Complex{Float64}, x)
 ```
 
-it's better to use available generic functions:
+es mejor usar funciones genéricas disponibles:
 
 ```julia
 complex(float(x))
 ```
 
-The second version will convert `x` to an appropriate type, instead of always the same type.
+La segunda versión convertirá `x` a un tipo apropiado, en lugrar de siempre al mismo tipo. 
 
 This style point is especially relevant to function arguments. For example, don't declare an argument
 to be of type `Int` or [`Int32`](@ref) if it really could be any integer, expressed with the abstract
