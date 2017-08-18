@@ -34,8 +34,6 @@ julia> (1+2)::Int
 3
 ```
 
-This allows a type assertion to be attached to any expression in-place.
-
 Esto permite que la aserción de tipo sea adjuntada a cualquier expresión *in situ*.
 
 Cuando se añade a una variable sobre el lado izquierdo de una asignación, o como parte de una declaración `local`, el operador `::` significa algo un poco diferente: declara que la variable siempre tendrá el tipo especificado, como una declaración de tipo de los lenguajes tipados estáticamente como C. Cada valor asignado a la variable será convertido al tipo declarado usando [`convert()`](@ref):
