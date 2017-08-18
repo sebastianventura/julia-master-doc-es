@@ -21,20 +21,21 @@ julia> f(x,y) = x + y
 f (generic function with 1 method)
 ```
 
-In the assignment form, the body of the function must be a single expression, although it can
-be a compound expression (see [Compound Expressions](@ref man-compound-expressions)). Short, simple function definitions
-are common in Julia. The short function syntax is accordingly quite idiomatic, considerably reducing
-both typing and visual noise.
+En esta segunda forma, el cuerpo de la función debe ser una sola expresión, aunque puede 
+tratarse de una expresión compuesta (see [Expresiones Compuestas](@ref man-compound-expressions)). 
+Estas definiciones de función cortas y simples son comunes en Julia. La sintaxis de funciones
+cortas es, por tanto, bastante idiomática, reduciendo considerablemente tanto la escritura como 
+el ruido visual.
 
-A function is called using the traditional parenthesis syntax:
+Para invocar una función se usa la sintaxis tradicional basada en el uso del paréntesis:
 
 ```jldoctest fofxy
 julia> f(2,3)
 5
 ```
 
-Without parentheses, the expression `f` refers to the function object, and can be passed around
-like any value:
+Sin usar paréntesis, la expresión `f` se refiere al objeto función, y puede ser tratada como 
+cualquier otro valor:
 
 ```jldoctest fofxy
 julia> g = f;
@@ -43,7 +44,7 @@ julia> g(2,3)
 5
 ```
 
-As with variables, Unicode can also be used for function names:
+Y, como en el caso de las variables, podemos usar Unicode en el caso de los nombres de función:
 
 ```jldoctest
 julia> ∑(x,y) = x + y
