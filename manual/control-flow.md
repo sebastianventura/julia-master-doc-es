@@ -4,25 +4,24 @@ Julia proporciona una variedad de construcciones para control de flujo:
 
   * [Expresiones Compuestas](@ref man-compound-expressions): `begin` and `(;)`.
   * [Evaluación Condicional](@ref man-conditional-evaluation): `if`-`elseif`-`else` and `?:` (ternary operator).
-  
-  * [Evaluación en Cortocircuito](@ref): `&&`, `||` and chained comparisons.
-  
+  * [Evaluación en Cortocircuito](@ref): `&&`, `||` and chained comparisons. 
   * [Evaluación Repetida: Bucles](@ref man-loops): `while` and `for`.
   * [Manejo de Excepciones](@ref): `try`-`catch`, [`error()`](@ref) and [`throw()`](@ref).
   * [Tareas (también denominadas Coroutinas)](@ref man-tasks): [`yieldto()`](@ref).
 
-The first five control flow mechanisms are standard to high-level programming languages. [`Task`](@ref)s
-are not so standard: they provide non-local control flow, making it possible to switch between
-temporarily-suspended computations. This is a powerful construct: both exception handling and
-cooperative multitasking are implemented in Julia using tasks. Everyday programming requires no
-direct usage of tasks, but certain problems can be solved much more easily by using tasks.
+Los cinco primeros mecanismos de control de flujo son estándar en los lenguajes de programación 
+de alto nivel. Las tareas no son un mecanismo tan estándar: ellas proporcionan control de flujo 
+no local, haciendo posible conmutar entre cálculos suspendidos temporalmente. Esta es una  
+construcción potente: tanto el manejo de excepciones como la multitarea cooperativa se 
+implementan en Julia usando tareas. La programación diaria no suele requerir el uso de tareas, 
+pero ciertos problemas se resuelve de forma mucho más sencilla usando este mecanismo. 
 
-## [Compound Expressions](@id man-compound-expressions)
+## [Expresiones Compuestas](@id man-compound-expressions)
 
-Sometimes it is convenient to have a single expression which evaluates several subexpressions
-in order, returning the value of the last subexpression as its value. There are two Julia constructs
-that accomplish this: `begin` blocks and `(;)` chains. The value of both compound expression constructs
-is that of the last subexpression. Here's an example of a `begin` block:
+Algunas veces es conveniente tener una sola expresión que lleva nueve varias subexpresiones 
+en orden, devolviendo el valor de la última subexpresión como su valor. Hay dos construcciones 
+en Julia que llevan a cabo este trabajo: los bloques `begin` y las cadenas `;` El valor de 
+ambas expresiones compuestas es el de la última subexpresión. He aquí un ejemplo del bloque `begin`:
 
 ```jldoctest
 julia> z = begin
@@ -33,17 +32,17 @@ julia> z = begin
 3
 ```
 
-Since these are fairly small, simple expressions, they could easily be placed onto a single line,
-which is where the `(;)` chain syntax comes in handy:
+Como estas expresiones son bastante pequeñas, podrían ponerse con facilidad en una sola línea. 
+Esta es precisamente la finalidad del `;`
 
 ```jldoctest
 julia> z = (x = 1; y = 2; x + y)
 3
 ```
 
-This syntax is particularly useful with the terse single-line function definition form introduced
-in [Functions](@ref). Although it is typical, there is no requirement that `begin` blocks be multiline
-or that `(;)` chains be single-line:
+Esta sintaxis es particularmente útil con la definición de función de una línea que introdujimos 
+en el tema [Funciones](@ref). Aunque es típico, no hay obligación de que los bloques `begin` sean 
+multilínea o de que las cadenas de punto y coma (`;`) tengan una única línea.
 
 ```jldoctest
 julia> begin x = 1; y = 2; x + y end
