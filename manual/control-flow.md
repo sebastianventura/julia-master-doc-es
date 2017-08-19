@@ -2,8 +2,8 @@
 
 Julia proporciona una variedad de construcciones para control de flujo:
 
-  * [Expresiones Compuestas](@ref man-compound-expressions): `begin` and `(;)`.  
-  * [Evaluación Condicional](@ref man-conditional-evaluation): `if`-`elseif`-`else` and `?:` (ternary operator).
+  * [Expresiones Compuestas](@ref man-compound-expressions): `begin` and `(;)`.
+  * [Evaluación Condicional](@ref man-conditional-evaluation): `if`-`elseif`-`else` and `?:` (ternary operator).
   
   * [Evaluación en Cortocircuito](@ref): `&&`, `||` and chained comparisons.
   
