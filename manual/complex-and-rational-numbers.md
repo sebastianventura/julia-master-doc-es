@@ -152,7 +152,7 @@ julia> sqrt(-1 + 0im)
 0.0 + 1.0im
 ```
 
-The [notación de coeficiente numérico literal](@ref man-numeric-literal-coefficients) no funciona 
+La [notación de coeficiente numérico literal](@ref man-numeric-literal-coefficients) no funciona 
 cuando se construye un número complejo a partir de variables. En su lugar, la multiplicación debe 
 expresarse explícitamente:
 
