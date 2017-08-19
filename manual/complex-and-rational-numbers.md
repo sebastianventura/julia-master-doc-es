@@ -1,24 +1,26 @@
 # Complex and Rational Numbers
 
-Julia ships with predefined types representing both complex and rational numbers, and supports
-all standard [Mathematical Operations and Elementary Functions](@ref) on them. [Conversion and Promotion](@ref conversion-and-promotion) are defined
-so that operations on any combination of predefined numeric types, whether primitive or composite,
-behave as expected.
+Julia se distribuye con tipos predefinidos que representan números complejos y racionales, 
+y soporta todas las [Operaciones Matemáticas y Funciones Elementales](@ref) estándar sobre ellos. 
+[Conversión and Promoción](@ref conversion-and-promotion) se definen de modo que las operaciones 
+en cualquier combinación de tipos numéricos predefinidos, primitivos o compuestos, se comporten 
+como se esperaba.
 
 ## Complex Numbers
 
-The global constant [`im`](@ref) is bound to the complex number *i*, representing the principal
-square root of -1. It was deemed harmful to co-opt the name `i` for a global constant, since it
-is such a popular index variable name. Since Julia allows numeric literals to be [juxtaposed with identifiers as coefficients](@ref man-numeric-literal-coefficients),
-this binding suffices to provide convenient syntax for complex numbers, similar to the traditional
-mathematical notation:
+La constante global [`im`](@ref) está ligada al número complejo *i*, que representa la raíz 
+cuadrada principal de -1. Se consideró nocivo para co-optar el nombre `i` para una constante 
+global, ya que es un nombre de variable de índice popular. Como Julia permite que los literales 
+numéricos se [yuxtapongan con identificadores como coeficientes](@ref man-numeric-literal-coefficients),
+esta unión es suficiente para proporcionar sintaxis conveniente para números complejos, 
+similar a la notación matemática tradicional:
 
 ```jldoctest
 julia> 1 + 2im
 1 + 2im
 ```
 
-You can perform all the standard arithmetic operations with complex numbers:
+Podemos realizar todas las operaciones aritméticas estándar con los números complejos:
 
 ```jldoctest
 julia> (1 + 2im)*(2 - 3im)
@@ -52,7 +54,7 @@ julia> 3(2 - 5im)^-1.0
 0.20689655172413796 + 0.5172413793103449im
 ```
 
-The promotion mechanism ensures that combinations of operands of different types just work:
+El mecanismo de promoción asegura qur las combinaciones de operandos de distintos tipos funcionarán:
 
 ```jldoctest
 julia> 2(1 - 1im)
@@ -83,10 +85,10 @@ julia> 1 + 3/4im
 1.0 - 0.75im
 ```
 
-Note that `3/4im == 3/(4*im) == -(3/4*im)`, since a literal coefficient binds more tightly than
-division.
+Nótese que `3/4im == 3/(4*im) == -(3/4*im)`, ya que un coeficiente literal se enlaza más 
+fuerte que la división.
 
-Standard functions to manipulate complex values are provided:
+También se proporcionan las funciones estándar para manipular valores complejos:
 
 ```jldoctest
 julia> z = 1 + 2im
@@ -111,10 +113,10 @@ julia> angle(1 + 2im) # phase angle in radians
 1.1071487177940904
 ```
 
-As usual, the absolute value ([`abs()`](@ref)) of a complex number is its distance from zero.
-[`abs2()`](@ref) gives the square of the absolute value, and is of particular use for complex
-numbers where it avoids taking a square root. [`angle()`](@ref) returns the phase angle in radians
-(also known as the *argument* or *arg* function). The full gamut of other [Elementary Functions](@ref)
+Como de costumbre, el valor absoluto ([`abs()`](@ref)) de un número complejo es su distancia a cero.
+[`abs2()`](@ref) da el cuadrado del valor absoluto, y es de uso particular para los números complejos 
+donde se evita tomar una raíz cuadrada. [`angle()`](@ref) devuelve el ángulo de fase en radianes 
+(también conocido como *argumento* o función *arg*). La gama completa de otras [Funciones Elementales](@ref)
 is also defined for complex numbers:
 
 ```jldoctest
@@ -134,9 +136,10 @@ julia> sinh(1 + 2im)
 -0.4890562590412937 + 1.4031192506220405im
 ```
 
-Note that mathematical functions typically return real values when applied to real numbers and
-complex values when applied to complex numbers. For example, [`sqrt()`](@ref) behaves differently
-when applied to `-1` versus `-1 + 0im` even though `-1 == -1 + 0im`:
+Tenga en cuenta que las funciones matemáticas normalmente devuelven valores reales cuando se 
+aplican a números reales y valores complejos cuando se aplican a números complejos. Por ejemplo, 
+[`sqrt()`](@ref) se comporta de forma diferente cuando se aplica a `-1` que cuanso se aplica sobre
+`-1 + 0im`, aunque `-1 == -1 + 0im`:
 
 ```jldoctest
 julia> sqrt(-1)
@@ -149,26 +152,28 @@ julia> sqrt(-1 + 0im)
 0.0 + 1.0im
 ```
 
-The [literal numeric coefficient notation](@ref man-numeric-literal-coefficients) does not work when constructing a complex number
-from variables. Instead, the multiplication must be explicitly written out:
+The [notación de coeficiente numérico literal](@ref man-numeric-literal-coefficients) no funciona 
+cuando se construye un número complejo a partir de variables. En su lugar, la multiplicación debe 
+expresarse explícitamente:
 
 ```jldoctest
 julia> a = 1; b = 2; a + b*im
 1 + 2im
 ```
 
-However, this is *not* recommended; Use the [`complex()`](@ref) function instead to construct
-a complex value directly from its real and imaginary parts:
+Sin embargo, esto no es lo recomendable; En su lugar, utilice la función [`complex()`](@ref) para 
+construir un valor complejo directamente de sus partes real e imaginaria:
 
 ```jldoctest
 julia> a = 1; b = 2; complex(a, b)
 1 + 2im
 ```
 
-This construction avoids the multiplication and addition operations.
+Esta construcción evita las operaciones de multiplicación y adición.
 
-[`Inf`](@ref) and [`NaN`](@ref) propagate through complex numbers in the real and imaginary parts
-of a complex number as described in the [Special floating-point values](@ref) section:
+[`Inf`](@ref) y [`NaN`](@ref) se propagan a través de números complejos en las partes real e 
+imaginaria de un número complejo como se describe en la sección [valores especiales en punto flotante](@ref) 
+section:
 
 ```jldoctest
 julia> 1 + Inf*im
