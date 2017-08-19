@@ -183,18 +183,18 @@ julia> 1 + NaN*im
 1.0 + NaN*im
 ```
 
-## Rational Numbers
+## Números racionales
 
-Julia has a rational number type to represent exact ratios of integers. Rationals are constructed
-using the [`//`](@ref) operator:
+Julia tiene un tipo numérico racional para representar razones exactas de enteros. Los racionales 
+se construyen usando el operador [`//`](@ref):
 
 ```jldoctest
 julia> 2//3
 2//3
 ```
 
-If the numerator and denominator of a rational have common factors, they are reduced to lowest
-terms such that the denominator is non-negative:
+Si el numerador y el denominador de un racional tienen factores comunes, ellos son reducidos a los 
+términos mínimos tales que el denominador sea no negativo:
 
 ```jldoctest
 julia> 6//9
@@ -210,10 +210,10 @@ julia> -4//-12
 1//3
 ```
 
-This normalized form for a ratio of integers is unique, so equality of rational values can be
-tested by checking for equality of the numerator and denominator. The standardized numerator and
-denominator of a rational value can be extracted using the [`numerator()`](@ref) and [`denominator()`](@ref)
-functions:
+Esta forma normalizada para una razón de enteros es única, por lo que la igualdad de valores 
+racionales puede ser testada comprobando la igualdad del numerador y el denominador. El numerador 
+estandarizado y el denominador de un valor racional pueden ser extraídos usando las funciones 
+[`numerator()`](@ref) y [`denominator()`](@ref):
 
 ```jldoctest
 julia> numerator(2//3)
@@ -223,8 +223,8 @@ julia> denominator(2//3)
 3
 ```
 
-Direct comparison of the numerator and denominator is generally not necessary, since the standard
-arithmetic and comparison operations are defined for rational values:
+La comparación directa de numerador y denominador no suele ser necesaria, ya que la aritmetica 
+estándar y las operaciones de comparación están definidas para los valores racionales:
 
 ```jldoctest
 julia> 2//3 == 6//9
@@ -252,15 +252,15 @@ julia> 6//5 / 10//7
 21//25
 ```
 
-Rationals can be easily converted to floating-point numbers:
+Los racionales pueden convertirse fácilmente en número en punto flotante:
 
 ```jldoctest
 julia> float(3//4)
 0.75
 ```
 
-Conversion from rational to floating-point respects the following identity for any integral values
-of `a` and `b`, with the exception of the case `a == 0` and `b == 0`:
+La conversión de racional a punto flotante respeta la siguiente identifaf para cualesquiera valores 
+enteros de `a` and `b`, con las excepciones de los casos `a == 0` and `b == 0`:
 
 ```jldoctest
 julia> a = 1; b = 2;
@@ -269,7 +269,7 @@ julia> isequal(float(a//b), a/b)
 true
 ```
 
-Constructing infinite rational values is acceptable:
+Construir valores racionales infinitos es aceptable:
 
 ```jldoctest
 julia> 5//0
@@ -282,7 +282,7 @@ julia> typeof(ans)
 Rational{Int64}
 ```
 
-Trying to construct a [`NaN`](@ref) rational value, however, is not:
+Sin embargo, no lo es tratar de construir un valor NaN [`NaN`](@ref) racional:
 
 ```jldoctest
 julia> 0//0
@@ -292,7 +292,8 @@ Stacktrace:
  [2] //(::Int64, ::Int64) at ./rational.jl:40
 ```
 
-As usual, the promotion system makes interactions with other numeric types effortless:
+Como es natural, el sistema de promoción hace que las interacciones con otros tipos numéricos 
+se hagan sin esfuerzo alguno:
 
 ```jldoctest
 julia> 3//5 + 1
