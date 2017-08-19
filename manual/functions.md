@@ -571,17 +571,20 @@ preocuparse de si la función salió normalmente o lanzó una excepción (la con
 Con la sintaxis de bloque `do` se ayuda a chequear la documentación o implementaciones para 
 saber cómo se inicializan los argumentos de la función de usuario.
 
-## [Dot Syntax for Vectorizing Functions](@id man-vectorized)
+## [Sintaxis Punto para funciones Vectorizadas](@id man-vectorized)
 
-In technical-computing languages, it is common to have "vectorized" versions of functions, which
-simply apply a given function `f(x)` to each element of an array `A` to yield a new array via
-`f(A)`. This kind of syntax is convenient for data processing, but in other languages vectorization
-is also often required for performance: if loops are slow, the "vectorized" version of a function
-can call fast library code written in a low-level language. In Julia, vectorized functions are
-*not* required for performance, and indeed it is often beneficial to write your own loops (see
-[Performance Tips](@ref man-performance-tips)), but they can still be convenient. Therefore, *any* Julia function
-`f` can be applied elementwise to any array (or other collection) with the syntax `f.(A)`.
-For example `sin` can be applied to all elements in the vector `A`, like so:
+En los lenguajes de computación técnicos es común tener versiones "vectorizadas" de funciones, 
+las cuales aplican una función dada `f(x)` a cada elemento de un array `A` para producir un 
+nuevo array vía `f(A)`. Esta clase de sintaxis es conveniente para procesamiento de datos, 
+pero en otros lenguajes la vectorización es también requerida en aras de mejor rendimiento: 
+si los bucles son lentos, la versión "vectorizada" de una función podría llamar al código 
+de librería rápido en un lenguaje de bajo nivel. En Julia, las funciones actualizadas 
+*no son requeridas por motivos de vencimiento*; de hecho, suele ser beneficioso que el 
+usuario escriba sus propios bucles (ver [Consejos de rendimiento](@ref man-performance-tips)), 
+a veces incluso conveniente. Por tanto *cualquier* función Julia `f` puede ser aplicada 
+elemento a elemento a cualquier array (u otra colección) con la sintaxis `f.(A)`.
+
+Por ejemplo `sin` puede ser aplicado a todos los elementos del vector `A` de esta forma:
 
 ```jldoctest
 julia> A = [1.0, 2.0, 3.0]
@@ -597,16 +600,17 @@ julia> sin.(A)
  0.14112
 ```
 
-Of course, you can omit the dot if you write a specialized "vector" method of `f`, e.g. via `f(A::AbstractArray) = map(f, A)`,
-and this is just as efficient as `f.(A)`. But that approach requires you to decide in advance
-which functions you want to vectorize.
+Por supuesto, uno puede omitir el punto si escrive un método especial para vectores de 
+`f` por ejemplo, vía `f(A::AbstractArray) = map(f, A)` y esto es tan eficiente como 
+`f.(A)`. Pero este enfoque necesitaría que decidas a priori qué funciones quieres 
+vectorizar.
 
-More generally, `f.(args...)` is actually equivalent to `broadcast(f, args...)`, which allows
-you to operate on multiple arrays (even of different shapes), or a mix of arrays and scalars (see
-[Broadcasting](@ref)). For example, if you have `f(x,y) = 3x + 4y`, then `f.(pi,A)` will return
-a new array consisting of `f(pi,a)` for each `a` in `A`, and `f.(vector1,vector2)` will return
-a new vector consisting of `f(vector1[i],vector2[i])` for each index `i` (throwing an exception
-if the vectors have different length).
+Más generalmente, `f.(args...)` es de hecho equivalente a `broadcast(f, args...)`, 
+que te permite operar sobre múltiples arrays (incluso de formas distintas) o una mezcla 
+de arrays y escalares (ver [Broadcasting](@ref)). Por ejemplo, si tenemos `f(x,y) = 3x + 4y`, 
+entonces `f.(pi,A)` devolverá un nuevo array consistente en `f(pi,a)`para cada `a` en `A`, 
+y `f.(vector1,vector2)` devolverá un nuevo vector que consiste en `f(vector1[i],vector2[i])` 
+para cada índice `i` (lanzando una excepción si los vectores tienen diferente longitud).
 
 ```jldoctest
 julia> f(x,y) = 3x + 4y;
@@ -628,29 +632,30 @@ julia> f.(A, B)
  33.0
 ```
 
-Moreover, *nested* `f.(args...)` calls are *fused* into a single `broadcast` loop. For example,
-`sin.(cos.(X))` is equivalent to `broadcast(x -> sin(cos(x)), X)`, similar to `[sin(cos(x)) for x in X]`:
-there is only a single loop over `X`, and a single array is allocated for the result. [In contrast,
-`sin(cos(X))` in a typical "vectorized" language would first allocate one temporary array for
-`tmp=cos(X)`, and then compute `sin(tmp)` in a separate loop, allocating a second array.] This
-loop fusion is not a compiler optimization that may or may not occur, it is a *syntactic guarantee*
-whenever nested `f.(args...)` calls are encountered. Technically, the fusion stops as soon as
-a "non-dot" function call is encountered; for example, in `sin.(sort(cos.(X)))` the `sin` and `cos`
-loops cannot be merged because of the intervening `sort` function.
+Además, las llamadas anidadas `f.(args...)`se funden en un solo `broadcast`. Por ejemplo 
+`sin.(cos.(X))` es equivalent a `broadcast(x->sin(cos(x)), X)`, lo cuál es similar a 
+`[sin(cos(x)) for x in X]`. Hay un solo bucle sobre `X`, y se asigna un solo array para el 
+resultado. En contraste, `sin(cos(X))` en un lenguaje vectorizado típio asignaría primero 
+un array temporal `tmp = cos(X)` y luego calcularía `sin(tmp)` en un bucle separado, asignando 
+un segundo array. Esta fusión de bucles no es una optimización del compilador que puede 
+ocurrir o no, sino que es una *garantía sintáctica*  cuando se encuentran llamadas `f.(array...)` 
+anidadas. Técnicamente, la fusión se para en cuanto se encuentr una función sin punto, por
+ejemplo, en `sin.(srt(cos.(X)))` los bucles de `sin` y `cos` no pueden mezclarse debido a la 
+intervención de la función `sort`.
 
-Finally, the maximum efficiency is typically achieved when the output array of a vectorized operation
-is *pre-allocated*, so that repeated calls do not allocate new arrays over and over again for
-the results (see [Pre-allocating outputs](@ref)). A convenient syntax for this is `X .= ...`, which
-is equivalent to `broadcast!(identity, X, ...)` except that, as above, the `broadcast!` loop is
-fused with any nested "dot" calls. For example, `X .= sin.(Y)` is equivalent to `broadcast!(sin, X, Y)`,
-overwriting `X` with `sin.(Y)` in-place. If the left-hand side is an array-indexing expression,
-e.g. `X[2:end] .= sin.(Y)`, then it translates to `broadcast!` on a `view`, e.g. `broadcast!(sin, view(X, 2:endof(X)), Y)`,
-so that the left-hand side is updated in-place.
+Finalmente, la eficiencia máxima suele conseguirse cuando el array de salida de una operación 
+vectorizada es *pre-asignado*, por lo que las llamadas repetidas no asignarán nuevos arrays 
+una y otra vez para los resultados (ver [Preasignando salidas(@ref)). Una sintaxis conveniente 
+para esto es `X .= ...` que es equivalente a `broadcast!(identity, X, ...)` excepto que, como 
+antes, el bucle `broadcast!` es fusionado con cualquier llamada con punto anidada. Por ejemplo, 
+`X .= sin.(Y)` es equivalente a `broadcast!(sin, X, Y)`, sobreescribiendo `X` con `sin.(Y)` en 
+su lugar. Si el miembro izquierdo de la expresión es una expresión de indexación de un array, 
+como `X[2:end] .= sin.(Y)` entonces ella se traduce a `broadcast!` sobre una vista, por ejemplo 
+`broadcast!(sin, view(X, 2:endof(X)), Y)`.
 
-Since adding dots to many operations and function calls in an expression
-can be tedious and lead to code that is difficult to read, the macro
-[`@.`](@ref @__dot__) is provided to convert *every* function call,
-operation, and assignment in an expression into the "dotted" version.
+Como añadir puntos a muchas operaciones y llamadas a función puede resultar tedioso y conducir 
+a código difícil de leer, se proporciona la macro `@.` para convertir cada llamada a función, 
+operación y asignación en una expresion en su versión "con puntos".
 
 ```jldoctest
 julia> Y = [1.0, 2.0, 3.0, 4.0];
@@ -665,10 +670,10 @@ julia> @. X = sin(cos(Y)) # equivalent to X .= sin.(cos.(Y))
  -0.608083
 ```
 
-Binary (or unary) operators like `.+` are handled with the same mechanism:
-they are equivalent to `broadcast` calls and are fused with other nested "dot" calls.
- `X .+= Y` etcetera is equivalent to `X .= X .+ Y` and results in a fused in-place assignment;
- see also [dot operators](@ref man-dot-operators).
+Los operadores binarios (o unarios) como `.+` se manejan con el mismo mecanismo: son equivalentes 
+a llamadas retransmitidas (broadcast) y son fundidas con otras llamadas que tiene puntos. 
+`X .+= Y etcetera` es equivalente a `X .= X .+ Y` y dan como resultado una asignación fusionada. 
+Ver (@ref man-dot-operators).
 
 ## Further Reading
 
