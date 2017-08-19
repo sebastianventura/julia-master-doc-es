@@ -147,9 +147,9 @@ julia> +(1,2,3)
 6
 ```
 
-The infix form is exactly equivalent to the function application form -- in fact the former is
-parsed to produce the function call internally. This also means that you can assign and pass around
-operators such as [`+()`](@ref) and [`*()`](@ref) just like you would with other function values:
+La forma infija es equivalente a la forma de aplicación función. De hecho, la primera es transformada 
+para producir la llamada a función internamente. Esto también significa que puedes asignar y pasar 
+operadores tales como [`+()`](@ref) y [`*()`](@ref) , tal y como se hace con otros valores función:
 
 ```jldoctest
 julia> f = +;
@@ -158,13 +158,13 @@ julia> f(1,2,3)
 6
 ```
 
-Under the name `f`, the function does not support infix notation, however.
+Sin embargo, cuando se usa el formato de función, como `f`, no se puede usar notación infija.
 
 ## Operators With Special Names
 
 A few special expressions correspond to calls to functions with non-obvious names. These are:
 
-| Expression        | Calls                  |
+| Expresión         | Llamada                |
 |:----------------- |:---------------------- |
 | `[A B C ...]`     | [`hcat()`](@ref)       |
 | `[A; B; C; ...]`  | [`vcat()`](@ref)       |
@@ -175,13 +175,13 @@ A few special expressions correspond to calls to functions with non-obvious name
 | `A[i]`            | [`getindex()`](@ref)   |
 | `A[i]=x`          | [`setindex!()`](@ref)  |
 
-## [Anonymous Functions](@id man-anonymous-functions)
+## [Funciones Anónimas](@id man-anonymous-functions)
 
-Functions in Julia are [first-class objects](https://en.wikipedia.org/wiki/First-class_citizen):
-they can be assigned to variables, and called using the standard function call syntax from the
-variable they have been assigned to. They can be used as arguments, and they can be returned as
-values. They can also be created anonymously, without being given a name, using either of these
-syntaxes:
+Las funciones en Julia son [objetos de primera clase](https://en.wikipedia.org/wiki/First-class_citizen):
+ellas pueden ser asignadas a variables y ser invocadas usando la sintaxis estándar de llamadas 
+a función desde la variable a la que han sido asignadas. Ellas pueden ser usadas como argumentos 
+y ser devueltas como valores. Ellas pueden también ser usadas de forma anónima sin dárseles un 
+nombre, usando alguna de estas sintaxis:
 
 ```jldoctest
 julia> x -> x^2 + 2x - 1
@@ -193,13 +193,13 @@ julia> function (x)
 (::#3) (generic function with 1 method)
 ```
 
-This creates a function taking one argument `x` and returning the value of the polynomial `x^2 +
-2x - 1` at that value. Notice that the result is a generic function, but with a compiler-generated
-name based on consecutive numbering.
+Esto crea una función que toma un argumento `x` y devuelve el valor del polinomio `x^2 + 2x - 1`. 
+Nótese que el resultado es una función genérica, pero con un nombre generado por el compilador 
+basado en una numeración consecutiva.
 
-The primary use for anonymous functions is passing them to functions which take other functions
-as arguments. A classic example is [`map()`](@ref), which applies a function to each value of
-an array and returns a new array containing the resulting values:
+El uso primario de las funciones anónimas es pasarlas a funciones que toman otras funciones como 
+argumentos. Un ejemplo clásico es [`map()`](@ref), , que aplica una función a cada valor de un 
+array y devuelve un nuevo array que contienen los valores resultantes:
 
 ```jldoctest
 julia> map(round, [1.2,3.5,1.7])
