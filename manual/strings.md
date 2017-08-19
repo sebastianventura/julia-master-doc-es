@@ -1,50 +1,52 @@
 # [Strings](@id man-strings)
 
-Strings are finite sequences of characters. Of course, the real trouble comes when one asks what
-a character is. The characters that English speakers are familiar with are the letters `A`, `B`,
-`C`, etc., together with numerals and common punctuation symbols. These characters are standardized
-together with a mapping to integer values between 0 and 127 by the [ASCII](https://en.wikipedia.org/wiki/ASCII)
-standard. There are, of course, many other characters used in non-English languages, including
-variants of the ASCII characters with accents and other modifications, related scripts such as
-Cyrillic and Greek, and scripts completely unrelated to ASCII and English, including Arabic, Chinese,
-Hebrew, Hindi, Japanese, and Korean. The [Unicode](https://en.wikipedia.org/wiki/Unicode) standard
-tackles the complexities of what exactly a character is, and is generally accepted as the definitive
-standard addressing this problem. Depending on your needs, you can either ignore these complexities
-entirely and just pretend that only ASCII characters exist, or you can write code that can handle
-any of the characters or encodings that one may encounter when handling non-ASCII text. Julia
-makes dealing with plain ASCII text simple and efficient, and handling Unicode is as simple and
-efficient as possible. In particular, you can write C-style string code to process ASCII strings,
-and they will work as expected, both in terms of performance and semantics. If such code encounters
-non-ASCII text, it will gracefully fail with a clear error message, rather than silently introducing
-corrupt results. When this happens, modifying the code to handle non-ASCII data is straightforward.
+Las cadenas son secuencias finitas de caracteres. Por supuesto, el verdadero problema viene cuando 
+uno se pregunta qué es un carácter. Los caracteres con los que están familiarizados con los hablantes 
+de inglés son las letras `A`, `B`, `C`, etc., junto con los números y los símbolos de puntuación 
+comunes. Estos caracteres se estandarizan junto con una correspondencia a valores enteros entre 0 y 
+127 a través del estándar ASCII. Hay, por supuesto, muchos otros caracteres utilizados en lenguas no 
+inglesas, incluyendo variantes de los caracteres ASCII con acentos y otras modificaciones, escrituras 
+relacionadas como cirílico y griego, y escrituras no relacionadas en abosluto con ASCII o inglés, entre 
+los que se incluyen árabe, chino, Hebreo, hindi, japonés y coreano. El estándar [Unicode](https://en.wikipedia.org/wiki/Unicode) aborda las complejidades de lo que es exactamente un carácter, 
+y es generalmente aceptado como el estándar definitivo que aborda este problema. Dependiendo de tus 
+necesidades, puedes ignorar estas complejidades por completo y fingir que sólo existen caracteres ASCII, 
+o puedes escribir código que pueda manejar cualquiera de los caracteres o codificaciones que se pueden 
+encontrar al manejar texto no ASCII. Julia hace que el manejo de texto ASCII sencillo sea simple y 
+eficiente, y el manejo de Unicode tan simple y eficiente como sea posible. En particular, puedes 
+escribir código de cadenas con estilo C para procesar cadenas ASCII y funcionarán como se esperaba, 
+tanto en términos de rendimiento como de semántica. Si dicho código encuentra texto no ASCII, fallará 
+graciosamente con un mensaje de error claro, en lugar de introducir en silencio resultados corruptos. 
+Cuando esto sucede, modificar el código para manejar datos no ASCII es sencillo.
 
-There are a few noteworthy high-level features about Julia's strings:
+Hay algunas características destacadas de alto nivel sobre las cadenas de caracteres en Julia:
 
-  * The built-in concrete type used for strings (and string literals) in Julia is [`String`](@ref).
-    This supports the full range of [Unicode](https://en.wikipedia.org/wiki/Unicode) characters via
-    the [UTF-8](https://en.wikipedia.org/wiki/UTF-8) encoding. (A [`transcode()`](@ref) function is
-    provided to convert to/from other Unicode encodings.)
-  * All string types are subtypes of the abstract type `AbstractString`, and external packages define
-    additional `AbstractString` subtypes (e.g. for other encodings).  If you define a function expecting
-    a string argument, you should declare the type as `AbstractString` in order to accept any string
-    type.
-  * Like C and Java, but unlike most dynamic languages, Julia has a first-class type representing
-    a single character, called `Char`. This is just a special kind of 32-bit primitive type whose numeric
-    value represents a Unicode code point.
-  * As in Java, strings are immutable: the value of an `AbstractString` object cannot be changed.
-    To construct a different string value, you construct a new string from parts of other strings.
-  * Conceptually, a string is a *partial function* from indices to characters: for some index values,
-    no character value is returned, and instead an exception is thrown. This allows for efficient
-    indexing into strings by the byte index of an encoded representation rather than by a character
-    index, which cannot be implemented both efficiently and simply for variable-width encodings of
-    Unicode strings.
+  * El tipo de concreto incorporado utilizado para cadenas (y literales de cadena) en Julia es [`String`](@ref).
+    Esto soporta el rango completo de caracteres  [Unicode](https://en.wikipedia.org/wiki/Unicode) a través de 
+    la codificación [UTF-8](https://en.wikipedia.org/wiki/UTF-8). (se proporciona una función [`transcode()`](@ref)  
+    para convertir a/desde otras codificaciones Unicode).
+  * Todos los tipos de cadenas son subtipos del tipo abstracto `AbstractString` y los paquetes 
+    externos definen subtipos `AbstractString` adicionales (por ejemplo, para otras codificaciones). 
+    Si define una función que espera un argumento de cadena, debe declarar el tipo como 
+    `AbstractString` para aceptar cualquier tipo de cadena.
+  * Como C y Java, pero a diferencia de la mayoría de los lenguajes dinámicos, Julia tiene un tipo 
+    de primera clase que representa un solo carácter, llamado `Char`. Esto es sólo un tipo especial 
+    de bits de 32 bits cuyo valor numérico representa un punto de código Unicode.
+  * Como en Java, las cadenas son inmutables: el valor de un objeto `AbstractString` no se puede 
+    cambiar. Para construir un valor de cadena diferente, se construye una nueva cadena de partes 
+    de otras cadenas.
+  * Conceptualmente, una cadena es una *función parcial* de índices a caracteres: para algunos 
+    valores de índice, no se devuelve ningún valor de carácter y, en su lugar, se genera una 
+    excepción. Esto permite una indexación eficiente en cadenas por el índice de bytes de una 
+    representación codificada en lugar de por un índice de caracteres, que no se puede implementar 
+    de manera eficiente y sencilla para encodificaciones de anchura variable de cadenas Unicode.
 
-## [Characters](@id man-characters)
+## [Caracteres](@id man-characters)
 
-A `Char` value represents a single character: it is just a 32-bit primitive type with a special literal
+Un valor Char representa un solo carácter: es sólo un bitstype de 32 bits con una representación 
+literal especial y comportamientos aritméticos apropiados, cuyo valor numérico se interpreta como un
 representation and appropriate arithmetic behaviors, whose numeric value is interpreted as a
-[Unicode code point](https://en.wikipedia.org/wiki/Code_point). Here is how `Char` values are
-input and shown:
+[punto de código Unicode](https://en.wikipedia.org/wiki/Code_point). Aquí se muestra cómo se 
+introducen y se muestran los valores `Char`:
 
 ```jldoctest
 julia> 'x'
@@ -54,7 +56,7 @@ julia> typeof(ans)
 Char
 ```
 
-You can convert a `Char` to its integer value, i.e. code point, easily:
+Podemos convertir un `Char` a su valor entero (su punto de código) fácilmente:
 
 ```jldoctest
 julia> Int('x')
