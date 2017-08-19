@@ -275,20 +275,20 @@ end
 
 Esto tiene exactamente el mismo efecto que la definicin anterior de `foo`.
 
-## Varargs Functions
+## Funciones con argumentos variables (varargs)
 
-It is often convenient to be able to write functions taking an arbitrary number of arguments.
-Such functions are traditionally known as "varargs" functions, which is short for "variable number
-of arguments". You can define a varargs function by following the last argument with an ellipsis:
+Suele ser muy conveniente ser capaz de escribir funciones que toman un número arbitrario de 
+argumentos. Estas funciones se conocen como *funciones vararg*. Podemos definir funciones de tal 
+tipo poniendo puntos suspensivos `…` después del último argumento.
 
 ```jldoctest barfunc
 julia> bar(a,b,x...) = (a,b,x)
 bar (generic function with 1 method)
 ```
 
-The variables `a` and `b` are bound to the first two argument values as usual, and the variable
-`x` is bound to an iterable collection of the zero or more values passed to `bar` after its first
-two arguments:
+Las variables `a` y `b` están asociadas a los dos primeros argumentos como es natural, y la variable 
+`x` se asocia a una colección, iterable de cero o más valores pasados a la función `bar` después de 
+estos dos argumentos:
 
 ```jldoctest barfunc
 julia> bar(1,2)
@@ -304,14 +304,14 @@ julia> bar(1,2,3,4,5,6)
 (1, 2, (3, 4, 5, 6))
 ```
 
-In all these cases, `x` is bound to a tuple of the trailing values passed to `bar`.
+En todos los casos, `x` es asociada a una tupla con el resto de valores pasados a la función.
 
-It is possible to constrain the number of values passed as a variable argument; this will be discussed
-later in [Parametrically-constrained Varargs methods](@ref).
+Es posible restringir el número de argumentos pasados como argumento variable. Esto se discutirá 
+más adelante en la sección [métodos *vararg* restringidos paramétricamente](@ref).
 
-On the flip side, it is often handy to "splice" the values contained in an iterable collection
-into a function call as individual arguments. To do this, one also uses `...` but in the function
-call instead:
+Como contraposición, es frecuente manejar la división de los valores contenidos en una colección 
+iterable en una llamada a función como argumentos individuales. Para hacer eso, se utilizará la 
+notación de puntos suspensivos, pero esta vez en la llamada a función.
 
 ```jldoctest barfunc
 julia> x = (3, 4)
@@ -321,8 +321,8 @@ julia> bar(1,2,x...)
 (1, 2, (3, 4))
 ```
 
-In this case a tuple of values is spliced into a varargs call precisely where the variable number
-of arguments go. This need not be the case, however:
+En este caso hay una tupla que se divide en una llamada *vararg* precisamente donde está el 
+número de argumentos variable. Esa necesidad no tiene por qué ser el caso:
 
 ```jldoctest barfunc
 julia> x = (2, 3, 4)
@@ -338,7 +338,7 @@ julia> bar(x...)
 (1, 2, (3, 4))
 ```
 
-Furthermore, the iterable object spliced into a function call need not be a tuple:
+Además, el objeto iterable dividido durante la llamada a función no tiene que ser una tupla:
 
 ```jldoctest barfunc
 julia> x = [3,4]
@@ -360,8 +360,8 @@ julia> bar(x...)
 (1, 2, (3, 4))
 ```
 
-Also, the function that arguments are spliced into need not be a varargs function (although it
-often is):
+También, la función cuyos argumentos son divididos no tiene por qué ser una función *vararg* 
+(aunque frecuentemente lo sea):
 
 ```jldoctest
 julia> baz(a,b) = a + b;
@@ -386,15 +386,17 @@ Closest candidates are:
   baz(::Any, ::Any) at none:1
 ```
 
-As you can see, if the wrong number of elements are in the spliced container, then the function
-call will fail, just as it would if too many arguments were given explicitly.
+Como puede comprobarse, si el número de elementos que se van a sacar del contenedor es inapropiado 
+para pasar a la función como argumentos, se generará un error, igual que si hubiéramos realizado la 
+llamada a función con un número de argumentos inapropiado.
 
-## Optional Arguments
+## Argumentos Opcionales
 
-In many cases, function arguments have sensible default values and therefore might not need to
-be passed explicitly in every call. For example, the library function [`parse(T, num, base)`](@ref)
-interprets a string as a number in some base. The `base` argument defaults to `10`. This behavior
-can be expressed concisely as:
+En muchos casos, los argumentos de función tienen valores por defecto sensibles y, por tanto, puede 
+no ser necesario que se pasen explícitamente en cada llamada. Por ejemplo, la función de librería 
+[`parse(type, num, base`](@ref) interpreta una cadena como un número en cierta base. El argumento 
+`base` tiene un valor por defecto de `10`. Este comportamiento puede expresarse de forma concisa 
+como:
 
 ```julia
 function parse(T, num, base=10)
@@ -402,8 +404,8 @@ function parse(T, num, base=10)
 end
 ```
 
-With this definition, the function can be called with either two or three arguments, and `10`
-is automatically passed when a third argument is not specified:
+Con esta definición, la función puede ser llamada con dos o tres argumentos y, cuando no se pase 
+el tercer argumento, la función asignara el valor por defecto de `10` al parámetro `base`.
 
 ```jldoctest
 julia> parse(Int,"12",10)
@@ -416,23 +418,23 @@ julia> parse(Int,"12")
 12
 ```
 
-Optional arguments are actually just a convenient syntax for writing multiple method definitions
-with different numbers of arguments (see [Note on Optional and keyword Arguments](@ref)).
+Los argumentos opcionales son una sintaxis conveniente para escribir múltiples definiciones de métodos con diferentes números de argumentos (ver [Nota sobre Argumentos opcionales y *keyword*](@ref)).
 
-## Keyword Arguments
+## Argumentos *keyword*
 
-Some functions need a large number of arguments, or have a large number of behaviors. Remembering
-how to call such functions can be difficult. Keyword arguments can make these complex interfaces
-easier to use and extend by allowing arguments to be identified by name instead of only by position.
+Algunas funciones necesitan un número de argumentos grande o tienen un gran número de comportamientos. 
+Recordar como llamar a tales funciones puede ser difícil. Los argumentos *keyword* pueden hacer que 
+estas interfaces complejas sean más fáciles de usar y extender permitiendo que los argumentos sean 
+identificados por su nombre en lugar del por su posición.
 
-For example, consider a function `plot` that plots a line. This function might have many options,
-for controlling line style, width, color, and so on. If it accepts keyword arguments, a possible
-call might look like `plot(x, y, width=2)`, where we have chosen to specify only line width. Notice
-that this serves two purposes. The call is easier to read, since we can label an argument with
-its meaning. It also becomes possible to pass any subset of a large number of arguments, in any
-order.
+Por ejemplo, considere una función `plot` que traza una línea. Esta función puede tener muchas 
+opciones para controlar el estilo de línea, su ancho, su color, etc. Si la función  aceptara argumentos 
+*keyword*, una posible llamada al método seria `plot(x,y, width=2)`, donde hemos elegido especificar 
+sólo el ancho de línea. Nótese que esto sirve a dos propósitos: La llamada es más sencillo leer, ya 
+que podemos etiquetar un argumento con su significado. También se vuelve posible pasar cualquier 
+subconjunto de un gran número de argumentos, en cualquier orden.
 
-Functions with keyword arguments are defined using a semicolon in the signature:
+Las funciones con argumentos *keyword* se definen usando un punto y coma en la signatura:
 
 ```julia
 function plot(x, y; style="solid", width=1, color="black")
@@ -440,15 +442,16 @@ function plot(x, y; style="solid", width=1, color="black")
 end
 ```
 
-When the function is called, the semicolon is optional: one can either call `plot(x, y, width=2)`
-or `plot(x, y; width=2)`, but the former style is more common. An explicit semicolon is required
-only for passing varargs or computed keywords as described below.
+Cuando la función es invocada, el punto y coma es opcional: uno puede hacer la llamada como 
+`plot(x, y, width=2)`o como `plot(x, y; width=2)`, aunque el primero es más común. Se 
+requiere un punto y coma explícito sólo en el caso de pasar *vargars* o palabras clave 
+calculadas como se describe abajo.
 
-Keyword argument default values are evaluated only when necessary (when a corresponding keyword
-argument is not passed), and in left-to-right order. Therefore default expressions may refer to
-prior keyword arguments.
+Los valores por defecto de los argumentos *keyword* son evaluados sólo cuando sea necesario 
+(cuando no se pasa el correspondiente argumento *keyword*) y en orden izquierda a derecha. 
+Por tanto, las expresiones por defecto pueden referirse a argumentos *keyword* previos.
 
-The types of keyword arguments can be made explicit as follows:
+Los tipos de argumentos *keyword*  pueden hacerse explícitos de la siguiente forma:
 
 ```julia
 function f(;x::Int=1)
@@ -456,7 +459,7 @@ function f(;x::Int=1)
 end
 ```
 
-Extra keyword arguments can be collected using `...`, as in varargs functions:
+Los argumentos *keyword* extra pueden ser recolectados usando `...` como en las funciones *vararg*:
 
 ```julia
 function f(x; y=0, kwargs...)
@@ -464,19 +467,21 @@ function f(x; y=0, kwargs...)
 end
 ```
 
-Inside `f`, `kwargs` will be a collection of `(key,value)` tuples, where each `key` is a symbol.
-Such collections can be passed as keyword arguments using a semicolon in a call, e.g. `f(x, z=1; kwargs...)`.
-Dictionaries can also be used for this purpose.
+Dentro de `f`, `kwargs` será una colección de tuplas `(clave,valor)`, donde cada `clave` es un 
+símbolo. Tales colecciones pueden ser pasadas como argumentos *keyword* usando un punto y coma en 
+la llamada. Por ejemplo: `f(x, z=1; kwargs...)`. Los diccionarios pueden ser también usados para 
+este propósito.
 
-One can also pass `(key,value)` tuples, or any iterable expression (such as a `=>` pair) that
-can be assigned to such a tuple, explicitly after a semicolon. For example, `plot(x, y; (:width,2))`
-and `plot(x, y; :width => 2)` are equivalent to `plot(x, y, width=2)`. This is useful in situations
-where the keyword name is computed at runtime.
+Uno puede también pasar tuplas `(clave, valor)` o cualquier expresión iterable (tal como un par `=>`) 
+que puede ser asignado a una tupla, explícitamente después de un punto y coma. Por ejemplo, 
+`plot(x, y; (:width,2))` y `plot(x, y; :width => 2)` son equivalentes a `plot(x, y, width=2)`. 
+Esto es útil en situaciones donde el nombre de la palabra clave se calcula en tiempo de ejecución.
 
-The nature of keyword arguments makes it possible to specify the same argument more than once.
-For example, in the call `plot(x, y; options..., width=2)` it is possible that the `options` structure
-also contains a value for `width`. In such a case the rightmost occurrence takes precedence; in
-this example, `width` is certain to have the value `2`.
+La naturaleza de los argumentos *keyword*  le hace posible especificar el mismo argumento más de una vez.
+Por ejemplo, en la llamada `plot(x, y; options..., width=2)` es posible que la estructura `options` 
+contenga también un valor para `width`. En tal caso la ocurrencia más a la derecha toma precedencia; en
+este ejemplo `width` tendrá el valor `2`.
+contenga también un valor para `width`. In such a case the rightmost occurrence takes precedence; in
 
 ## Evaluation Scope of Default Values
 
