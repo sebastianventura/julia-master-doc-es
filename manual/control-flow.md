@@ -1,13 +1,13 @@
-# Control Flow
+# Control de Flujo
 
-Julia provides a variety of control flow constructs:
+Julia proporciona una variedad de construcciones para control de flujo:
 
-  * [Compound Expressions](@ref man-compound-expressions): `begin` and `(;)`.
-  * [Conditional Evaluation](@ref man-conditional-evaluation): `if`-`elseif`-`else` and `?:` (ternary operator).
-  * [Short-Circuit Evaluation](@ref): `&&`, `||` and chained comparisons.
-  * [Repeated Evaluation: Loops](@ref man-loops): `while` and `for`.
-  * [Exception Handling](@ref): `try`-`catch`, [`error()`](@ref) and [`throw()`](@ref).
-  * [Tasks (aka Coroutines)](@ref man-tasks): [`yieldto()`](@ref).
+  * [Expresiones Compuestas](@ref man-compound-expressions): `begin` and `(;)`.
+  * [Evaluación Condicional](@ref man-conditional-evaluation): `if`-`elseif`-`else` and `?:` (ternary operator).
+  * [Evaluación en Cortocircuito](@ref): `&&`, `||` and chained comparisons.
+  * [Evaluación Repetida: Bucles](@ref man-loops): `while` and `for`.
+  * [Manejo de Excepciones](@ref): `try`-`catch`, [`error()`](@ref) and [`throw()`](@ref).
+  * [Tareas (también denominadas Coroutinas)](@ref man-tasks): [`yieldto()`](@ref).
 
 The first five control flow mechanisms are standard to high-level programming languages. [`Task`](@ref)s
 are not so standard: they provide non-local control flow, making it possible to switch between
