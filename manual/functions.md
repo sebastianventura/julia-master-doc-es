@@ -485,9 +485,8 @@ este ejemplo `width` tendrá el valor `2`.
 
 ## Ámbito de evaluación de Valores por defecto
 
-When optional and keyword argument default expressions are evaluated, only *previous* arguments are in
-scope.
-For example, given this definition:
+Cuando se evalúan expresiones en argumentos opcionales y *keyword* sólo los argumentos *previos* están
+en el ámbito. Por ejemplo, dada esta definición:
 
 ```julia
 function f(x, a=b, b=1)
@@ -495,14 +494,14 @@ function f(x, a=b, b=1)
 end
 ```
 
-the `b` in `a=b` refers to a `b` in an outer scope, not the subsequent argument `b`.
+la `b` en `a=b` se refiere a la `b` de un ámbito más externo, no el siguiente argumento `b`.
 
-## Do-Block Syntax for Function Arguments
+## Sintaxis Bloque Do para Argumentos Function
 
-Passing functions as arguments to other functions is a powerful technique, but the syntax for
-it is not always convenient. Such calls are especially awkward to write when the function argument
-requires multiple lines. As an example, consider calling [`map()`](@ref) on a function with several
-cases:
+Pasar funciones como argumentos a otras funciones es una técnica muy potente, pero su sintaxs no es 
+siempre conveniente. Estas llamadas son especialmente incómodas de escribir cuando la función 
+argumento necesita varias líneas. Por ejemplo, consideremos llamar a  [`map()`](@ref) sobre una 
+función con varios casos:
 
 ```julia
 map(x->begin
@@ -517,7 +516,7 @@ map(x->begin
     [A, B, C])
 ```
 
-Julia provides a reserved word `do` for rewriting this code more clearly:
+Julia proporciona la palabra reservada `do` para reescribir este código de forma más clara:
 
 ```julia
 map([A, B, C]) do x
@@ -531,18 +530,18 @@ map([A, B, C]) do x
 end
 ```
 
-The `do x` syntax creates an anonymous function with argument `x` and passes it as the first argument
-to [`map()`](@ref). Similarly, `do a,b` would create a two-argument anonymous function, and a
-plain `do` would declare that what follows is an anonymous function of the form `() -> ...`.
+La sintaxis `do x` crea una función anónima con argumento `x` y la pasa como primer argumento a 
+[`map()`](@ref). Similarmente, `do a,b` crearía una función anónima de dos argumentos, y un `do` 
+solo sería una función anónima de la forma `() -> ...`.
 
-How these arguments are initialized depends on the "outer" function; here, [`map()`](@ref) will
-sequentially set `x` to `A`, `B`, `C`, calling the anonymous function on each, just as would happen
-in the syntax `map(func, [A, B, C])`.
+Cómo se inicializan estos argumentos depende de la función más externa; aquí `map()` fijará 
+secuencialmente `x` a `A,B,C` llamando a la función anónima sobre cada uno de ellos, tal y 
+como pasa en la sintaxis `map(func, [A,B,C])`.
 
-This syntax makes it easier to use functions to effectively extend the language, since calls look
-like normal code blocks. There are many possible uses quite different from [`map()`](@ref), such
-as managing system state. For example, there is a version of [`open()`](@ref) that runs code ensuring
-that the opened file is eventually closed:
+Esta sintaxis hace más fácil usar funciones para extender el lenguaje de forma efectiva, ya que 
+las llamadas tiene el aspecto de códigos de bloque normales. Hay muchos usos posibles diferentes 
+al de [`map()`](@ref), tal como la gestión del estado del sistema. Por ejemplo, hay una versión 
+de  [`open()`](@ref) que ejecuta código asegurando que el fichero abierto es cerrado eventualmente:
 
 ```julia
 open("outfile", "w") do io
@@ -550,7 +549,7 @@ open("outfile", "w") do io
 end
 ```
 
-This is accomplished by the following definition:
+Esto se consigue mediante la siguiente definición:
 
 ```julia
 function open(f::Function, args...)
@@ -563,13 +562,14 @@ function open(f::Function, args...)
 end
 ```
 
-Here, [`open()`](@ref) first opens the file for writing and then passes the resulting output stream
-to the anonymous function you defined in the `do ... end` block. After your function exits, [`open()`](@ref)
-will make sure that the stream is properly closed, regardless of whether your function exited
-normally or threw an exception. (The `try/finally` construct will be described in [Control Flow](@ref).)
+Here, [`open()`](@ref) primero abre el fichero para escritura y luego pasa el flujo de salida 
+resultante a la función anónima que se define en el bloque `do...end`.  Después de que la 
+función exista, [`open()`](@ref) asegurará que el flujo ha sido cerrado apropiadamente, sin 
+preocuparse de si la función salió normalmente o lanzó una excepción (la construcción 
+`try/finally` será descrita en  [Control de Flujo](@ref).)
 
-With the `do` block syntax, it helps to check the documentation or implementation to know how
-the arguments of the user function are initialized.
+Con la sintaxis de bloque `do` se ayuda a chequear la documentación o implementaciones para 
+saber cómo se inicializan los argumentos de la función de usuario.
 
 ## [Dot Syntax for Vectorizing Functions](@id man-vectorized)
 
@@ -672,8 +672,10 @@ they are equivalent to `broadcast` calls and are fused with other nested "dot" c
 
 ## Further Reading
 
-We should mention here that this is far from a complete picture of defining functions. Julia has
-a sophisticated type system and allows multiple dispatch on argument types. None of the examples
-given here provide any type annotations on their arguments, meaning that they are applicable to
-all types of arguments. The type system is described in [Types](@ref man-types) and defining a function
-in terms of methods chosen by multiple dispatch on run-time argument types is described in [Methods](@ref).
+Deberíamos mencionar que esto está lejos de ser una visión completa de las definiciones de 
+función. Julia tiene un sistema de tipos sofisticado y permite despacho múltiple sobre los 
+tipos de argumento. Ninguno de los ejemplos dados aquí proporciona anotaciones de tipo sobre 
+sus argmentos, lo que significa que son aplicables a cualquier tipo de argumento. El sistema 
+de tipos es descrito en [Tipos](@ref man-types) definir una función en términos de métodos 
+elegidos mediante despacho múltiple sobre los tpos de argumento en tiempo de ejecucoión 
+se describe en el capítulo [Methods](@ref).
