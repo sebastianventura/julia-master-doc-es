@@ -209,10 +209,10 @@ julia> map(round, [1.2,3.5,1.7])
  2.0
 ```
 
-This is fine if a named function effecting the transform already exists to pass as the first argument
-to [`map()`](@ref). Often, however, a ready-to-use, named function does not exist. In these
-situations, the anonymous function construct allows easy creation of a single-use function object
-without needing a name:
+Esto está bien si ya exite una función que efectúa la transformación que uno desea para pasarla 
+como primer argumento de [`map()`](@ref). Sin embargo, no es frecuente que exista este tipo de 
+función. En estas situaciones, el constructor de la función anónima permite una fácil creación 
+de un objeto función de un solo uso sin necesidad de asignarle un nombre:
 
 ```jldoctest
 julia> map(x -> x^2 + 2x - 1, [1,3,-1])
@@ -222,17 +222,18 @@ julia> map(x -> x^2 + 2x - 1, [1,3,-1])
  -2
 ```
 
-An anonymous function accepting multiple arguments can be written using the syntax `(x,y,z)->2x+y-z`.
-A zero-argument anonymous function is written as `()->3`. The idea of a function with no arguments
-may seem strange, but is useful for "delaying" a computation. In this usage, a block of code is
-wrapped in a zero-argument function, which is later invoked by calling it as `f()`.
+Para escribir funciones anónimas que aceptan múltiples argumentos puede utilizarse la sintaxis 
+`(x,y,z) -> 2x + y +z`. Una función anónima con cero argumentos se escribe como `() -> 3`.  La 
+idea de una funci´n sin argumentos puede parecer extraña, pero es útil para demorar un cálculo. 
+En este uso, un bloque de código es envuelto en una función con cero argumentos, el cual es 
+después invocado mediante una llamada como `f()`.
 
 ## Multiple Return Values
 
-In Julia, one returns a tuple of values to simulate returning multiple values. However, tuples
-can be created and destructured without needing parentheses, thereby providing an illusion that
-multiple values are being returned, rather than a single tuple value. For example, the following
-function returns a pair of values:
+En Julia, uno devuelve una tupla para simular el retorno de múltiples valores. Sin embargo, como
+las tuplas puede salteadas y destruidas sin necesitar paréntesis, podemos proporcionar una ilusión 
+de que se están devolviendo múltiples valores. Por ejemplo, la siguiente función devuelve un par 
+de valores:
 
 ```jldoctest foofunc
 julia> function foo(a,b)
@@ -241,16 +242,16 @@ julia> function foo(a,b)
 foo (generic function with 1 method)
 ```
 
-If you call it in an interactive session without assigning the return value anywhere, you will
-see the tuple returned:
+Si invocamos esta función en una sesión interactiva sin asignar los valores en ningún sitio, 
+comprobaremos que la función devuelve una tupla:
 
 ```jldoctest foofunc
 julia> foo(2,3)
 (5, 6)
 ```
 
-A typical usage of such a pair of return values, however, extracts each value into a variable.
-Julia supports simple tuple "destructuring" that facilitates this:
+Un uso típico de tal par de valores devueltos es extraer cada valor en una variable. Julia 
+soporta la "desestructuración" simple de una tupla que facilita esto:
 
 ```jldoctest foofunc
 julia> x, y = foo(2,3)
@@ -263,7 +264,8 @@ julia> y
 6
 ```
 
-You can also return multiple values via an explicit usage of the `return` keyword:
+Y también podemos devolver múltiples valores mediante el uso explícito de la palabra clave
+`return`:
 
 ```julia
 function foo(a,b)
@@ -271,7 +273,7 @@ function foo(a,b)
 end
 ```
 
-This has the exact same effect as the previous definition of `foo`.
+Esto tiene exactamente el mismo efecto que la definicin anterior de `foo`.
 
 ## Varargs Functions
 
