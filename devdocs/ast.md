@@ -1,6 +1,6 @@
 # ASTs en Julia
 
-Julia tiene dos representaciones del código. Primero, hay una sintaxis ASt superficial devuelta
+Julia tiene dos representaciones del código. Primero, hay una sintaxis AST superficial devuelta
 por el analizador sintáxtico (e.g. the [`parse()`](@ref) function), y manipulada mediante macros. 
 Es una representacin estructurada del código conforme este se escribe, construída por
  `julia-parser.scm` a partir de un flujo de caracteres. A contjinuacin hay una forma *lowered*, 
