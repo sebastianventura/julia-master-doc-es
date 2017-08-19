@@ -54,22 +54,23 @@ julia> ∑(2, 3)
 5
 ```
 
-## Argument Passing Behavior
+## Comportamiento del Paso de Argumentos
 
-Julia function arguments follow a convention sometimes called "pass-by-sharing", which means that
-values are not copied when they are passed to functions. Function arguments themselves act as
-new variable *bindings* (new locations that can refer to values), but the values they refer to
-are identical to the passed values. Modifications to mutable values (such as `Array`s) made within
-a function will be visible to the caller. This is the same behavior found in Scheme, most Lisps,
-Python, Ruby and Perl, among other dynamic languages.
+Los argumentos de función en Julia siguen un convenio denominado a veces "paso por compartición", 
+que significa que los valores no son copiados cuando se pasan a las funciones. Los argumentos de 
+las funciones actúan ellos mismos como nuevos enlaces a variable (nuevas localizaciones que pueden 
+referirse a valores) pero los valores a los que se refieren son idénticos a los valores pasados. 
+Las modificaciones a valores mutables (tales como los Arrays) hechos dentro de la función serán 
+visibles desde fuera de ésta. Este es el mismo comportamiento que presenta Scheme, la mayoría de 
+versiones de Lisp, Python, Ruby y Perl, entre otros lenguajes dinámicos.
 
-## The `return` Keyword
+## La palabra clave `return`
 
-The value returned by a function is the value of the last expression evaluated, which, by default,
-is the last expression in the body of the function definition. In the example function, `f`, from
-the previous section this is the value of the expression `x + y`. As in C and most other imperative
-or functional languages, the `return` keyword causes a function to return immediately, providing
-an expression whose value is returned:
+El valor devuelto por una función es el valor de la última expresión evaluada, el cual, por 
+defecto, es la última expresión en el cuerpo de definición de la función. En la función `f`, 
+mostrada en la sección anterior, el valor devuelto sería la suma `x + y`. Como en C y la mayoría 
+de los demás lenguajes imperativos o funcionales, la palabra clave `return` causa que la función 
+retorne inmediatamente, proporcionando una función cuyo valor es devuelto:
 
 ```julia
 function g(x,y)
@@ -78,8 +79,8 @@ function g(x,y)
 end
 ```
 
-Since function definitions can be entered into interactive sessions, it is easy to compare these
-definitions:
+Como las definiciones a función pueden ser introducidas en una sesión interactiva, es muy sencillo 
+comparar estas definiciones:
 
 ```jldoctest
 julia> f(x,y) = x + y
