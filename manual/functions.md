@@ -99,11 +99,12 @@ julia> g(2,3)
 6
 ```
 
-Of course, in a purely linear function body like `g`, the usage of `return` is pointless since
-the expression `x + y` is never evaluated and we could simply make `x * y` the last expression
-in the function and omit the `return`. In conjunction with other control flow, however, `return`
-is of real use. Here, for example, is a function that computes the hypotenuse length of a right
-triangle with sides of length `x` and `y`, avoiding overflow:
+Por supuesto, en una función con cuerpo puramente lineal como `g`, el uso de `return` es irrelevante 
+ya que la expresión `x+y` nunca va a ser evaluada, por lo que podríamos hacer que `x*y` fuese la última 
+línea de la función y omitir el `return`. Sin embargo, cuando hacemos uso de esta instrucción junto 
+con otras de control de flujo, el resultado puede ser muy interesante. Aquí, por ejemplo, hay una 
+función que calcula la longitud de la hipotenusa de un triángulo equilátero correcto con catetos de
+longitudes `x` e `y`, evitando un desbordamiento:
 
 ```jldoctest
 julia> function hypot(x,y)
@@ -125,17 +126,18 @@ julia> hypot(3, 4)
 5.0
 ```
 
-There are three possible points of return from this function, returning the values of three different
-expressions, depending on the values of `x` and `y`. The `return` on the last line could be omitted
-since it is the last expression.
+Hay tres posibles puntos de retorno en esta función, devolviendo los valores de tres expresiones 
+diferentes, dependiendo de los valores de `x` e `y`. El `return` de la última línea podría ser 
+omitido ya que es la última expresión.
 
-## Operators Are Functions
+## Los Operadores son Funciones
 
-In Julia, most operators are just functions with support for special syntax. (The exceptions are
-operators with special evaluation semantics like `&&` and `||`. These operators cannot be functions
-since [Short-Circuit Evaluation](@ref) requires that their operands are not evaluated before evaluation
-of the operator.) Accordingly, you can also apply them using parenthesized argument lists, just
-as you would any other function:
+En Julia, la mayoría de los operadores son funciones con soporte para una sintaxis especial (la 
+excepción a esta regla son las operaciones con una semática de evaluación especial, tales como 
+`&&` y `||`. Estos operadores no pueden ser funciones porque la [Evaluacin en Cortocircuito]
+(@ref) requiere que sus operandos no sean evaluados antes de la evaluación
+del operador). De acuerdo con ésto, podemos usar listas de argumentos entre paréntesis, tal como 
+en cualquier otra función:
 
 ```jldoctest
 julia> 1 + 2 + 3
