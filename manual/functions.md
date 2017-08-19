@@ -418,7 +418,8 @@ julia> parse(Int,"12")
 12
 ```
 
-Los argumentos opcionales son una sintaxis conveniente para escribir múltiples definiciones de métodos con diferentes números de argumentos (ver [Nota sobre Argumentos opcionales y *keyword*](@ref)).
+Los argumentos opcionales son una sintaxis conveniente para escribir múltiples definiciones de 
+métodos con diferentes números de argumentos (ver [Nota sobre Argumentos opcionales y *keyword*](@ref)).
 
 ## Argumentos *keyword*
 
@@ -481,9 +482,8 @@ La naturaleza de los argumentos *keyword*  le hace posible especificar el mismo 
 Por ejemplo, en la llamada `plot(x, y; options..., width=2)` es posible que la estructura `options` 
 contenga también un valor para `width`. En tal caso la ocurrencia más a la derecha toma precedencia; en
 este ejemplo `width` tendrá el valor `2`.
-contenga también un valor para `width`. In such a case the rightmost occurrence takes precedence; in
 
-## Evaluation Scope of Default Values
+## Ámbito de evaluación de Valores por defecto
 
 When optional and keyword argument default expressions are evaluated, only *previous* arguments are in
 scope.
