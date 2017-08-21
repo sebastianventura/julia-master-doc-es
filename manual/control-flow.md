@@ -56,8 +56,8 @@ julia> (x = 1;
 
 ## [Conditional Evaluation](@id man-conditional-evaluation)
 
-Conditional evaluation allows portions of code to be evaluated or not evaluated depending on the
-value of a boolean expression. Here is the anatomy of the `if`-`elseif`-`else` conditional syntax:
+La evaluación condicional permite que porciones de código sean evaluadas o no evaluadas dependiendo 
+del valor de una expresión booleana. Esta es la anatomía de la estructura de  `if`-`elseif`-`else`:
 
 ```julia
 if x < y
@@ -69,9 +69,10 @@ else
 end
 ```
 
-If the condition expression `x < y` is `true`, then the corresponding block is evaluated; otherwise
-the condition expression `x > y` is evaluated, and if it is `true`, the corresponding block is
-evaluated; if neither expression is true, the `else` block is evaluated. Here it is in action:
+En el ejemplo anterior, si la condición `x<y` es verdadera, entonces se evaluará el bloque 
+correspondiente. En caso contrario se evaluará la expresión `x>y`, y si esta es verdadera, se 
+ejecutará el bloque correspondiente. Si la expresión también es falsa, se ejecutaría el bloque 
+correspondiente al `else`. Veámoslo en acción:
 
 ```jldoctest
 julia> function test(x, y)
@@ -95,14 +96,14 @@ julia> test(1, 1)
 x is equal to y
 ```
 
-The `elseif` and `else` blocks are optional, and as many `elseif` blocks as desired can be used.
-The condition expressions in the `if`-`elseif`-`else` construct are evaluated until the first
-one evaluates to `true`, after which the associated block is evaluated, and no further condition
-expressions or blocks are evaluated.
+Los bloques `elsif` y `else` son opcionales, y además pueden usarse tantos `elsif` como se 
+deseen. Las expresiones condicionales del `if-elsif-else` serán evaluadas hasta que una de 
+ellas se evalúe a `true`, después de lo cuál se evaluará el blqoue asociado, y ya no se 
+evaluarán más expresiones condicionales.
 
-`if` blocks are "leaky", i.e. they do not introduce a local scope. This means that new variables
-defined inside the `if` clauses can be used after the `if` block, even if they weren't defined
-before. So, we could have defined the `test` function above as
+Los bloques `if` son "permeables", es decir, no introducen un ámbito local. Eso significa 
+que las variables que se definen dentro del bloque serán visibles fuera del mismo. Por 
+tanto, podríamos haber definido la relación `test` de antes como...
 
 ```jldoctest
 julia> function test(x,y)
@@ -121,9 +122,10 @@ julia> test(2, 1)
 x is greater than y.
 ```
 
-The variable `relation` is declared inside the `if` block, but used outside. However, when depending
-on this behavior, make sure all possible code paths define a value for the variable. The following
-change to the above function results in a runtime error
+La variable `relation` se ha declarado dentro del bloque `if`,  pero se usa fuera. Sin 
+embargo, cuando se hace uso de este tipo de variables, hay que asegurarse de que todos los 
+caminos de código definen un valor para la variable. La siguiente función no lo tiene en 
+cuenta y genera un error en tiempo de ejecución.
 
 ```jldoctest
 julia> function test(x,y)
@@ -145,9 +147,9 @@ Stacktrace:
  [1] test(::Int64, ::Int64) at ./none:7
 ```
 
-`if` blocks also return a value, which may seem unintuitive to users coming from many other languages.
-This value is simply the return value of the last executed statement in the branch that was chosen,
-so
+Los bloques `if` también devuelven un valor, lo que puede no parecer intuitivo para quienes 
+proceden de otros lenguajes de programación no funcionales. Este valor no es más que el  
+devuelto por la última instrucción en la rama que fue elegida. Por tanto:
 
 ```jldoctest
 julia> x = 3
@@ -161,11 +163,12 @@ julia> if x > 0
 "positive!"
 ```
 
-Note that very short conditional statements (one-liners) are frequently expressed using Short-Circuit
-Evaluation in Julia, as outlined in the next section.
+Nótese que las instrucciones condicionales muy cortas (de una línea) se suelen expresar en 
+Julia mediante evaluación en cortocircuito, como se verá en la siguiente sección.
 
-Unlike C, MATLAB, Perl, Python, and Ruby -- but like Java, and a few other stricter, typed languages
--- it is an error if the value of a conditional expression is anything but `true` or `false`:
+A diferencia de C, MATLAB, Perl, Python y Ruby (pero como en Java y en otros lenguajes 
+tipados, más estrictos) en Julia se produce un error si el valor de una expresión condicional 
+es algo que no sea `true` o `false`.
 
 ```jldoctest
 julia> if 1
@@ -177,25 +180,27 @@ ERROR: TypeError: non-boolean (Int64) used in boolean context
 This error indicates that the conditional was of the wrong type: [`Int64`](@ref) rather
 than the required [`Bool`](@ref).
 
-The so-called "ternary operator", `?:`, is closely related to the `if`-`elseif`-`else` syntax,
-but is used where a conditional choice between single expression values is required, as opposed
-to conditional execution of longer blocks of code. It gets its name from being the only operator
-in most languages taking three operands:
+Este error indica que el condicional fue de un tipo incorrecto. 
+
+El llamado *operador ternario* (`?`) está muy relacionado con la sintaxis de `if-elsif-else`, 
+pero se usa donde hay que hacer una elección condicional entre expresiones sencillas, a 
+diferencia de la ejecución condicional de grandes bloques de código. Su nombre se debe a que 
+es el único operador que toma tres operandos en la mayoría de los lenguajes de programación:
 
 ```julia
 a ? b : c
 ```
 
-The expression `a`, before the `?`, is a condition expression, and the ternary operation evaluates
-the expression `b`, before the `:`, if the condition `a` is `true` or the expression `c`, after
-the `:`, if it is `false`. Note that the spaces around `?` and `:` are mandatory: an expression
-like `a?b:c` is not a valid ternary expression (but a newline is acceptable after both the `?` and
-the `:`).
+La expresión `a` delante del `?` es una expresión condicional, y la operación ternaria evalúa 
+la expresión `b` (la que está delante del símbolo `:`)  si la condición `a` es `true` o la 
+expresión `c` si la condición `a` es `false`. Nótese que los espacios alrededor de `?` y `:` 
+çson obligatorios: una expresión como `a?b:c` no es una expresin ternaria válida (aunque se
+pueden utilizar saltos de línea entre los símbolos `?` y `:`).
 
-The easiest way to understand this behavior is to see an example. In the previous example, the
-`println` call is shared by all three branches: the only real choice is which literal string to
-print. This could be written more concisely using the ternary operator. For the sake of clarity,
-let's try a two-way version first:
+La forma más fácil de comprender este comportamiento es ver un ejemplo. En el ejemplo anterior,
+la llamada a `println` es compartida por las tres ramas: la única elección real es qué cadena
+literal imprimir. Esto podría haberse escrito de forma más concisa usando el operador ternario.
+En aras de la claridad, intentemos primero la versin con dos caminos:
 
 ```jldoctest
 julia> x = 1; y = 2;
@@ -209,9 +214,9 @@ julia> println(x < y ? "less than" : "not less than")
 not less than
 ```
 
-If the expression `x < y` is true, the entire ternary operator expression evaluates to the string
-`"less than"` and otherwise it evaluates to the string `"not less than"`. The original three-way
-example requires chaining multiple uses of the ternary operator together:
+En los ejemplos anteriores, si `x < y` es `true` se devolverá la cadena `"less than"` y, en caso 
+contrario, se devolverá la cadena `"not less than"`. El ejemplo original, que tiene tres opciones, 
+requeriría el uso encadenado del operador `?`:
 
 ```jldoctest
 julia> test(x, y) = println(x < y ? "x is less than y"    :
@@ -228,10 +233,11 @@ julia> test(1, 1)
 x is equal to y
 ```
 
-To facilitate chaining, the operator associates from right to left.
+Para facilitar el encadenamiento, el operador `?` asocia de derecha a izquierda.
 
-It is significant that like `if`-`elseif`-`else`, the expressions before and after the `:` are
-only evaluated if the condition expression evaluates to `true` or `false`, respectively:
+Es también significativo que, como en la construcción `if-elsif-else` las expresiones anterior y 
+posterior al símbolo `:` sólo se evalúan si la expresión condicional es evaluada a `true` o `false`, 
+respectivamente.
 
 ```jldoctest
 julia> v(x) = (println(x); x)
