@@ -252,21 +252,23 @@ no
 "no"
 ```
 
-## Short-Circuit Evaluation
+## Evaluación en Cortocircuito
 
-Short-circuit evaluation is quite similar to conditional evaluation. The behavior is found in
-most imperative programming languages having the `&&` and `||` boolean operators: in a series
-of boolean expressions connected by these operators, only the minimum number of expressions are
-evaluated as are necessary to determine the final boolean value of the entire chain. Explicitly,
-this means that:
+La evaluación en cortocircuito es bastante similar a la evaluación condicional. Este comportamiento 
+aparece en la mayoría de los lenguajes de programación imperativos que tiene los operadores booleanos 
+`&&` y `||`.  En una serie de expresiones booleanas conectadas por estos operadores, sólo se evalúa 
+el número mínimo de expresiones necesarios para determinar el valor booleano final de la cadena 
+completa. Explícitamente, esto significa que:
 
-  * In the expression `a && b`, the subexpression `b` is only evaluated if `a` evaluates to `true`.
-  * In the expression `a || b`, the subexpression `b` is only evaluated if `a` evaluates to `false`.
+* En la expresión `a && b` la subexpresión `b` sólo se evalúa si la subexpresión `a` es evaluada a 
+`true`.
+* En la expresión `a || b` la subexpresión `b` sólo se evalúa si la subexpresión `a` es evaluada a 
+`false`.
 
-The reasoning is that `a && b` must be `false` if `a` is `false`, regardless of the value of
-`b`, and likewise, the value of `a || b` must be true if `a` is `true`, regardless of the value
-of `b`. Both `&&` and `||` associate to the right, but `&&` has higher precedence than `||` does.
-It's easy to experiment with this behavior:
+El razonamiento es que `a && b` debe ser `false` si `a` is `false`, independientemente del valor de `b`
+y, análogamente, el valor de `a || b` debe ser cierto si `a` es `true`, independientemente del valor de
+`b`. Tanto `&&` como `||` asocian a la derecha, pero `&&` tiene mayore precedencia que `||`. Es fácil 
+experimentar con este comportamiento:
 
 ```jldoctest tandf
 julia> t(x) = (println(x); true)
