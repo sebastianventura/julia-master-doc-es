@@ -962,62 +962,70 @@ Note que en la actualidad las tareas Julia no son planificadas para que ejecuten
 
 ### Core task operations
 
-Let us explore the low level construct [`yieldto()`](@ref) to underestand how task switching works.
-`yieldto(task,value)` suspends the current task, switches to the specified `task`, and causes
-that task's last [`yieldto()`](@ref) call to return the specified `value`. Notice that [`yieldto()`](@ref)
-is the only operation required to use task-style control flow; instead of calling and returning
-we are always just switching to a different task. This is why this feature is also called "symmetric
-coroutines"; each task is switched to and from using the same mechanism.
+Exploremos la construcción de bajo nivel  [`yieldto()`](@ref) para comprender cómo funciona la 
+conmutación de tareas. `yieldto(task,value)` suspende la tarea actual, conmuta a la tarea 
+especificada, y causa que la última llamada a  [`yieldto()`](@ref) devuelva el valor especificado
+`value`. Nótese que [`yieldto()`](@ref) para usar control de flujo estilo tarea: en lugar de 
+llamar y retornar nos limitamos a conmutar entre las distintas tareas. Esta es la razón por la 
+que esta característica es también llamada "corrutinas simétricas". Cada tarea es conmutada
+usando el mismo mecanismo.
 
-[`yieldto()`](@ref) is powerful, but most uses of tasks do not invoke it directly. Consider why
-this might be. If you switch away from the current task, you will probably want to switch back
-to it at some point, but knowing when to switch back, and knowing which task has the responsibility
-of switching back, can require considerable coordination. For example, [`put!()`](@ref) and [`take!()`](@ref)
-are blocking operations, which, when used in the context of channels maintain state to remember
-who the consumers are. Not needing to manually keep track of the consuming task is what makes [`put!()`](@ref)
-easier to use than the low-level [`yieldto()`](@ref).
 
-In addition to [`yieldto()`](@ref), a few other basic functions are needed to use tasks effectively.
+[`yieldto()`](@ref) es potente, pero la mayoría de los usos de tareas no lo invocan directamente. 
+Consideremos a qué se debe esto. Si tu conmutas desde la tarea actual, probablemente querrás 
+volver a conmutar en otro puento, pero saber cuándo conmutar, y saber qué tarea tiene la
+responsabilidad de conmutar hacia atrás puede requerir una coordinación considerable. Por 
+ejemplo,  [`put!()`](@ref) y [`take!()`](@ref) son operaciones bloqueantes, las cuales, cuando
+se usan en el contexto de los canales mantienen un estado para recordar quiénes son los 
+consumidores.  No necesitar mantener manualmente la traza de la tarea es lo que hace que 
+[`put!()`](@ref) sea más sencilla de usar que la instrucción de bajo nivel [`yieldto()`](@ref).
 
-  * [`current_task()`](@ref) gets a reference to the currently-running task.
-  * [`istaskdone()`](@ref) queries whether a task has exited.
-  * [`istaskstarted()`](@ref) queries whether a task has run yet.
-  * [`task_local_storage()`](@ref) manipulates a key-value store specific to the current task.
+Ademas de [`yieldto()`](@ref), se necesitan otras funciones básicas para usar las tareas de 
+forma efectiva:
+
+  * [`current_task()`](@ref) devuelve una referencia a la tarea que se está ejecutando actualmente.
+  * [`istaskdone()`](@ref) consulta para saber si una tarea ha salido.
+  * [`istaskstarted()`](@ref) consulta para saber si una tarea se ha iniciado ya.
+  * [`task_local_storage()`](@ref) manipula un almacenamiento clave-valor específico a la tarea 
+    actual.
 
 ### Tasks and events
 
-Most task switches occur as a result of waiting for events such as I/O requests, and are performed
-by a scheduler included in the standard library. The scheduler maintains a queue of runnable tasks,
-and executes an event loop that restarts tasks based on external events such as message arrival.
+Muchos cambios de tarea ocurren como resultado de la espera de eventos tales como peticiones de E/S, y
+son realizados por un planificador incluido en la librería estándar. El planificador mantiene una cola 
+de tareas ejecutables, y ejecuta un bucle de eventos que reinicia las tareas basándose en eventos 
+externos tales como la llegada de un mensaje.
 
-The basic function for waiting for an event is [`wait()`](@ref). Several objects implement [`wait()`](@ref);
-for example, given a `Process` object, [`wait()`](@ref) will wait for it to exit. [`wait()`](@ref)
-is often implicit; for example, a [`wait()`](@ref) can happen inside a call to [`read()`](@ref)
-to wait for data to be available.
+La función básica para esperar un evento es [`wait()`](@ref). Hay varios objetos que implementan 
+[`wait()`](@ref); por ejemplo, dado un objeto `Process`, [`wait()`](@ref)  esperará a que este salga.
+[`wait()`](@ref) suele ser implícito; por ejemplo, una llamada a [`wait()`](@ref) puede tener lugar 
+dentro de una llamada a  [`read()`](@ref) para esperar a que haya datos disponibles.
 
-In all of these cases, [`wait()`](@ref) ultimately operates on a [`Condition`](@ref) object, which
-is in charge of queueing and restarting tasks. When a task calls [`wait()`](@ref) on a [`Condition`](@ref),
-the task is marked as non-runnable, added to the condition's queue, and switches to the scheduler.
-The scheduler will then pick another task to run, or block waiting for external events. If all
-goes well, eventually an event handler will call [`notify()`](@ref) on the condition, which causes
-tasks waiting for that condition to become runnable again.
+En todos estos casos,  [`wait()`](@ref) opera últimamente sobre un objeto  [`Condition`](@ref)
+que es responsable de encolar y reiniciar las tareas. Cuando una tarea llama a [`wait()`](@ref) 
+sobre un objeto [`Condition`](@ref),la tarea es marcada como no ejecutable, añadida a la cola de 
+esta condición y el control pasa al planificador. El planificador se ocupa entonces de preparar 
+otra tarea para ejecución o se queda bloqueado esperando eventos externos. Si todo va bien, 
+eventualmente un manejador de eventos llamará a  [`notify()`](@ref) sobre la condición, lo que causa
+que las tareas que estaban esperando esa condición se vuelvan ejecutables de nuevo.
 
-A task created explicitly by calling [`Task`](@ref) is initially not known to the scheduler. This
-allows you to manage tasks manually using [`yieldto()`](@ref) if you wish. However, when such
-a task waits for an event, it still gets restarted automatically when the event happens, as you
-would expect. It is also possible to make the scheduler run a task whenever it can, without necessarily
-waiting for any events. This is done by calling [`schedule()`](@ref), or using the [`@schedule`](@ref)
-or [`@async`](@ref) macros (see [Parallel Computing](@ref) for more details).
+Una tarea creada explícitamente llamado a  [`Task`](@ref) es inicialmente no conocida por el
+planificador. Esto nos permite gestionar las tareas manualmente usando  [`yieldto()`](@ref) si 
+lo deseamos. Sin embargo, cuando tal tarea espera un evento, sigue siendo reiniciada cuando el 
+evento tiene lugar, como podría esperarse. Es también posible hacer que el planificador ejecute
+una tarea siempre que pueda, sin esperar ningún evento necesariamente. Esto se hace llamando
+a [`schedule()`](@ref), o usando las macros [`@schedule`](@ref) o [`@async`](@ref) macros 
+(ver [Parallel Computing](@ref) para más detalles).
 
 ### Task states
 
-Tasks have a `state` field that describes their execution status. A [`Task`](@ref) `state` is one of the following
-symbols:
+La tareas tienen un campo `state` que describe su estado de ejecucoión. El estado de una tarea es 
+uno de los siguientes símbolos:
 
-| Symbol      | Meaning                                            |
-|:----------- |:-------------------------------------------------- |
-| `:runnable` | Currently running, or available to be switched to  |
-| `:waiting`  | Blocked waiting for a specific event               |
-| `:queued`   | In the scheduler's run queue about to be restarted |
-| `:done`     | Successfully finished executing                    |
-| `:failed`   | Finished with an uncaught exception                |
+| Symbol      | Meaning                                                            |
+|:----------- |:------------------------------------------------------------------ |
+| `:runnable` | Ejecutando actualmente, o disponible para ser intercambiado        |
+| `:waiting`  | Bloqueado esperando un evento específico                           |
+| `:queued`   | En la cola de ejecución del planiticador a punto de ser reiniciado |
+| `:done`     | Finalizada su ejecucción con éxito                                 |
+| `:failed`   | Finalizado con alguna excepción no atrapada                        |
