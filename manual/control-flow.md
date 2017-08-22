@@ -960,7 +960,7 @@ para enlazar explícitamente un conjunto de canales con un conjunto de tareas pr
 
 Note que en la actualidad las tareas Julia no son planificadas para que ejecuten sobre núcleos de CPU separados. Los verdaderos hilos del núcleo se discutirán en la sección [Computación Paralela](@ref).
 
-### Core task operations
+### Operaciones Básicas de Tareas
 
 Exploremos la construcción de bajo nivel  [`yieldto()`](@ref) para comprender cómo funciona la 
 conmutación de tareas. `yieldto(task,value)` suspende la tarea actual, conmuta a la tarea 
@@ -989,7 +989,7 @@ forma efectiva:
   * [`task_local_storage()`](@ref) manipula un almacenamiento clave-valor específico a la tarea 
     actual.
 
-### Tasks and events
+### Tareas y Eventos
 
 Muchos cambios de tarea ocurren como resultado de la espera de eventos tales como peticiones de E/S, y
 son realizados por un planificador incluido en la librería estándar. El planificador mantiene una cola 
@@ -1017,7 +1017,7 @@ una tarea siempre que pueda, sin esperar ningún evento necesariamente. Esto se 
 a [`schedule()`](@ref), o usando las macros [`@schedule`](@ref) o [`@async`](@ref) macros 
 (ver [Parallel Computing](@ref) para más detalles).
 
-### Task states
+### Estados de una Tarea
 
 La tareas tienen un campo `state` que describe su estado de ejecucoión. El estado de una tarea es 
 uno de los siguientes símbolos:
