@@ -314,15 +314,15 @@ julia> f(1) || f(2)
 false
 ```
 
-You can easily experiment in the same way with the associativity and precedence of various combinations
-of `&&` and `||` operators.
+Se puede experimentar de forma parecida con la asociatividad y la precedencia de varias combinaciones de 
+operadores `&&` y `||`.
 
-This behavior is frequently used in Julia to form an alternative to very short `if` statements.
-Instead of `if <cond> <statement> end`, one can write `<cond> && <statement>` (which could be
-read as: <cond> *and then* <statement>). Similarly, instead of `if ! <cond> <statement> end`,
-one can write `<cond> || <statement>` (which could be read as: <cond> *or else* <statement>).
+Este comportamiento se utiliza en Julia con frecuencia para formar una alternativa a instrucciones `if` 
+muy cortas. En lugar de usar la construcción `if <cond> && <instrucción>` uno puede escribir `<cond> && <instrucción>` 
+que puede leerse como `<cond>` y entonces `<instrucción>`. de forma similar, uno puede escribir 
+`<cond> || <instrucción>`, que se leería como `<cond>` o sino `<instrucción>` en lugar de `if !<cond> || <instrucción>`.
 
-For example, a recursive factorial routine could be defined like this:
+Por ejemplo, una rutina recursiva para obtener un factorial podría ser definida como:
 
 ```jldoctest
 julia> function fact(n::Int)
@@ -344,9 +344,10 @@ Stacktrace:
  [1] fact(::Int64) at ./none:2
 ```
 
-Boolean operations *without* short-circuit evaluation can be done with the bitwise boolean operators
-introduced in [Mathematical Operations and Elementary Functions](@ref): `&` and `|`. These are
-normal functions, which happen to support infix operator syntax, but always evaluate their arguments:
+Las operaciones booleanas sin cortocircuito podrían llevarse a cabo con los operadores a nivel de bit 
+introducidos en la sección [Operaciones Matemáticas y Funciones Elementales](@ref): `&` and `|`. Estas 
+son funciones normales, que suportan la sintaxis infija de los operadores, pero que siempre evalúan 
+sus argumentos:
 
 ```jldoctest tandf
 julia> f(1) & t(2)
@@ -360,17 +361,18 @@ julia> t(1) | t(2)
 true
 ```
 
-Just like condition expressions used in `if`, `elseif` or the ternary operator, the operands of
-`&&` or `||` must be boolean values (`true` or `false`). Using a non-boolean value anywhere except
-for the last entry in a conditional chain is an error:
+Como en el caso de las expresiones condicionales usadas en `if`, `elsif` o el operador 
+ternario `?`, los operandos de `&&` y de `||` deben ser valores booleanos.  Usar un valor
+no booleanos en cualquier lugar distinto de la última entrada en una cadena condicional 
+producirá un error.
 
 ```jldoctest
 julia> 1 && true
 ERROR: TypeError: non-boolean (Int64) used in boolean context
 ```
 
-On the other hand, any type of expression can be used at the end of a conditional chain. It will
-be evaluated and returned depending on the preceding conditionals:
+Por otra parte, cualquire tipo de expresión puede ser usada al final de una cadena 
+condicional. Ella será evaluada y devuelta dependiendo de los condicionales precedentes:
 
 ```jldoctest
 julia> true && (x = (1, 2, 3))
@@ -380,10 +382,10 @@ julia> false && (x = (1, 2, 3))
 false
 ```
 
-## [Repeated Evaluation: Loops](@id man-loops)
+## [Evaluación Repetida: Bucles](@id man-loops)
 
-There are two constructs for repeated evaluation of expressions: the `while` loop and the `for`
-loop. Here is an example of a `while` loop:
+Hay dos construcciones que realizan la evaluación repetida de expresiones: el bucle 
+`while` y el bucle `for`. He aquí un ejemplo del bucle `while`:
 
 ```jldoctest
 julia> i = 1;
@@ -399,13 +401,13 @@ julia> while i <= 5
 5
 ```
 
-The `while` loop evaluates the condition expression (`i <= 5` in this case), and as long it remains
-`true`, keeps also evaluating the body of the `while` loop. If the condition expression is `false`
-when the `while` loop is first reached, the body is never evaluated.
+El bucle `while` evalúa la expresión condicional (en el ejemplo `i<=5`) y, mientras que 
+esta se evalúe a `true`, sigue evaluando el cuerpo del bucle `while`. Si la expresión se 
+evalúa a `false` la primera vez en que se alcanza el bucle, su cuerpo nunca será evaluado.
 
-The `for` loop makes common repeated evaluation idioms easier to write. Since counting up and
-down like the above `while` loop does is so common, it can be expressed more concisely with a
-`for` loop:
+El bucle `for` facilita la repetición. Dado que contar arriba y abajo (como en el ejemplo 
+anterior del bucle `while`) es tan común, podemos expresar esto de una forma muy concisa 
+con un bucle `for`:
 
 ```jldoctest
 julia> for i = 1:5
@@ -418,12 +420,13 @@ julia> for i = 1:5
 5
 ```
 
-Here the `1:5` is a `Range` object, representing the sequence of numbers 1, 2, 3, 4, 5. The `for`
-loop iterates through these values, assigning each one in turn to the variable `i`. One rather
-important distinction between the previous `while` loop form and the `for` loop form is the scope
-during which the variable is visible. If the variable `i` has not been introduced in an other
-scope, in the `for` loop form, it is visible only inside of the `for` loop, and not afterwards.
-You'll either need a new interactive session instance or a different variable name to test this:
+En el ejemplo anterior, `1:5` es un objeto `Range` que representa una secuencia de números. 
+El bucle `for` itera sobre estos valores, asignando cada uno de ellos por turno a la variable
+`i`.  Una distinción importante ente esta construcción (`for`) y la construcción anterior 
+(`while`) es el ámbito durante el cuál la variable es visible. Si la variable `i` no ha 
+sido introducida en otro ámbito, el bucle `for` la verá sólo en su interior y no 
+posteriormente. Para demostrar esto necesitaremos una nueva sesión interactiva o usar un 
+nombre de variable distinto:
 
 ```jldoctest
 julia> for j = 1:5
@@ -439,12 +442,12 @@ julia> j
 ERROR: UndefVarError: j not defined
 ```
 
-See [Scope of Variables](@ref scope-of-variables) for a detailed explanation of variable scope and how it works in
-Julia.
+Ver [Ámbito de Variables](@ref scope-of-variables) para una explicación detallada de los ámbitos
+de las variables y cómo funcionan en Julia.
 
-In general, the `for` loop construct can iterate over any container. In these cases, the alternative
-(but fully equivalent) keyword `in` or `∈` is typically used instead of `=`, since it makes
-the code read more clearly:
+En general, la construcción `for` puede iterar sobre cualquier contenedor. En estos casos, la 
+palara clave alternativa (pero totalmente equivalente `in` o `∈` es usada en lugar de `=`, dado 
+que hace que la lectura del código sea más clara.
 
 ```jldoctest
 julia> for i in [1,4,0]
@@ -462,12 +465,12 @@ bar
 baz
 ```
 
-Various types of iterable containers will be introduced and discussed in later sections of the
-manual (see, e.g., [Multi-dimensional Arrays](@ref man-multi-dim-arrays)).
+En otras secciones del manual se introducirán y discutirán varios tipos de contenedores iterables 
+(ver, por ejemplo, [Arrays Multi-dimensionales](@ref man-multi-dim-arrays)).
 
-It is sometimes convenient to terminate the repetition of a `while` before the test condition
-is falsified or stop iterating in a `for` loop before the end of the iterable object is reached.
-This can be accomplished with the `break` keyword:
+Algunas veces es conveniente terminar la repetición de un `while` antes de chequear la condición 
+de test o partar de iterar en un bucle `for` antes de que se alcance el final del objeto iterable. 
+Esto puede conseguirse usando la palabra clave `break`:
 
 ```jldoctest
 julia> i = 1;
@@ -498,10 +501,12 @@ julia> for i = 1:1000
 5
 ```
 
-Without the `break` keyword, the above `while` loop would never terminate on its own, and the `for` loop would iterate up to 1000. These loops are both exited early by using `break`.
+Si no existiera la palabra clave `break`, el bucle `while` anterior nunca finalizará por si 
+mismo,  y el bucle `for` iteraría hasta 10000. Si hacemos uso de la instrucción `break` 
+conseguiremos abandonar el bucle mucho antes.
 
-In other circumstances, it is handy to be able to stop an iteration and move on to the next one
-immediately. The `continue` keyword accomplishes this:
+En otras circunstancias es útil ser capaz de detener una iteración y moverse a la siguiente 
+de forma inmediata. Para ello, se utiliza la palabra clave `continue`:
 
 ```jldoctest
 julia> for i = 1:10
@@ -515,13 +520,13 @@ julia> for i = 1:10
 9
 ```
 
-This is a somewhat contrived example since we could produce the same behavior more clearly by
-negating the condition and placing the `println` call inside the `if` block. In realistic usage
-there is more code to be evaluated after the `continue`, and often there are multiple points from
-which one calls `continue`.
+Este es un ejemplo un tanto artificial, ya que podríamos obtener el mismo comportamiento de 
+forma mucho más clara negando las condiciones y colocando la llamada a `println` dentro del 
+bloque `if`. En usos más reales hay más código que evaluar después del `continue`, y con 
+frecuencia hay muchos puntos desde los que uno puede llamar a esta instrucción.
 
-Multiple nested `for` loops can be combined into a single outer loop, forming the cartesian product
-of its iterables:
+Podemos anidar múltiples bucles for en un solo bucle externo, formando el producto cartesiano 
+de sus iterables:
 
 ```jldoctest
 julia> for i = 1:2, j = 3:4
@@ -533,7 +538,8 @@ julia> for i = 1:2, j = 3:4
 (2, 4)
 ```
 
-A `break` statement inside such a loop exits the entire nest of loops, not just the inner one.
+Una instrucción `break` dentro de tal bucle sale del anidamiento de bucles completo, no sólo 
+del más interior.
 
 ## Exception Handling
 
