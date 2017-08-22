@@ -1,32 +1,34 @@
-# [Scope of Variables](@id scope-of-variables)
+# [Ámbito de las variables](@id scope-of-variables)
 
-The *scope* of a variable is the region of code within which a variable is visible. Variable scoping
-helps avoid variable naming conflicts. The concept is intuitive: two functions can both have arguments
-called `x` without the two `x`'s referring to the same thing. Similarly there are many other cases
-where different blocks of code can use the same name without referring to the same thing. The
-rules for when the same variable name does or doesn't refer to the same thing are called scope
-rules; this section spells them out in detail.
+El *ámbito* de una variable es la región de código donde dicha variable es visible. El ámbito de las 
+variables ayuda a evitar conflictos de nombrado de variables. El concepto es intuitivo: dos funciones
+pueden tener argumentos denominados `x` sin que las dos `x` se refieran a la misma cosa. De forma 
+similar, hay muchos otros casos donde diferentes bloques de código pueden usar el mismo nombre sin 
+referirse a la misma cosa. Las reglas para cuando el mismo nombre de variable se refiere o no a la 
+misma cosa se llaman *reglas de ámbito*. Em este tema se analizan en detalle. 
 
-Certain constructs in the language introduce *scope blocks*, which are regions of code that are
-eligible to be the scope of some set of variables. The scope of a variable cannot be an arbitrary
-set of source lines; instead, it will always line up with one of these blocks. There are two
-main types of scopes in Julia, *global scope* and *local scope*, the latter can be nested. The
-constructs introducing scope blocks are:
+Ciertas construcciones en el lenguaje introducen *bloques de ámbitos*, que son regiones de código 
+que son elegibles para estar en el ámbito de algún conjunto de variables. El ámbito de una variable 
+no puede ser un conjunto arbitrario de líneas de código; en lugar de ello, siempre se alinea con uno
+de esos bloques. Hay dos tipos principales de ámbitos en Julia: *globales* y *locales*, pudiendo los
+últimos estar anidados. Las construcciones que introducen estos bloques de ámbito son:
 
-| Scope name           | block/construct introducing this kind of scope                                                           |
-|:-------------------- |:-------------------------------------------------------------------------------------------------------- |
-| [Global Scope](@ref) | `module`, `baremodule`, at interactive prompt (REPL)                                                     |
-| [Local Scope](@ref)  | [Soft Local Scope](@ref): `for`, `while`, comprehensions, try-catch-finally, `let`                       |
-| [Local Scope](@ref)  | [Hard Local Scope](@ref): functions (either syntax, anonymous & do-blocks), `struct`, `macro`            |
+|Nombre de ámbito | Bloque/construcción que introduce este tipo de ámbito                                             |
+|:---------------|:---------------------------------------------------------------------------------------------------|
+| Ámbito Global  | `module`, `baremodule` y prompt interactivo (REPL)                                                 |
+| Ámbito Local   | [Ámbito local blando](@ref): `for`, `while` comprensiones, bloques `try-catch-finally`, `let`      |
+| Ámbito Local   | [Ámbito local duro](@ref): funciones (cualquier sintaxis, anónima y bloques do), `struct`, `macro` |
 
-Notably missing from this table are [begin blocks](@ref man-compound-expressions) and [if blocks](@ref man-conditional-evaluation), which do *not*
-introduce new scope blocks. All three types of scopes follow somewhat different rules which will
-be explained below as well as some extra rules for certain blocks.
 
-Julia uses [lexical scoping](https://en.wikipedia.org/wiki/Scope_%28computer_science%29#Lexical_scoping_vs._dynamic_scoping),
-meaning that a function's scope does not inherit from its caller's scope, but from the scope in
-which the function was defined. For example, in the following code the `x` inside `foo` refers
-to the `x` in the global scope of its module `Bar`:
+Dos notables ausencias en esta tabla son los [bloques begin](@ref man-compound-expressions) y los
+[bloques if](@ref man-conditional-evaluation), que no introducen nuevos bloques de ámbito. Los tres
+tipos de bloques siguen reglas un poco diferentes que serán explicadas más adelante, así como algunas 
+reglas extra para ciertos bloques.
+
+Julia usa un [ámbito léxico](https://en.wikipedia.org/wiki/Scope_%28computer_science%29#Lexical_scoping_vs._dynamic_scoping),
+lo que significa que el ámbito de una función no hereda del ámbito que lo invocó, pero si del ámbito 
+en que la función fue definida. Por ejemplo, en el siguiente código, `x` deontro de `foo` se refiere 
+a la `x` que hay en el ámbito local de su módulo `Bar`:
 
 ```jldoctest moduleBar
 julia> module Bar
@@ -35,7 +37,7 @@ julia> module Bar
        end;
 ```
 
-and not a `x` in the scope where `foo` is used:
+y no a la `x` en el ámbito en que se ha usado `foo`:
 
 ```jldoctest moduleBar
 julia> import .Bar
@@ -46,9 +48,17 @@ julia> Bar.foo()
 1
 ```
 
-Thus *lexical scope* means that the scope of variables can be inferred from the source code alone.
+Por tanto, *ámbito léxico* significa que el ámbito de las variables puede ser inferido del código 
+fuente sin más. 
 
 ## Global Scope
+
+*Cada módulo introduce un nuevo espacio global*, separado del ámbito global de todos los otros 
+módulos; no existen ámbitos globales compartidos por todos. Los módulos pueden introducir variables 
+de otros módulos o en su ámbito a través del uso de las instrucciones [`using`](@ref modules) o 
+[`import`](@ref modules) o a través de acceso cualificado usando la notación punto. En consecuencia, 
+cada módulo es un espacio de nombres. Notese que los enlaces de nombres pueden sólo ser cambiados 
+dentro de su ámbito global y no desde un módulo exterior.
 
 *Each module introduces a new global scope*, separate from the global scope of all other modules;
 there is no all-encompassing global scope. Modules can introduce variables of other modules into
@@ -83,20 +93,20 @@ julia> module E
 ERROR: cannot assign variables in other modules
 ```
 
-Note that the interactive prompt (aka REPL) is in the global scope of the module `Main`.
+Nótese que el prompt interactivo (REPL) está en el ámbito global del módulo `Main`.
 
-## Local Scope
+## Ámbito Local
 
-A new local scope is introduced by most code-blocks, see above table for a complete list.
- A local scope *usually* inherits all the variables from its parent scope, both for reading and
-writing. There are two subtypes of local scopes, hard and soft, with slightly different rules
-concerning what variables are inherited. Unlike global scopes, local scopes are not namespaces,
-thus variables in an inner scope cannot be retrieved from the parent scope through some sort of
-qualified access.
+La mayoría de los bloques de código introducen un nuevo ámbito local. Los ámbitos locales 
+suelen heredar todas las variables de su ámbito padre, tanto para lectura como para escritura. 
+Hay dos subtipos de ámbitos locales, denominados *duros* y *blandos*, con reglas ligeramente 
+distintas en relación a qué variables son heredadas. A diferencia de los ámbitos globales, los 
+ámbitos locales no son espacios de nombres, por lo que las variables de un ámbito más interno 
+no pueden ser recuperadas de uno más externo a través de alguna clase de acceso cualificado.
 
-The following rules and examples pertain to both hard and soft local scopes. A newly introduced
-variable in a local scope does not back-propagate to its parent scope. For example, here the
-`z` is not introduced into the top-level scope:
+Las siguientes reglas y ejemplos pertenecen tanto a los ámbitos locales como globales. Una 
+variable introducida de nuevo en un ámbito local no se retroprogada a su ámbito padre. Por 
+ejemplo, la `z` no se introduce en el ámbito de nivel superior:
 
 ```jldoctest
 julia> for i = 1:10
@@ -107,10 +117,11 @@ julia> z
 ERROR: UndefVarError: z not defined
 ```
 
-(Note, in this and all following examples it is assumed that their top-level is a global scope
-with a clean workspace, for instance a newly started REPL.)
+(Nótese que En este ejemplo y los siguientes se supone que el ámbito de nivel superior es un ámbito 
+global con un espacio de trabajo limpio, por ejemplo un REPL arrancado de nuevo.)
 
-Inside a local scope a variable can be forced to be a local variable using the `local` keyword:
+Dentro de un ámbito local una variable puede ser forzada a ser una variables local usando la palabra 
+clave `local`.
 
 ```jldoctest
 julia> x = 0;
@@ -124,7 +135,7 @@ julia> x
 0
 ```
 
-Inside a local scope a new global variable can be defined using the keyword `global`:
+Dentro de un ámbito local puede definirse una nueva variable global usando la palabra clave `global`:
 
 ```jldoctest
 julia> for i = 1:10
@@ -135,9 +146,8 @@ julia> for i = 1:10
 julia> z
 10
 ```
-
-The location of both the `local` and `global` keywords within the scope block is irrelevant.
-The following is equivalent to the last example (although stylistically worse):
+La localización de las palabras clave `local` y  `global` dentro del bloque del ámbito es irrelevante. 
+El siguiente código es totalmente equivalente al ejemplo anterior: 
 
 ```jldoctest
 julia> for i = 1:10
@@ -149,8 +159,8 @@ julia> z
 10
 ```
 
-The `local` and `global` keywords can also be applied to destructuring assignments, e.g.
-`local x, y = 1, 2`. In this case the keyword affects all listed variables.
+Las palabras clave `local` y `global` pueden también usarse en asignaciones desestructuradas, por ejemplo,
+`local x, y = 1, 2`. En este caso la palabra clave afecta a toas las variables listadas.
 
 ### Soft Local Scope
 
