@@ -541,17 +541,18 @@ julia> for i = 1:2, j = 3:4
 Una instrucción `break` dentro de tal bucle sale del anidamiento de bucles completo, no sólo 
 del más interior.
 
-## Exception Handling
+## Manejo de Excepciones
 
-When an unexpected condition occurs, a function may be unable to return a reasonable value to
-its caller. In such cases, it may be best for the exceptional condition to either terminate the
-program, printing a diagnostic error message, or if the programmer has provided code to handle
-such exceptional circumstances, allow that code to take the appropriate action.
+Cuando tiene lugar una condición inesperada, una funció puede ser incapaz de devolver un valor 
+razonable al código que la invoca. En tales casos, puede ser mejor para la condición excepcional 
+terminar el programa, imprimiendo un mensaje de error diagnóstico, o si el programador ha 
+proporcionado código para manejar tales circunstancias excepcionales, permitiendo que el código 
+tome la acción apropiada.
 
-### Built-in `Exception`s
+### Excepciones predefinidas
 
-`Exception`s are thrown when an unexpected condition has occurred. The built-in `Exception`s listed
-below all interrupt the normal flow of control.
+Las excepciones se lanzan cuando ocurre una condición inesperada. En la siguiente tabla se 
+muestran todas la excepciones predefinidas, que interrumplen todas el flujo de control normal.
 
 | `Exception`                   |
 |:----------------------------- |
@@ -580,8 +581,8 @@ below all interrupt the normal flow of control.
 | [`UndefVarError`](@ref)       |
 | `UnicodeError`                |
 
-For example, the [`sqrt()`](@ref) function throws a [`DomainError`](@ref) if applied to a negative
-real value:
+Por ejemplo, la función [`sqrt()`](@ref) lanza un [`DomainError`](@ref) si se aplica sobre un valor 
+real negativo:
 
 ```jldoctest
 julia> sqrt(-1)
@@ -591,17 +592,16 @@ Stacktrace:
  [1] sqrt(::Int64) at ./math.jl:447
 ```
 
-You may define your own exceptions in the following way:
-
+Uno puede definir sus propias excepciones de la siguiente manera:
 ```jldoctest
 julia> struct MyCustomException <: Exception end
 ```
 
-### The [`throw()`](@ref) function
+### La función [`throw()`](@ref)
 
-Exceptions can be created explicitly with [`throw()`](@ref). For example, a function defined only
-for nonnegative numbers could be written to [`throw()`](@ref) a [`DomainError`](@ref) if the argument
-is negative:
+Las excepciones pueden crearse explícitamente con  [`throw()`](@ref). Por ejemplo, una función 
+definida sólo para número no negativos podría escribirse para que lanzara un
+[`DomainError`](@ref) si el argumento es negativo:
 
 ```jldoctest
 julia> f(x) = x>=0 ? exp(-x) : throw(DomainError())
@@ -616,8 +616,8 @@ Stacktrace:
  [1] f(::Int64) at ./none:1
 ```
 
-Note that [`DomainError`](@ref) without parentheses is not an exception, but a type of exception.
-It needs to be called to obtain an `Exception` object:
+Notese que [`DomainError`](@ref) sin paréntesis no es una excepción, sino un tipo de excepción. 
+Ella necesita ser invocada para obtener un objeto `Exception`:
 
 ```jldoctest
 julia> typeof(DomainError()) <: Exception
@@ -627,15 +627,16 @@ julia> typeof(DomainError) <: Exception
 false
 ```
 
-Additionally, some exception types take one or more arguments that are used for error reporting:
+Adicionalmente, algunos tipos de excepción toman uno o más argumentos que se utilizan para reportar 
+errores.
 
 ```jldoctest
 julia> throw(UndefVarError(:x))
 ERROR: UndefVarError: x not defined
 ```
 
-This mechanism can be implemented easily by custom exception types following the way [`UndefVarError`](@ref)
-is written:
+Este mecanismo puede ser fácilmente implementado mediante los tipos de excepción personalizados 
+que sigan la forma en que se escribe [`UndefVarError`](@ref):
 
 ```jldoctest
 julia> struct MyUndefVarError <: Exception
@@ -646,24 +647,27 @@ julia> Base.showerror(io::IO, e::MyUndefVarError) = print(io, e.var, " not defin
 ```
 
 !!! note
-    When writing an error message, it is preferred to make the first word lowercase. For example,
+    Cuando se escribe un mensaje de error, es preferible que la primera palabra sea minúscula. 
+    Por ejemplo,
+    
     `size(A) == size(B) || throw(DimensionMismatch("size of A not equal to size of B"))`
 
-    is preferred over
+    es preferible a 
 
     `size(A) == size(B) || throw(DimensionMismatch("Size of A not equal to size of B"))`.
 
-    However, sometimes it makes sense to keep the uppercase first letter, for instance if an argument
-    to a function is a capital letter: `size(A,1) == size(B,2) || throw(DimensionMismatch("A has first dimension..."))`.
+    Sin embargo, algunas veces tiene sentido mantener la primera letra en mayúscula, por 
+    ejemplo, si un argumento a función es una letra mayúscula: 
+    `size(A,1) == size(B,2) || throw(DimensionMismatch("A has first dimension..."))`.
 
 ### Errors
 
-The [`error()`](@ref) function is used to produce an [`ErrorException`](@ref) that interrupts
-the normal flow of control.
+La función [`error()`](@ref) se usa para producir una [`ErrorException`](@ref) que interrumpe el
+flujo de control normal.
 
-Suppose we want to stop execution immediately if the square root of a negative number is taken.
-To do this, we can define a fussy version of the [`sqrt()`](@ref) function that raises an error
-if its argument is negative:
+Supóngase que deseamos detener la ejecución inmediatamente si se toma la raíz cuadrad de un número 
+negativo. Para hacer ésto, podemos definir una versión "quisquillosa" de la función  [`sqrt()`](@ref) 
+que lanza un error si recibe un número negativo:
 
 ```jldoctest fussy_sqrt
 julia> fussy_sqrt(x) = x >= 0 ? sqrt(x) : error("negative x not allowed")
@@ -678,9 +682,9 @@ Stacktrace:
  [1] fussy_sqrt(::Int64) at ./none:1
 ```
 
-If `fussy_sqrt` is called with a negative value from another function, instead of trying to continue
-execution of the calling function, it returns immediately, displaying the error message in the
-interactive session:
+Si `fussy_sqrt()` es invocada con un valor negativo desde otra función, en lugar de intentar 
+continuar la ejecución de la función que la invocó, retorna inmediatamente, mostrando el mensaje 
+de error en la sesión interactiva.:
 
 ```jldoctest fussy_sqrt
 julia> function verbose_fussy_sqrt(x)
@@ -706,8 +710,8 @@ Stacktrace:
 
 ### Warnings and informational messages
 
-Julia also provides other functions that write messages to the standard error I/O, but do not
-throw any `Exception`s and hence do not interrupt execution:
+Julia también proporciona otras funciones que escriben mensajes a la salida de error 
+estándar, pero no lanzan ninguna `Exception` y, por tanto, no interrumpen la ejecución:
 
 ```jldoctest
 julia> info("Hi"); 1+1
@@ -724,11 +728,12 @@ Stacktrace:
  [1] error(::String) at ./error.jl:21
 ```
 
-### The `try/catch` statement
+### La instrucción `try/catch` 
 
-The `try/catch` statement allows for `Exception`s to be tested for. For example, a customized
-square root function can be written to automatically call either the real or complex square root
-method on demand using `Exception`s :
+La intrucción `try/ catch` permite comprobar a aparición de excepciones. Por ejemplo, 
+puede escribirse una función personalizada para calcular la raíz cuadrada que invoque 
+automáticamente al método de cálculo de la raíz de valores reales y/o complejos en 
+función de la excepción:
 
 ```jldoctest
 julia> f(x) = try
@@ -745,12 +750,13 @@ julia> f(-1)
 0.0 + 1.0im
 ```
 
-It is important to note that in real code computing this function, one would compare `x` to zero
-instead of catching an exception. The exception is much slower than simply comparing and branching.
+Es importante notar que en el código real que computa esta función, uno podría comparar `x` 
+con vero en lugar de atrapar la excepción. De hcho, la opción de la excepción ees mucho 
+más lenta de comparar y ramificar.
 
-`try/catch` statements also allow the `Exception` to be saved in a variable. In this contrived
-example, the following example calculates the square root of the second element of `x` if `x`
-is indexable, otherwise assumes `x` is a real number and returns its square root:
+Las instrucciones `try / catch` también permiten salvar la excepción en una variable. En 
+este ejemplo artificial, se calcula la raíz cuadrada del segundo elemento de `x`.  Si `x` 
+es indexavle, en caso contrario asume que `x` es un número real y devuelve su raíz cuadrada:
 
 ```jldoctest
 julia> sqrt_second(x) = try
@@ -779,15 +785,16 @@ Stacktrace:
  [1] sqrt_second(::Int64) at ./none:7
 ```
 
-Note that the symbol following `catch` will always be interpreted as a name for the exception,
-so care is needed when writing `try/catch` expressions on a single line. The following code will
-*not* work to return the value of `x` in case of an error:
+Note que el símbolo que sigue al `catch` siempre será interpretado como el nombre 
+para la excepción, por lo que hay que tener cuidado cuando se escriben expresiones
+`try / catch` en una sola línea. El siguiente código no funcionará para devolver el
+valor de `x` en caso de error:
 
 ```julia
 try bad() catch x end
 ```
 
-Instead, use a semicolon or insert a line break after `catch`:
+En su lugar, es mejor usar un punto u coma o insertar un salto de línea después del `catch`:
 
 ```julia
 try bad() catch; x end
@@ -798,19 +805,21 @@ catch
 end
 ```
 
-The `catch` clause is not strictly necessary; when omitted, the default return value is `nothing`.
+La cláusula `catch` no es estrictamente necesaria; cuando se omite el valor de retorno 
+por defecto es `nothing`.
 
 ```jldoctest
 julia> try error() end # Returns nothing
 ```
 
-The power of the `try/catch` construct lies in the ability to unwind a deeply nested computation
-immediately to a much higher level in the stack of calling functions. There are situations where
-no error has occurred, but the ability to unwind the stack and pass a value to a higher level
-is desirable. Julia provides the [`rethrow()`](@ref), [`backtrace()`](@ref) and [`catch_backtrace()`](@ref)
-functions for more advanced error handling.
+La potencia de la construcción `try / catch` estriba  en la capacidad de desplegar inmediatamente
+un  cálculo profundamente anidado de hasta un nivel mucho más elevado en la pila de llamadas a
+función. Hay situacionces donde no ha ocurrido error, pero la capacidad de desplegar la pila 
+y pasar un valor a un nivel superior es deseable. Julia proporciona las funciones 
+ [`rethrow()`](@ref), [`backtrace()`](@ref) and [`catch_backtrace()`](@ref) para un manejo de
+ errores más avanzado.
 
-### `finally` Clauses
+### Cláusulas `finally` 
 
 In code that performs state changes or uses resources like files, there is typically clean-up
 work (such as closing files) that needs to be done when the code is finished. Exceptions potentially
