@@ -821,13 +821,13 @@ y pasar un valor a un nivel superior es deseable. Julia proporciona las funcione
 
 ### Cláusulas `finally` 
 
-In code that performs state changes or uses resources like files, there is typically clean-up
-work (such as closing files) that needs to be done when the code is finished. Exceptions potentially
-complicate this task, since they can cause a block of code to exit before reaching its normal
-end. The `finally` keyword provides a way to run some code when a given block of code exits, regardless
-of how it exits.
+En código que realiza cambios de estado o usa recursos como ficheros, hay típicamente un trabajo 
+de limpieza (tal como cerrar ficheros) que necesita ser realizado cuando el código finaliza. Las 
+excepciones complican potencialmente esta tarea, ya que pueden causar que un bloque de código salga 
+antes de alcanzar su final normal. La palabra clave `finally` proporciona una forma de ejecutar 
+código cuando existe un blqoue de código dado, sin preocuparse de cómo salga.
 
-For example, here is how we can guarantee that an opened file is closed:
+Por ejemplo, aquí podemos garantizar que un fichero abierto se cierra:
 
 ```julia
 f = open("file")
@@ -838,41 +838,46 @@ finally
 end
 ```
 
-When control leaves the `try` block (for example due to a `return`, or just finishing normally),
-`close(f)` will be executed. If the `try` block exits due to an exception, the exception will
-continue propagating. A `catch` block may be combined with `try` and `finally` as well. In this
-case the `finally` block will run after `catch` has handled the error.
+Cuando el contro deja el bloque `try` (por ejemplo, debido a un `return`, o finalizando normalmente) 
+se ejecutará `close()`.  Si el bloque `try` saliera debido a una excepción, la excepción continuará 
+propagándose. Un bloque `catch` puede ser combinada con `try` y `finally` también. En este caso el
+bloque `finally` ejecutará después de que `catch` haya manejado el error.
 
-## [Tasks (aka Coroutines)](@id man-tasks)
+## [Tareas (aka Corutinas)](@id man-tasks)
 
-Tasks are a control flow feature that allows computations to be suspended and resumed in a flexible
-manner. This feature is sometimes called by other names, such as symmetric coroutines, lightweight
-threads, cooperative multitasking, or one-shot continuations.
+Las tareas son una característica de control de flujo que permite que los cálculos sean 
+suspendidos y continuados de una forma flexible. Esta característica es llamada algunas veces con
+otros nombres, tales como corrutinas simétricas, hilos de peso ligero, multitarea cooperativa o
+continuaciones de un disparo.
 
-When a piece of computing work (in practice, executing a particular function) is designated as
-a [`Task`](@ref), it becomes possible to interrupt it by switching to another [`Task`](@ref).
-The original [`Task`](@ref) can later be resumed, at which point it will pick up right where it
-left off. At first, this may seem similar to a function call. However there are two key differences.
-First, switching tasks does not use any space, so any number of task switches can occur without
-consuming the call stack. Second, switching among tasks can occur in any order, unlike function
-calls, where the called function must finish executing before control returns to the calling function.
+Cuando una pieza de trabajo de cómputo (en la práctica, ejecutar una función particular) es designada
+como tarea ([`Task`](@ref)), se hace posible interrumplirla intercambiándola por otra tarea. La tarea 
+original puede ser continuada después, en el punto en que se encontraba justo cuando fue detenida. A 
+primera vista, esto puede parecer similar a una llamada a función. Sin embargo, hay dos diferencias 
+clave. Primero, conmutar tareas no usa ningún espacio, por lo que puede tener lugar cualquier número
+de intercambios de tarea sin que se consuma la pila de llamadas. Segundo, conmutar entre tareas puede
+ocurrir en cualquier orden, a diferencia de lo que pasa en las llamadas a función, donde la función 
+invocada debe terminar la ejecución antes de que el control retorne a la función que la llamó.
 
-This kind of control flow can make it much easier to solve certain problems. In some problems,
-the various pieces of required work are not naturally related by function calls; there is no obvious
-"caller" or "callee" among the jobs that need to be done. An example is the producer-consumer
-problem, where one complex procedure is generating values and another complex procedure is consuming
-them. The consumer cannot simply call a producer function to get a value, because the producer
-may have more values to generate and so might not yet be ready to return. With tasks, the producer
-and consumer can both run as long as they need to, passing values back and forth as necessary.
+Esta clase de flujo de control puede hacer mucho más fácil resolver ciertos problemas. En algunos
+problemas, las distintas piezas de trabajo requerido no están relacionadas naturalmente mediante 
+llamadas a función: no hay un obvio llamador o llamado entre los trabajos que necesitan ser 
+realizados. Un ejemplo es el problema del productor-consumidor, donde un procedimiento complejo 
+está generando valores u otro procedimiento complejo los está consumiendo. El consumidor no puede
+simplemente llamar a la función productora para obtener un valor, debido a que el productor puede 
+tener más valores que generar y, por tanto, podría no estar listo todavía para retornar. Con las 
+tareas, el productor y el consumidor pueden ambos ejecutarse mientas que lo necesiten, pasando 
+valores adelante y detrás cuando sea necesario.
 
-Julia provides a [`Channel`](@ref) mechanism for solving this problem.
-A [`Channel`](@ref) is a waitable first-in first-out queue which can have
-multiple tasks reading from and writing to it.
+Julia proporciona un mecanismo denominado "canal" ([`Channel`](@ref) para resolver este problema. 
+Un canal es una cola FIFO (primero en entrar, primero en salir) que puede tener múltiples tareas 
+leyendo de y escribiendo en ella. 
 
-Let's define a producer task, which produces values via the [`put!`](@ref) call.
-To consume values, we need to schedule the producer to run in a new task. A special [`Channel`](@ref)
-constructor which accepts a 1-arg function as an argument can be used to run a task bound to a channel.
-We can then [`take!()`](@ref) values repeatedly from the channel object:
+Definamos una tarea productor, que produce valores a través de una llamada  [`put!`](@ref).
+Para consumir valores, necesitamos planificar un productor que ejecute una nueva tarea. 
+Para ejecutar una tarea asociada a un canal utilizaremos un constructor especial [`Channel`](@ref)
+que recibe como argumento una función de un argumento. Podemos entonce tomar valores repetidamente 
+del objeto canar mediante llamadas a [`take!()`](@ref):
 
 ```jldoctest producer
 julia> function producer(c::Channel)
@@ -904,11 +909,13 @@ julia> take!(chnl)
 "stop"
 ```
 
-One way to think of this behavior is that `producer` was able to return multiple times. Between
-calls to [`put!()`](@ref), the producer's execution is suspended and the consumer has control.
+Una forma de pensar en este comportamiento es que el `producer` era capaz de retornar múltiples
+veces. Entre las llamadas a [`put!()`](@ref), la ejecución del productor se ha suspendido y el 
+consumidor tiene el control.
 
-The returned [`Channel`](@ref) can be used as an iterable object in a `for` loop, in which case the
-loop variable takes on all the produced values. The loop is terminated when the channel is closed.
+El objeto [`Channel`](@ref) devuelto puede ser usado como un objeto iterable dentro de un bucle
+`for` loop,  en cuyo caso las variable del bucle tomará todos los objetos producidos. El bucle 
+será terminado cuando el canal se haya cerrado.
 
 ```jldoctest producer
 julia> for x in Channel(producer)
@@ -922,17 +929,20 @@ start
 stop
 ```
 
-Note that we did not have to explicitly close the channel in the producer. This is because
-the act of binding a [`Channel`](@ref) to a [`Task()`](@ref) associates the open lifetime of
-a channel with that of the bound task. The channel object is closed automatically when the task
-terminates. Multiple channels can be bound to a task, and vice-versa.
+Note que nosotros no tuvimos que cerrar explícitamente el canal en el productor. Esto es
+debido a que el acto de enlazar un canal ([`Channel`](@ref)) a una tarea ([`Task()`](@ref)) 
+asocia el tiempo de vida abierto de un canal con el de la tarea asociada. El objeto canal 
+se cierra automáticamente cuando la tarea termina. Podemos enlazar múltiplos canales a una
+tarea, y viceversa.
 
-While the [`Task()`](@ref) constructor expects a 0-argument function, the [`Channel()`](@ref)
-method which creates a channel bound task expects a function that accepts a single argument of
-type [`Channel`](@ref). A common pattern is for the producer to be parameterized, in which case a partial
-function application is needed to create a 0 or 1 argument [anonymous function](@ref man-anonymous-functions).
+Aunque el constructor de [`Task()`](@ref) espere una función sin argumentos, el método 
+[`Channel()`](@ref) que crea un enlace entre un canal y una tarea espera una función que 
+acepta un solo argumento de tipo [`Channel`](@ref). Un patrón común es que el productor
+esté parametrizado, en cuyo caso se neceesita una aplicación de función parcial para crear 
+una [función anónima](@ref man-anonymous-functions) con 1 ó 0 argumentos..
 
-For [`Task()`](@ref) objects this can be done either directly or by use of a convenience macro:
+Para objetos [`Task()`](@ref) esto puede hacerse bien directamente o mediante el uso de una
+macro conveniente:
 
 ```julia
 function mytask(myarg)
@@ -944,12 +954,11 @@ taskHdl = Task(() -> mytask(7))
 taskHdl = @task mytask(7)
 ```
 
-To orchestrate more advanced work distribution patterns, [`bind()`](@ref) and [`schedule()`](@ref)
-can be used in conjunction with [`Task()`](@ref) and [`Channel()`](@ref)
-constructors to explicitly link a set of channels with a set of producer/consumer tasks.
+Para orquestar patrones de distribucióin más avanzados, pueden usarse [`bind()`](@ref) y 
+[`schedule()`](@ref) en conjunción con los constructores de [`Task()`](@ref) y [`Channel()`](@ref)
+para enlazar explícitamente un conjunto de canales con un conjunto de tareas productor/consumidor.
 
-Note that currently Julia tasks are not scheduled to run on separate CPU cores.
-True kernel threads are discussed under the topic of [Parallel Computing](@ref).
+Note que en la actualidad las tareas Julia no son planificadas para que ejecuten sobre núcleos de CPU separados. Los verdaderos hilos del núcleo se discutirán en la sección [Computación Paralela](@ref).
 
 ### Core task operations
 
