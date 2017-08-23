@@ -17,7 +17,7 @@ Una característica particularmente distintiva del sistema de tipos de Julia es 
 
 El sistema de tipos de Julia está diseñado para ser potente y expresivo, además de claro, intuitivo y no obstructivo. Muchos programadores Julia nunca sentirán la necesidad de escribir código que use los tipos explícitamente. Algunas clases de programación, sin embargo, se vuelven más claras, rápidas y robustas usando tipos declarados.
 
-## Type Declarations
+## Declaraciones de tipo
 
 El operador `::` puede usarse para adjuntar declaraciones de tipo a expresiones y variables en los programas. Hay dos razones principales para esto:
 
@@ -109,19 +109,18 @@ abstract type Signed   <: Integer end
 abstract type Unsigned <: Integer end
 ```
 
-The [`Number`](@ref) type is a direct child type of `Any`, and [`Real`](@ref) is its child.
-In turn, `Real` has two children (it has more, but only two are shown here; we'll get to
-the others later): [`Integer`](@ref) and [`AbstractFloat`](@ref), separating the world into
-representations of integers and representations of real numbers. Representations of real
-numbers include, of course, floating-point types, but also include other types, such as
-rationals. Hence, `AbstractFloat` is a proper subtype of `Real`, including only
-floating-point representations of real numbers. Integers are further subdivided into
-[`Signed`](@ref) and [`Unsigned`](@ref) varieties.
+El tipo [`Number`](@ref) es un hijo directo de `Any`, y [`Real`](@ref) es su hijo. `Real` tiene dos hijos
+(tiene más, pero sólo mostraremos dos aquí): [`Integer`](@ref) y [`AbstractFloat`](@ref), , que dividen 
+el mundo entre representaciones de números enteros y reales. Las representaciones de números reales 
+incluyen, por supuesto, los tipos en punto flotante, pero también incluyen otros tipos como los racionales. 
+Por tanto,  `AbstractFloat` es un subtipo apropiado de `Real` que incluye sólo representaciones en punto 
+flotante de los números reales. Los enteros están también divididos en las variedades [`Signed`](@ref) 
+y [`Unsigned`](@ref).
 
-The `<:` operator in general means "is a subtype of", and, used in declarations like this, declares
-the right-hand type to be an immediate supertype of the newly declared type. It can also be used
-in expressions as a subtype operator which returns `true` when its left operand is a subtype of
-its right operand:
+El operador `<:` significa, en general, "es un subtipo de" y, usado en declaraciones como esta, declara 
+que el tipo de la parte derecha es un supertipo inmediato de tipo que acaba de crearse. También puede 
+usarse en expresiones como un obperador de subtipo que devuelve `true` cuando el operando de su izquierda 
+es un subtipo del operando de su derecha:
 
 ```jldoctest
 julia> Integer <: Number
@@ -131,8 +130,7 @@ julia> Integer <: AbstractFloat
 false
 ```
 
-An important use of abstract types is to provide default implementations for concrete types. To
-give a simple example, consider:
+Un uso importante de los tipos abstractos es proporcionar una implementación por defecto para los tipos concretos. Para dar un ejemplo simple, considere:
 
 ```julia
 function myplus(x,y)
@@ -140,14 +138,14 @@ function myplus(x,y)
 end
 ```
 
-The first thing to note is that the above argument declarations are equivalent to `x::Any` and
-`y::Any`. When this function is invoked, say as `myplus(2,5)`, the dispatcher chooses the most
-specific method named `myplus` that matches the given arguments. (See [Methods](@ref) for more
-information on multiple dispatch.)
+La primera cosa que hay que notar es que las declaraciones de argumento anteriores son equivalentes a
+`x::Any` e `y::Any`.  Cuando se invoca a estas funciones, digamos con `myplus(2,5)`, el despachador 
+elige el método más específico cuyo nombres sea `myplus` y que se corresponda con los argumentos dados 
+(ver [Métodos](@ref) para más informacíon sobre despacho múltiple).
 
-Assuming no method more specific than the above is found, Julia next internally defines and compiles
-a method called `myplus` specifically for two `Int` arguments based on the generic function given
-above, i.e., it implicitly defines and compiles:
+Asumiendo que no se encuentra método más específico que el anterior, a continuación Julia define y 
+compila un método llamado `myplus` específicamente para dos argumentos `Int` basado en la función 
+genérica dada anteriormente, es decir, implícitamente define y compila:
 
 ```julia
 function myplus(x::Int,y::Int)
@@ -155,23 +153,26 @@ function myplus(x::Int,y::Int)
 end
 ```
 
-and finally, it invokes this specific method.
+y, finalmente invoca a este método específico.
 
-Thus, abstract types allow programmers to write generic functions that can later be used as the
-default method by many combinations of concrete types. Thanks to multiple dispatch, the programmer
-has full control over whether the default or more specific method is used.
+Por tanto, los tipos abstractos permiten a los programadores escribir funciones genéricas que puedan
+ser usadas después como el método por defecto mediante muchas combinaciones de tipos concretos.
+Gracias al despacho múltipel, el programador tiene control total sobre si se usa el método por 
+defecto o uno más específico.
 
-An important point to note is that there is no loss in performance if the programmer relies on
-a function whose arguments are abstract types, because it is recompiled for each tuple of argument
-concrete types with which it is invoked. (There may be a performance issue, however, in the case
-of function arguments that are containers of abstract types; see [Performance Tips](@ref man-performance-tips).)
+Un punto importante que notar es que no hay pérdida en el rendimiento si el programador se baa en 
+una función cuyos argumentos sean tipos abstractos, dado que ella es recompilada para cada tupla 
+de argumentos de tipos concretos con la cuál sea invocada (sin embargo, puede haber un problema de 
+rendimiento en el caso de argumentos función que sean contenedores de tipos abstractos; ver 
+[Consejos de Rendimiento](@ref man-performance-tips).)
 
-## Primitive Types
+## Tipos Primitivos
 
-A primitive type is a concrete type whose data consists of plain old bits. Classic examples of primitive
-types are integers and floating-point values. Unlike most languages, Julia lets you declare your
-own primitive types, rather than providing only a fixed set of built-in ones. In fact, the standard
-primitive types are all defined in the language itself:
+Un tipo primitivo es aquél un tipo concreto cuyos datos consisten en bits normales y corrientes. 
+Ejemplos clásicos de tipos bits son los valores enteros y punto flotante. A diferencia de muchos 
+enguajes, Julia nos permite declarar nuestros propios tipos bits, en lugar de proporcionar un 
+conjunto fijo de tipos bits predefinidos. De hecho, los tupos bits estándar que están definidos 
+en el propios lenguaje son:
 
 ```julia
 primitive type Float16 <: AbstractFloat 16 end
@@ -193,31 +194,33 @@ primitive type Int128  <: Signed   128 end
 primitive type UInt128 <: Unsigned 128 end
 ```
 
-The general syntaxes for declaring a primitive type are:
+Las sintaxis generales para la declaración de un `bitstype` son:
 
 ```
 primitive type «name» «bits» end
 primitive type «name» <: «supertype» «bits» end
 ```
 
-The number of bits indicates how much storage the type requires and the name gives the new type
-a name. A primitive type can optionally be declared to be a subtype of some supertype. If a supertype
-is omitted, then the type defaults to having `Any` as its immediate supertype. The declaration
-of [`Bool`](@ref) above therefore means that a boolean value takes eight bits to store, and has
-[`Integer`](@ref) as its immediate supertype. Currently, only sizes that are multiples of
-8 bits are supported. Therefore, boolean values, although they really need just a single bit,
-cannot be declared to be any smaller than eight bits.
+El `«bits»` indica cuánta memoria requiere el tipo y `«name»` indica el nombre del nuevo 
+tipo. Un tipo primitivo puede ser declarado opcionalmente como un subtipo de algún 
+supertipo. Si se omite el supertipo, se asigna como supertipo por defecto el tipo `Any`. 
+Por tanto, la declaración de [`Bool`](@ref) significa que un valor booleano consume 8 bits 
+de almacenamiento, y que [`Integer`](@ref) es su supertipo inmediato. Actualmente sólo se 
+soportan tamaños que sea múltiplo de 8 bits. Por tanto, los valores booleanos, aunque sólo 
+necesitan un bit, no puden ser declarados como menores de 8 bits.
 
-The types [`Bool`](@ref), [`Int8`](@ref) and [`UInt8`](@ref) all have identical representations:
-they are eight-bit chunks of memory. Since Julia's type system is nominative, however, they
-are not interchangeable despite having identical structure. A fundamental difference between
-them is that they have different supertypes: [`Bool`](@ref)'s direct supertype is [`Integer`](@ref),
-[`Int8`](@ref)'s is [`Signed`](@ref), and [`UInt8`](@ref)'s is [`Unsigned`](@ref). All other
-differences between [`Bool`](@ref), [`Int8`](@ref), and [`UInt8`](@ref) are matters of
-behavior -- the way functions are defined to act when given objects of these types as
-arguments. This is why a nominative type system is necessary: if structure determined type,
-which in turn dictates behavior, then it would be impossible to make [`Bool`](@ref) behave
-any differently than [`Int8`](@ref) or [`UInt8`](@ref).
+Los tipos [`Bool`](@ref), [`Int8`](@ref) y [`UInt8`](@ref) tienen representaciones 
+idénticas: se trata de bloques de memoria de 8 bits. Como el sistema de tipos de Julia es 
+nominativo, sin embargo, ellos no son intercambiables aunque tengan estructura idéntica. 
+Otra diferencia fundamental entre ellos es que ellos tienen supertipos diferentes: 
+[`Integer`](@ref) es el supertipo directo de [`Bool`](@ref), [`Signed`](@ref) es el de
+[`Int8`](@ref), y [`Unsigned`](@ref) es el de  [`UInt8`](@ref). Todas las demás diferencias
+entre  [`Bool`](@ref), [`Int8`](@ref), y [`UInt8`](@ref) son cuestiones de comportamiento 
+(la forma en la que las funciones son definidas para actuar cuando se pasan como argumentos 
+objetos de estos tipos). Esta es la razón por la que es necesario un sistema de tipos 
+nominativo: si la estructura determinara el tipo, que a su vez dicta el comportamiento, 
+sería imposible hacer que los valores  [`Bool`](@ref) se comportaran de forma diferente a los
+[`Int8`](@ref) o los [`UInt8`](@ref).
 
 ## Composite Types
 
