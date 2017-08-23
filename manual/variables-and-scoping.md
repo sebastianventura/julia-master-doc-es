@@ -162,16 +162,17 @@ julia> z
 Las palabras clave `local` y `global` pueden también usarse en asignaciones desestructuradas, por ejemplo,
 `local x, y = 1, 2`. En este caso la palabra clave afecta a toas las variables listadas.
 
-### Soft Local Scope
+### Ámbito local blando
 
-> In a soft local scope, all variables are inherited from its parent scope unless a variable is
-> specifically marked with the keyword `local`.
+> En el ámbito local blando, todas las variables son heredadas de su ámbito padre a menos que una 
+> variable haya sido marcada específicamente con la palabra `local`.
 
-Soft local scopes are introduced by for-loops, while-loops, comprehensions, try-catch-finally-blocks,
-and let-blocks. There are some extra rules for [Let Blocks](@ref) and for [For Loops and Comprehensions](@ref).
+Los ámbitos locales blandos se introducen en los bucles `for`, bucles `while`, comprensiones, bloques 
+`try-catch-finally` y bloqiues `let`. Hay algunas reglas extra para los bloques `let` y para los bucles 
+`for` y comprensiones.
 
-In the following example the `x` and `y` refer always to the same variables as the soft local
-scope inherits both read and write variables:
+En el siguiente ejemplo, `x` e `y` se refieren siempre a la misma variable dado que el ámbito local 
+blando heredan ambas variables de lectura y escritura:
 
 ```jldoctest
 julia> x, y = 0, 1;
@@ -184,8 +185,8 @@ julia> x
 12
 ```
 
-Within soft scopes, the *global* keyword is never necessary, although allowed. The only case
-when it would change the semantics is (currently) a syntax error:
+Dentro de los ámbitos blandos, la palabra clave *global* no es nunca necesaria, aunque está permitida. 
+El único caso donde podría cambiar la semántica es en un error sintáctico:
 
 ```jldoctest
 julia> let
@@ -197,17 +198,17 @@ julia> let
 ERROR: syntax: `global j`: j is local variable in the enclosing scope
 ```
 
-### Hard Local Scope
+### Ámbito local duro
 
-Hard local scopes are introduced by function definitions (in all their forms), struct type definition blocks,
-and macro-definitions.
+Los ámbitos locales duros se introducen mediante las definiciones de función (en todas sus formas) 
+bloques de tipos e inmutables y definiciones de macros.
 
-> In a hard local scope, all variables are inherited from its parent scope unless:
+> En el ámbito local duro, todas las variables son heredades de su ámbito padre a menos que:
 >
->   * an assignment would result in a modified *global* variable, or
->   * a variable is specifically marked with the keyword `local`.
+>   * Una asignación daría como resultado una variable `global`
+>   * Una variable sea marcada específicamente con la palabra clave `local`.
 
-Thus global variables are only inherited for reading but not for writing:
+Por tanto, las variables globales son sólo heredadas para lectura pero no para escritura::
 
 ```jldoctest
 julia> x, y = 1, 2;
@@ -224,7 +225,7 @@ julia> x
 1
 ```
 
-An explicit `global` is needed to assign to a global variable:
+Se necesita un `global` explícito para asignar a una variable global:
 
 ```jldoctest
 julia> x = 1;
@@ -239,8 +240,8 @@ julia> x
 2
 ```
 
-Note that *nested functions* can behave differently to functions defined in the global scope as
-they can modify their parent scope's *local* variables:
+Note que las *funciones anidadas* pueden comportarse diferentemente de las funciones definidas 
+en el ámbito global como si ellas pudieran variar las variables locales del ámbito padre.
 
 ```jldoctest
 julia> x, y = 1, 2;
@@ -261,9 +262,9 @@ julia> x, y
 (1, 2)
 ```
 
-The distinction between inheriting global and local variables for assignment can lead to some
-slight differences between functions defined in local vs. global scopes. Consider the modification
-of the last example by moving `bar` to the global scope:
+La distinción entre heredar variables locales y globales para asignación puede llevar a ligeras 
+diferencias entre funciones definidas en ámbitos locales y/o globales. Considere la modificación
+del último ejemplo moviendo `bar` al ámbito global:
 
 ```jldoctest
 julia> x, y = 1, 2;
@@ -285,12 +286,13 @@ julia> x, y
 (1, 2)
 ```
 
-Note that above subtlety does not pertain to type and macro definitions as they can only appear
-at the global scope. There are special scoping rules concerning the evaluation of default and
-keyword function arguments which are described in the [Function section](@ref man-functions).
+Notemos que lo anterior sutilmente no pertenece a las definiciones de tipo y de macro, por lo que 
+ellas sólo pueden aparecer en el ámbito global. Hay reglas de ámbito especiales relacionadas con 
+la evaluación de argumentos de función por defecto y palabra clave que se describen en la sección 
+de [Funcciones](@ref man-functions).
 
-An assignment introducing a variable used inside a function, type or macro definition need not
-come before its inner usage:
+Una asignación que introduce una variable usada dentro de una definicíon de función, tipo o macro 
+no necesita ir antes de su uso interno: 
 
 ```jldoctest
 julia> f = y -> y + a
@@ -308,12 +310,13 @@ julia> f(3)
 4
 ```
 
-This behavior may seem slightly odd for a normal variable, but allows for named functions -- which
-are just normal variables holding function objects -- to be used before they are defined. This
-allows functions to be defined in whatever order is intuitive and convenient, rather than forcing
-bottom up ordering or requiring forward declarations, as long as they are defined by the time
-they are actually called. As an example, here is an inefficient, mutually recursive way to test
-if positive integers are even or odd:
+Este comportamiento puede parecer un poco raro para una variable normal, pero está permitido 
+para que las funciones nombradas sean usadas antes de ser definidas (las funciones nombradas 
+son exactamente variables normales que almacenan objetos función). Esto permite a las funciones 
+ser definidas en cualquier orden que sea intuitivo y conveniente en lugar de forzar un 
+ordenamiento de abajo a arriba o requerir declaraciones hacia delante, mientras que ellas sean 
+definidas en el momento que sean usadas. Por ejemplo, he aquí una forma ineficiente, mutuamente 
+recursiva de comprobar si un entero positivo es par o impar:
 
 ```jldoctest
 julia> even(n) = n == 0 ? true : odd(n-1);
@@ -327,23 +330,24 @@ julia> odd(3)
 true
 ```
 
-Julia provides built-in, efficient functions to test for oddness and evenness called [`iseven()`](@ref)
-and [`isodd()`](@ref) so the above definitions should only be taken as examples.
+Julia proporciona funciones eficientes y predefinidas para comprobar la paridad o imparidad, 
+llamadas [`iseven()`](@ref) e [`isodd()`](@ref). Por tanto, las definiciones anteriores 
+deberían ser sólo tomadas como ejemplos.
 
-### Hard vs. Soft Local Scope
+### Ámbitos locales duro vs. blando
 
-Blocks which introduce a soft local scope, such as loops, are generally used to manipulate the
-variables in their parent scope. Thus their default is to fully access all variables in their
-parent scope.
+Los bloques que introducen un ámbito local blando, como los bucles, se suelen usar para 
+manipular las variables en su ámbito padre. Por tanto, su defecto es acceder completamente a 
+todas las variables de su ámbito padre.
 
-Conversely, the code inside blocks which introduce a hard local scope (function, type, and macro
-definitions) can be executed at any place in a program. Remotely changing the state of global
-variables in other modules should be done with care and thus this is an opt-in feature requiring
-the `global` keyword.
+A la inversa, el código dentro de los bloques que introduce un ámbito local duro (definiciones 
+de función, tipo o macro) pueden ser ejecutados en cualquier parte del programa. Cambiar 
+remotamente el estado de variables locales en otros módulos debería ser realizado con cuidado 
+y por tanto esta es una característica de optimización que requiere la palabra clave `global`.
 
-The reason to allow *modifying local* variables of parent scopes in nested functions is to allow
-constructing [closures](https://en.wikipedia.org/wiki/Closure_%28computer_programming%29) which
-have a private state, for instance the `state` variable in the following example:
+La razón para permitir *modificar local* variables de ámbitos padres en funciones anidadas
+es permitir la construccin de [cierres](https://en.wikipedia.org/wiki/Closure_%28computer_programming%29) 
+que tienen un estado privado, por ejemplo la variable `state` del siguiente ejemplo:
 
 ```jldoctest
 julia> let
@@ -359,15 +363,15 @@ julia> counter()
 2
 ```
 
-See also the closures in the examples in the next two sections.
+Ver también los cierres en los ejemplos de las dos siguientes secciones.
 
-### Let Blocks
+### Bloques Let
 
-Unlike assignments to local variables, `let` statements allocate new variable bindings each time
-they run. An assignment modifies an existing value location, and `let` creates new locations.
-This difference is usually not important, and is only detectable in the case of variables that
-outlive their scope via closures. The `let` syntax accepts a comma-separated series of assignments
-and variable names:
+A diferencia de las asignaciones a variables locales, las instrucciones `let` asignan nuevas 
+asociaciones de variables cada vez que se ejecutan. Una asignación modifica el valor de una
+localización existente, y `let` crea nuevas localizaciones. Esta diferencia no suele ser importante, 
+y es sólo detectable en el caso de variables que sobreviven a sus ámbitos vía cierres. La sintaxis 
+de `let` acepta una serie de asignaciones y nombres de variables separados por comas:
 
 ```jldoctest
 julia> x, y, z = -1, -1, -1;
@@ -380,10 +384,10 @@ x: 1, y: -1
 ERROR: UndefVarError: z not defined
 ```
 
-The assignments are evaluated in order, with each right-hand side evaluated in the scope before
-the new variable on the left-hand side has been introduced. Therefore it makes sense to write
-something like `let x = x` since the two `x` variables are distinct and have separate storage.
-Here is an example where the behavior of `let` is needed:
+Las asignaciones se evalúan en orden, con cada término derecho evaluado en el ámbito antes de que 
+se introduzca la nueva variable a través del término izquierdo. Por tanto, tiene sentido escribir 
+algo como `let x = x` ya que las dos variables son distintas y tienen almacenamiento separado. Este
+es un ejemplo de dónde se necesita el comportamiento de `let`: 
 
 ```jldoctest
 julia> Fs = Array{Any}(2); i = 1;
@@ -400,9 +404,9 @@ julia> Fs[2]()
 3
 ```
 
-Here we create and store two closures that return variable `i`. However, it is always the same
-variable `i`, so the two closures behave identically. We can use `let` to create a new binding
-for `i`:
+Aquí creamos y almacenamos dos cierres que devuelven la variable `i`. Sin embargo, es siempre 
+la misma variable `i`, por lo que los dos cierres se comportan de forma idéntica. Podemos usar 
+`let` para crear una nueva correspondencia para `i`:
 
 ```jldoctest
 julia> Fs = Array{Any}(2); i = 1;
@@ -421,8 +425,8 @@ julia> Fs[2]()
 2
 ```
 
-Since the `begin` construct does not introduce a new scope, it can be useful to use a zero-argument
-`let` to just introduce a new scope block without creating any new bindings:
+Como la construcción `begin` no construye un nuevo ámbito, puede ser útil usar un `let` con cero
+argumentos para introducir un nuevo bloque de ámbito sin crear ninguna nueva correspondencia:
 
 ```jldoctest
 julia> let
@@ -435,15 +439,15 @@ julia> let
 1
 ```
 
-Since `let` introduces a new scope block, the inner local `x` is a different variable than the
-outer local `x`.
+Como `let` introduce un nuevo bloque de ámbito, la variable local interna `x` es diferente de la
+externa local `x`.
 
-### For Loops and Comprehensions
+### Blucles for y compresiones
 
-`for` loops and [Comprehensions](@ref) have the following behavior: any new variables introduced
-in their body scopes are freshly allocated for each loop iteration. This is in contrast to `while`
-loops which reuse the variables for all iterations. Therefore these constructs are similar to
-`while` loops with `let` blocks inside:
+Los bucles `for` y las [comprensiones](@ref) tiene el siguiente comportamiento: cualquier nueva 
+variable introducida en sus ámbitos se reservan de nuevo para cada nueva iteración del bucle. 
+Esto contrasta con los bucles `while` que reservan las variables para todas las iteraciones. 
+or tanto, estas construcciones son similares a bucles `while` con bloques `let` dentro de ellos:
 
 ```jldoctest
 julia> Fs = Array{Any}(2);
@@ -459,7 +463,7 @@ julia> Fs[2]()
 2
 ```
 
-`for` loops will reuse existing variables for its iteration variable:
+Los bucles `for` reusarán las variables existentes para su variable iteración:
 
 ```jldoctest
 julia> i = 0;
@@ -471,7 +475,8 @@ julia> i
 3
 ```
 
-However, comprehensions do not do this, and always freshly allocate their iteration variables:
+Sin embargo, las comprensiones no hacen esto, y siempre asignan de nuevo sus variables de 
+iteración:
 
 ```jldoctest
 julia> x = 0;
@@ -482,10 +487,11 @@ julia> x
 0
 ```
 
-## Constants
+## Constantes
 
-A common use of variables is giving names to specific, unchanging values. Such variables are only
-assigned once. This intent can be conveyed to the compiler using the `const` keyword:
+Un uso común de las variables es darle nombres de valores específicos, no cambiantes. Tales 
+variables sólo se asignan una vez. Esta intención puede ser transportada al compilador usando 
+la palabra clave `const`:
 
 ```jldoctest
 julia> const e  = 2.71828182845904523536;
@@ -493,16 +499,18 @@ julia> const e  = 2.71828182845904523536;
 julia> const pi = 3.14159265358979323846;
 ```
 
-The `const` declaration is allowed on both global and local variables, but is especially useful
-for globals. It is difficult for the compiler to optimize code involving global variables, since
-their values (or even their types) might change at almost any time. If a global variable will
-not change, adding a `const` declaration solves this performance problem.
+La declaración `const` es permitida sobre variables globales y locales, pero es especialmente 
+útil para las globales. Es difícil para el compilador optimizar´código en el que están 
+implicadas las variables globales, ya que sus valores (o incluso sus tipos) podrían cambiar en 
+cualquier momento. Si una variable global no va a cambiar, añadir una declaración `const` 
+resolverá este problema de rendimiento.
 
-Local constants are quite different. The compiler is able to determine automatically when a local
-variable is constant, so local constant declarations are not necessary for performance purposes.
+Las constantes locales son bastante diferentes. El compilador es capaz de determinar cuando 
+una variable local es constante, por lo que las declaraciones de constante local no son 
+necesarias para mejorar el rendimiento.
 
-Special top-level assignments, such as those performed by the `function` and `struct` keywords,
-are constant by default.
+Las asignaciones especiales de nivel superior, tales como las realizadas por las palabras clave 
+`function` y `type` son constantes por defecto. 
 
-Note that `const` only affects the variable binding; the variable may be bound to a mutable object
-(such as an array), and that object may still be modified.
+Nótese que `const` sólo afecta a la asociación de variables:  la variable puede ser asociada 
+a un objeto mutable (tal com un array) y el objeto puede aún ser modificado.
