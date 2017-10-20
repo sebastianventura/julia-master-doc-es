@@ -1,12 +1,13 @@
 # Methods
 
-Recall from [Functions](@ref man-functions) that a function is an object that maps a tuple of arguments to a
-return value, or throws an exception if no appropriate value can be returned. It is common for
-the same conceptual function or operation to be implemented quite differently for different types
-of arguments: adding two integers is very different from adding two floating-point numbers, both
-of which are distinct from adding an integer to a floating-point number. Despite their implementation
-differences, these operations all fall under the general concept of "addition". Accordingly, in
-Julia, these behaviors all belong to a single object: the `+` function.
+Recordemos de la sección [Funciones](@ref man-functions) que una función es un objeto que establece 
+una correspondencia entre una tupla de argumentos y un valor de retorno o lanza una excepción si 
+no puede devolverse el valor apropiado. Para la misma función conceptual es común soy implementada 
+de una forma muy diferente para tipos de argumentos diferentes: sumar dos enteros es distinto de 
+sumar dos valores en punto flotante y ambos son distintos de sumar un entero y 1 punto flotante. 
+A pesar de las diferencias de implementación, éstas operaciones caen todas bajo el concepto general 
+de "suma". En consecuencia, en Julia, estos comportamientos pertenecen todos a un solo objeto: 
+la función `+`.
 
 To facilitate using many different implementations of the same concept smoothly, functions need
 not be defined all at once, but can rather be defined piecewise by providing specific behaviors
