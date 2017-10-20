@@ -9,31 +9,32 @@ A pesar de las diferencias de implementación, éstas operaciones caen todas baj
 de "suma". En consecuencia, en Julia, estos comportamientos pertenecen todos a un solo objeto: 
 la función `+`.
 
-To facilitate using many different implementations of the same concept smoothly, functions need
-not be defined all at once, but can rather be defined piecewise by providing specific behaviors
-for certain combinations of argument types and counts. A definition of one possible behavior for
-a function is called a *method*. Thus far, we have presented only examples of functions defined
-with a single method, applicable to all types of arguments. However, the signatures of method
-definitions can be annotated to indicate the types of arguments in addition to their number, and
-more than a single method definition may be provided. When a function is applied to a particular
-tuple of arguments, the most specific method applicable to those arguments is applied. Thus, the
-overall behavior of a function is a patchwork of the behaviors of its various method definitions.
-If the patchwork is well designed, even though the implementations of the methods may be quite
-different, the outward behavior of the function will appear seamless and consistent.
+Para facilitar el uso de muchas implementaciones distintas del mismo concepto suavemente, las 
+funciones necesitan no ser definidas de una vez, sino poder ser definidas a trozos proporcionando 
+comportamientos distintos para ciertas combinaciones de tipos de argumentos y cuentas. Llamamos 
+*método* a la definición de un posible comportamiento para una función. Hasta ahora sólo se han 
+presentado ejemplos de funciones definidas como sólo método, aplicables a todo tipo de 
+argumentos. Sin embargo, las asignaturas de las definiciones de los métodos pueden anotarse 
+para indicar los tipos de los argumentos además de su número, y puede proporcionarse más de 
+una sola definición de método. Cuando una función se aplica a una dupla de argumentos particular, 
+se aplica el método más específico y aplicable a esos argumentos. Por tanto, el comportamiento 
+global de una función es un collage de los comportamientos de sus distintas definiciones de 
+métodos. Si el collage está bien diseñado, incluso aunque las implementaciones de los métodos 
+puedan ser bastante diferentes, el comportamiento exterior de la función pareciera contínuo y 
+consistente.
 
-The choice of which method to execute when a function is applied is called *dispatch*. Julia allows
-the dispatch process to choose which of a function's methods to call based on the number of arguments
-given, and on the types of all of the function's arguments. This is different than traditional
-object-oriented languages, where dispatch occurs based only on the first argument, which often
-has a special argument syntax, and is sometimes implied rather than explicitly written as an argument.
-[^1] Using all of a function's arguments to choose which method should be invoked, rather than
-just the first, is known as [multiple dispatch](https://en.wikipedia.org/wiki/Multiple_dispatch).
-Multiple dispatch is particularly useful for mathematical code, where it makes little sense to
-artificially deem the operations to "belong" to one argument more than any of the others: does
-the addition operation in `x + y` belong to `x` any more than it does to `y`? The implementation
-of a mathematical operator generally depends on the types of all of its arguments. Even beyond
-mathematical operations, however, multiple dispatch ends up being a powerful and convenient paradigm
-for structuring and organizing programs.
+La elección de qué método ejecutar cuando se aplica una función se llama *despacho*. Julia 
+permite al proceso de despacho elegir qué método de una función llamar basándose en el número 
+de argumentos y en los tipos de todos los argumentos dados a la función. Este mecanismo es 
+diferente al que ocurre en los lenguajes orientados al objeto tradicionales, donde el despacho 
+se basa solo en el primer argumento, que frecuentemente tiene una sintaxis especial, y que es 
+muchas veces implicado el lugar de ser escrito explícitamente como argumento. [^1] Usar todos 
+los argumentos de la función para elegir qué método debería ser invocado es conocido como 
+[multiple dispatch](https://en.wikipedia.org/wiki/Multiple_dispatch).. El despacho múltiple es 
+particularmente útil para código matemático, donde  tiene poco sentido considerar que las 
+operaciones pertenecen a un argumento más que los demás. Más allá de las operaciones 
+matemáticas, sin embargo, el despacho múltiple ha resultado ser un paradigma potente y 
+conveniente para estructurar y organizar los programas.
 
 [^1]:
     In C++ or Java, for example, in a method call like `obj.meth(arg1,arg2)`, the object obj "receives"
