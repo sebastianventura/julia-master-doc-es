@@ -51,7 +51,7 @@ julia> Bar.foo()
 Por tanto, *ámbito léxico* significa que el ámbito de las variables puede ser inferido del código 
 fuente sin más. 
 
-## Global Scope
+## Ámbito Global
 
 *Cada módulo introduce un nuevo espacio global*, separado del ámbito global de todos los otros 
 módulos; no existen ámbitos globales compartidos por todos. Los módulos pueden introducir variables 
@@ -59,12 +59,6 @@ de otros módulos o en su ámbito a través del uso de las instrucciones [`using
 [`import`](@ref modules) o a través de acceso cualificado usando la notación punto. En consecuencia, 
 cada módulo es un espacio de nombres. Notese que los enlaces de nombres pueden sólo ser cambiados 
 dentro de su ámbito global y no desde un módulo exterior.
-
-*Each module introduces a new global scope*, separate from the global scope of all other modules;
-there is no all-encompassing global scope. Modules can introduce variables of other modules into
-their scope through the [using or import](@ref modules) statements or through qualified access using the
-dot-notation, i.e. each module is a so-called *namespace*. Note that variable bindings can only
-be changed within their global scope and not from an outside module.
 
 ```jldoctest
 julia> module A
@@ -164,11 +158,11 @@ Las palabras clave `local` y `global` pueden también usarse en asignaciones des
 
 ### Ámbito local blando
 
-> En el ámbito local blando, todas las variables son heredadas de su ámbito padre a menos que una 
-> variable haya sido marcada específicamente con la palabra `local`.
+En el ámbito local blando, todas las variables son heredadas de su ámbito padre a menos que una 
+variable haya sido marcada específicamente con la palabra `local`.
 
 Los ámbitos locales blandos se introducen en los bucles `for`, bucles `while`, comprensiones, bloques 
-`try-catch-finally` y bloqiues `let`. Hay algunas reglas extra para los bloques `let` y para los bucles 
+`try-catch-finally` y bloques `let`. Hay algunas reglas extra para los bloques `let` y para los bucles 
 `for` y comprensiones.
 
 En el siguiente ejemplo, `x` e `y` se refieren siempre a la misma variable dado que el ámbito local 
@@ -289,7 +283,7 @@ julia> x, y
 Notemos que lo anterior sutilmente no pertenece a las definiciones de tipo y de macro, por lo que 
 ellas sólo pueden aparecer en el ámbito global. Hay reglas de ámbito especiales relacionadas con 
 la evaluación de argumentos de función por defecto y palabra clave que se describen en la sección 
-de [Funcciones](@ref man-functions).
+de [Funciones](@ref man-functions).
 
 Una asignación que introduce una variable usada dentro de una definicíon de función, tipo o macro 
 no necesita ir antes de su uso interno: 
