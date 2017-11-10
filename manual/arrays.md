@@ -1,4 +1,4 @@
-# [Multi-dimensional Arrays](@id man-multi-dim-arrays)
+# [Arrays Multi-dimensionales](@id man-multi-dim-arrays)
 
 Julia, como la mayoría de los lenguajes informáticos técnicos, proporciona una implementación de los arrays de primera clase. La mayoría de los lenguajes informáticos técnicos prestan mucha atención a su implementación de arrays a expensas de otros contenedores. Julia no trata los arrays de manera especial. La biblioteca de arrays se ha implementado casi completamente en el propio lenguaje Julia, y deriva su rendimiento del compilador, al igual que cualquier otro código escrito en Julia. Como tal, es también posible definir tipos de arrays personalizados heredando de AbstractArray. Consulte la [sección de manual en la interfaz AbstractArray](@ref man-interface-array) para ms detalles sobre implementar un tipo array personalizado.
 
@@ -19,7 +19,7 @@ behavior, should take care to create a copy of inputs that it may modify.
 
 ## Arrays
 
-### Basic Functions
+### Funciones Básicas
 
 | Function               | Description                                                                      |
 |:---------------------- |:-------------------------------------------------------------------------------- |
@@ -34,7 +34,7 @@ behavior, should take care to create a copy of inputs that it may modify.
 | [`stride(A,k)`](@ref)  | the stride (linear index distance between adjacent elements) along dimension `k` |
 | [`strides(A)`](@ref)   | a tuple of the strides in each dimension                                         |
 
-### Construction and Initialization
+### Construcción e Inicialización
 
 Many functions for constructing and initializing arrays are provided. In the following list of
 such functions, calls with a `dims...` argument can either take a single tuple of dimension sizes
@@ -72,7 +72,7 @@ The syntax `[A, B, C, ...]` constructs a 1-d array (vector) of its arguments. If
 arguments have a common [promotion type](@ref conversion-and-promotion) then they get
 converted to that type using `convert()`.
 
-### Concatenation
+### Concatenación
 
 Arrays can be constructed and also concatenated using the following functions:
 
@@ -94,7 +94,7 @@ The concatenation functions are used so often that they have special syntax:
 
 [`hvcat()`](@ref) concatenates in both dimension 1 (with semicolons) and dimension 2 (with spaces).
 
-### Typed array initializers
+### Inicializadores de array tipados
 
 An array with a specific element type can be constructed using the syntax `T[A, B, C, ...]`. This
 will construct a 1-d array with element type `T`, initialized to contain elements `A`, `B`, `C`,
@@ -113,7 +113,7 @@ julia> Int8[[1 2] [3 4]]
  1  2  3  4
 ```
 
-### Comprehensions
+### Comprehensiones
 
 Comprehensions provide a general and powerful way to construct arrays. Comprehension syntax is
 similar to set construction notation in mathematics:
@@ -161,7 +161,7 @@ the result in single precision by writing:
 Float32[ 0.25*x[i-1] + 0.5*x[i] + 0.25*x[i+1] for i=2:length(x)-1 ]
 ```
 
-### Generator Expressions
+### Expresiones Generador
 
 Comprehensions can also be written without the enclosing square brackets, producing an object
 known as a generator. This object can be iterated to produce values on demand, instead of allocating
@@ -216,7 +216,7 @@ julia> [(i,j) for i=1:3 for j=1:i if i+j == 4]
  (3, 1)
 ```
 
-### [Indexing](@id man-array-indexing)
+### [Indexación](@id man-array-indexing)
 
 The general syntax for indexing into an n-dimensional array A is:
 
