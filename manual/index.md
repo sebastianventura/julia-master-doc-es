@@ -2,8 +2,8 @@
 
   * [Introducción](@ref man-introduction)
   * [Empezando](@ref getting-started)
-  * [Variables](@ref)
-  * [Números Enteros y Punto Flotante](@ref)
+  * [Variables](@ref variables)
+  * [Números Enteros y Punto Flotante](@ref)
   * [Operaciones Matemáticas y Funciones Elementales](@ref)
   * [Números Complejos y Racionales](@ref)
   * [Cadenas](@ref)
