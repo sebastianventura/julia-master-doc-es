@@ -296,7 +296,7 @@ Además, estas funciones (como cualquier función de Julia) se pueden aplicar de
 
 ## Precedencia de Operadores
 
-Julia applies the following order of operations, from highest precedence to lowest:
+Julia aplica el siguiente orden de operaciones, de mayor a menor precedencia:
 
 | Category       | Operators                                                                                         |
 |:-------------- |:------------------------------------------------------------------------------------------------- |
@@ -311,10 +311,10 @@ Julia applies the following order of operations, from highest precedence to lowe
 | Control flow   | `&&` followed by `\|\|` followed by `?`                                                           |
 | Assignments    | `= += -= *= /= //= \= ^= ÷= %= \|= &= ⊻= <<= >>= >>>=`                                            |
 
-For a complete list of *every* Julia operator's precedence, see the top of this file:
+Para una lista completa de cada una de las precedencias de operadores de Julia, consultar el fichero
 [`src/julia-parser.scm`](https://github.com/JuliaLang/julia/blob/master/src/julia-parser.scm)
 
-You can also find the numerical precedence for any given operator via the built-in function `Base.operator_precedence`, where higher numbers take precedence:
+También puede encontrarse la precedencia numérica pra cualquier operación dada mediante la función intrínseca `Base.operator_precedence` donde el número mayor corresponde a la operación con mayor precedencia.
 
 ```jldoctest
 julia> Base.operator_precedence(:+), Base.operator_precedence(:*), Base.operator_precedence(:.)
@@ -324,23 +324,19 @@ julia> Base.operator_precedence(:+=), Base.operator_precedence(:(=))  # (Note th
 (1, 1)
 ```
 
-## Numerical Conversions
+## Conversiones Numéricas
 
-Julia supports three forms of numerical conversion, which differ in their handling of inexact
-conversions.
+Julia soporta tres formas de conversión numérica, que difieren en su manejo de las conversiones inexactas.
 
-  * The notation `T(x)` or `convert(T,x)` converts `x` to a value of type `T`.
+  * La notación `T(x)` o `convert(T,x)` convierte `x` a un valor de tipo `T`.
 
-      * If `T` is a floating-point type, the result is the nearest representable value, which could be
-        positive or negative infinity.
-      * If `T` is an integer type, an `InexactError` is raised if `x` is not representable by `T`.
-  * `x % T` converts an integer `x` to a value of integer type `T` congruent to `x` modulo `2^n`,
-    where `n` is the number of bits in `T`. In other words, the binary representation is truncated
-    to fit.
-  * The [Rounding functions](@ref) take a type `T` as an optional argument. For example, `round(Int,x)`
-    is a shorthand for `Int(round(x))`.
 
-The following examples show the different forms.
+      * Si `T` es un tipo en punto flotante, el resultado es el valor más cercano representable, que podría ser infinito positivo o negativo.
+      * Si `T` es un tipo entero, se lanzará un `InexactError` si `x`no es representable por `T`.
+  *  `x % T`convierte un entero `x` a un valor de un tipo entero `T` congruente a `x` modulo `2^n`, donde `n` es el número de bits en `T`. En otras palabras, la representación binaria es truncada para ajustarse.
+  * Las [Funciones de Redondeo](@ref rounding-functions) toman un tipo `T` como argumento opcional. Por ejemplo, `round(Int,x)` es una abreviatura de `Int(round(x))`.
+
+Los siguientes ejemplos muestran las siguientes formas:
 
 ```jldoctest
 julia> Int8(127)
@@ -382,38 +378,38 @@ Stacktrace:
  [2] round(::Type{Int8}, ::Float64) at ./float.jl:338
 ```
 
-See [Conversion and Promotion](@ref conversion-and-promotion) for how to define your own conversions and promotions.
+Ver [Conversión y Promoción](@ref conversion-and-promotion) para ver cómo definir tus propias conversiones y promociones.
 
-### Rounding functions
+### Funciones de Redondeo
 
-| Function              | Description                      | Return type |
-|:--------------------- |:-------------------------------- |:----------- |
-| [`round(x)`](@ref)    | round `x` to the nearest integer | `typeof(x)` |
-| [`round(T, x)`](@ref) | round `x` to the nearest integer | `T`         |
-| [`floor(x)`](@ref)    | round `x` towards `-Inf`         | `typeof(x)` |
-| [`floor(T, x)`](@ref) | round `x` towards `-Inf`         | `T`         |
-| [`ceil(x)`](@ref)     | round `x` towards `+Inf`         | `typeof(x)` |
-| [`ceil(T, x)`](@ref)  | round `x` towards `+Inf`         | `T`         |
-| [`trunc(x)`](@ref)    | round `x` towards zero           | `typeof(x)` |
-| [`trunc(T, x)`](@ref) | round `x` towards zero           | `T`         |
+| Function              | Description                        | Return type |
+|:--------------------- |:---------------------------------- |:----------- |
+| [`round(x)`](@ref)    | Redondea `x` al entero más cercano | `typeof(x)` |
+| [`round(T, x)`](@ref) | Redondea `x` al entero más cercano | `T`         |
+| [`floor(x)`](@ref)    | Redondea `x` hacia `-Inf`          | `typeof(x)` |
+| [`floor(T, x)`](@ref) | Redondea `x` hacia `-Inf`          | `T`         |
+| [`ceil(x)`](@ref)     | Redondea `x` hacia `+Inf`          | `typeof(x)` |
+| [`ceil(T, x)`](@ref)  | Redondea `x` hacia `+Inf`          | `T`         |
+| [`trunc(x)`](@ref)    | Redondea `x` hacia cero            | `typeof(x)` |
+| [`trunc(T, x)`](@ref) | Redondea `x` hacia cero            | `T`         |
 
-### Division functions
+### Funciones de división
 
-| Function              | Description                                                                                               |
-|:--------------------- |:--------------------------------------------------------------------------------------------------------- |
-| [`div(x,y)`](@ref)    | truncated division; quotient rounded towards zero                                                         |
-| [`fld(x,y)`](@ref)    | floored division; quotient rounded towards `-Inf`                                                         |
-| [`cld(x,y)`](@ref)    | ceiling division; quotient rounded towards `+Inf`                                                         |
-| [`rem(x,y)`](@ref)    | remainder; satisfies `x == div(x,y)*y + rem(x,y)`; sign matches `x`                                       |
-| [`mod(x,y)`](@ref)    | modulus; satisfies `x == fld(x,y)*y + mod(x,y)`; sign matches `y`                                         |
-| [`mod1(x,y)`](@ref)   | `mod()` with offset 1; returns `r∈(0,y]` for `y>0` or `r∈[y,0)` for `y<0`, where `mod(r, y) == mod(x, y)` |
-| [`mod2pi(x)`](@ref)   | modulus with respect to 2pi;  `0 <= mod2pi(x)    < 2pi`                                                   |
-| [`divrem(x,y)`](@ref) | returns `(div(x,y),rem(x,y))`                                                                             |
-| [`fldmod(x,y)`](@ref) | returns `(fld(x,y),mod(x,y))`                                                                             |
-| [`gcd(x,y...)`](@ref) | greatest positive common divisor of `x`, `y`,...                                                          |
-| [`lcm(x,y...)`](@ref) | least positive common multiple of `x`, `y`,...                                                            |
+| Función               | Descripción                                                                                        |
+|:--------------------- |:-------------------------------------------------------------------------------------------------- |
+| [`div(x,y)`](@ref)    | División truncada; cociente redondeado hacia cero                                                  |
+| [`fld(x,y)`](@ref)    | División *floored*; cociente redondeado hacia `-Inf`                                               |
+| [`cld(x,y)`](@ref)    | División *ceiling*; cociente redondeado hacia `+Inf`                                               |
+| [`rem(x,y)`](@ref)    | Resto; satisface `x == div(x,y)*y + rem(x,y)`; el signo se corresponde con el de `x`               |
+| [`mod(x,y)`](@ref)    | Módulo; satisface `x == fld(x,y)*y + mod(x,y)`; el signo se corresponde con el de `y`              |
+| [`mod1(x,y)`](@ref)   | Módulo con un desplazamiento de 1; devuelve `r∈(0,y]` para `y>0` o `r∈[y,0)` para `y<0`, donde `mod(r, y) == mod(x, y)` |
+| [`mod2pi(x)`](@ref)   | Módulo con respecto a 2pi; `0 <= mod2pi(x)  < 2pi`                                                 |
+| [`divrem(x,y)`](@ref) | Devuelve `(div(x,y),rem(x,y))`                                                                     |
+| [`fldmod(x,y)`](@ref) | Devuelve `(fld(x,y),mod(x,y))`                                                                     |
+| [`gcd(x,y...)`](@ref) | Máximo común divisor positivo de `x`, `y`,...                                                      |
+| [`lcm(x,y...)`](@ref) | Mínimo común múltiplo positivo de `x`, `y`,...                                                     |
 
-### Sign and absolute value functions
+### Funciones de signo y valor absoluto
 
 | Function                | Description                                                |
 |:----------------------- |:---------------------------------------------------------- |
@@ -424,7 +420,7 @@ See [Conversion and Promotion](@ref conversion-and-promotion) for how to define 
 | [`copysign(x,y)`](@ref) | a value with the magnitude of `x` and the sign of `y`      |
 | [`flipsign(x,y)`](@ref) | a value with the magnitude of `x` and the sign of `x*y`    |
 
-### Powers, logs and roots
+### Potencias, logaritmos y raíces
 
 | Function                 | Description                                                                |
 |:------------------------ |:-------------------------------------------------------------------------- |
