@@ -54,7 +54,7 @@ julia> (x = 1;
 3
 ```
 
-## [Conditional Evaluation](@id man-conditional-evaluation)
+## [Evaluación Condicional](@id man-conditional-evaluation)
 
 La evaluación condicional permite que porciones de código sean evaluadas o no evaluadas dependiendo 
 del valor de una expresión booleana. Esta es la anatomía de la estructura de  `if`-`elseif`-`else`:
