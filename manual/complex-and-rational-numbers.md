@@ -1,4 +1,4 @@
-# Complex and Rational Numbers
+# [Números Racionales y Complejos](@id complex-and-rational-numbers)
 
 Julia se distribuye con tipos predefinidos que representan números complejos y racionales, 
 y soporta todas las [Operaciones Matemáticas y Funciones Elementales](@ref) estándar sobre ellos. 
@@ -6,7 +6,7 @@ y soporta todas las [Operaciones Matemáticas y Funciones Elementales](@ref) est
 en cualquier combinación de tipos numéricos predefinidos, primitivos o compuestos, se comporten 
 como se esperaba.
 
-## Complex Numbers
+## Números Complejos
 
 La constante global [`im`](@ref) está ligada al número complejo *i*, que representa la raíz 
 cuadrada principal de -1. Se consideró nocivo para co-optar el nombre `i` para una constante 
