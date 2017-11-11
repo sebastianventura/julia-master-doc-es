@@ -21,9 +21,9 @@ están soportados sobre todos los tipos primitivos:
 
 así como la negación sobre tipos [`Bool`](@ref):
 
-| Expression | Name     | Description                              |
-|:---------- |:-------- |:---------------------------------------- |
-| `!x`       | negation | changes `true` to `false` and vice versa |
+| Expression | Name     | Description                         |
+|:---------- |:-------- |:----------------------------------- |
+| `!x`       | negación | Cambia `true` a `false` y viceversa |
 
 El sistema de promoción de Julia hace que las operaciones aritméticas sobre mezclas de tipos de argumentos funcione de forma natural y automáticamente. Ver [Conversión y Promoción](@ref conversion-and-promotion) para los detalles del sistema de promoción.
 
@@ -300,7 +300,7 @@ Julia aplica el siguiente orden de operaciones, de mayor a menor precedencia:
 
 | Category       | Operators                                                                                         |
 |:-------------- |:------------------------------------------------------------------------------------------------- |
-| Syntax         | `.` followed by `::`                                                                              |
+| Syntax         | `.` seguida por `::`                                                                              |
 | Exponentiation | `^`                                                                                               |
 | Fractions      | `//`                                                                                              |
 | Multiplication | `* / % & \`                                                                                       |
