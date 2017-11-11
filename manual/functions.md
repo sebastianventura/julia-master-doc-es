@@ -675,7 +675,7 @@ a llamadas retransmitidas (broadcast) y son fundidas con otras llamadas que tien
 `X .+= Y etcetera` es equivalente a `X .= X .+ Y` y dan como resultado una asignación fusionada. 
 Ver (@ref man-dot-operators).
 
-## Further Reading
+## Otras Lecturas
 
 Deberíamos mencionar que esto está lejos de ser una visión completa de las definiciones de 
 función. Julia tiene un sistema de tipos sofisticado y permite despacho múltiple sobre los 
