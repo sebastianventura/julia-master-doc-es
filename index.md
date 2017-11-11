@@ -2,12 +2,12 @@
 
 ## Manual
 
-  * [Introducción](manual/introduction)
-  * [Empezando](manual/getting-started)
-  * [Variables](manual/variables)
-  * [Números Enteros y en Punto Flotante](manual/integers-and-floating-point-numbers)
-  * [Operaciones Matemáticas y Funciones Elementales](manual/mathematical-operations)
-  * [Números Complejos y Racionales](manual/complex-and-rational-numbers)
+* [Introducción](manual/introduction)
+* [Empezando](manual/getting-started)
+* [Variables](manual/variables)
+* [Números Enteros y en Punto Flotante](manual/integers-and-floating-point-numbers)
+* [Operaciones Matemáticas y Funciones Elementales](manual/mathematical-operations)
+* [Números Complejos y Racionales](manual/complex-and-rational-numbers)
   * [Cadenas](manual/strings)
   * [Funciones](manual/functions)
   * [Control de Flujo](manual/control-flow)
