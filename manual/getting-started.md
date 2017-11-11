@@ -1,4 +1,4 @@
-# Empezando
+# [Empezando](@id getting-started)
 
 La instalación de Julia es sencilla, ya sea utilizando binarios precompilados o compilando desde la fuente. Descargue e instale Julia siguiendo las instrucciones en [https://julialang.org/downloads/](https://julialang.org/downloads/).
 
