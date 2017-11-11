@@ -1,4 +1,4 @@
-# [Strings](@id man-strings)
+# [Cadenas](@id man-strings)
 
 Las cadenas son secuencias finitas de caracteres. Por supuesto, el verdadero problema viene cuando 
 uno se pregunta qué es un carácter. Los caracteres con los que están familiarizados con los hablantes 
@@ -66,17 +66,14 @@ julia> typeof(ans)
 Int64
 ```
 
-On 32-bit architectures, [`typeof(ans)`](@ref) will be [`Int32`](@ref). You can convert an
-integer value back to a `Char` just as easily:
+En arquitecturas de 32 bits,  [`typeof(ans)`](@ref) será [`Int32`](@ref). Puede convertir un valor entero de nuevo a un `Char` fácilmente:
 
 ```jldoctest
 julia> Char(120)
 'x': ASCII/Unicode U+0078 (category Ll: Letter, lowercase)
 ```
 
-Not all integer values are valid Unicode code points, but for performance, the `Char()` conversion
-does not check that every character value is valid. If you want to check that each converted value
-is a valid code point, use the [`isvalid()`](@ref) function:
+No todos los valores enteros son puntos de código Unicode válidos, pero por una cuestión de  rendimiento, la conversión `Char()` no comprueba que cada valor de carácter sea válido. Si desea comprobar que cada valor convertido es un punto de código válido, utilice la función [`isvalid()`](@ref):
 
 ```jldoctest
 julia> Char(0x110000)
@@ -86,13 +83,9 @@ julia> isvalid(Char, 0x110000)
 false
 ```
 
-As of this writing, the valid Unicode code points are `U+00` through `U+d7ff` and `U+e000` through
-`U+10ffff`. These have not all been assigned intelligible meanings yet, nor are they necessarily
-interpretable by applications, but all of these values are considered to be valid Unicode characters.
+A partir de este momento, los puntos de código Unicode válidos son `U+00` a `U+d7ff` y `U+e000` a `U+10ffff`. A estos no se les han asignado todavía significados inteligibles, ni son necesariamente interpretables por las aplicaciones, pero todos ellos se consideran caracteres Unicode válidos.
 
-You can input any Unicode character in single quotes using `\u` followed by up to four hexadecimal
-digits or `\U` followed by up to eight hexadecimal digits (the longest valid value only requires
-six):
+Puede introducir cualquier carácter Unicode entre comillas simples utilizando `\u` seguido de hasta cuatro dígitos hexadecimales o `\U` seguido de hasta ocho dígitos hexadecimales (el valor válido más largo sólo requiere seis):
 
 ```jldoctest
 julia> '\u0'
@@ -108,10 +101,7 @@ julia> '\U10ffff'
 '\U10ffff': Unicode U+10ffff (category Cn: Other, not assigned)
 ```
 
-Julia uses your system's locale and language settings to determine which characters can be printed
-as-is and which must be output using the generic, escaped `\u` or `\U` input forms. In addition
-to these Unicode escape forms, all of [C's traditional escaped input forms](https://en.wikipedia.org/wiki/C_syntax#Backslash_escapes)
-can also be used:
+Julia utiliza la configuración regional y de idioma de tu sistema para determinar qué caracteres se pueden imprimir tal cual y cuáles se deben imprimir utilizando las formas de entrada genéricas, escapadas con `\u` o `\U`. Además de estas formas de escape de Unicode, también se pueden usar todas las [formas de entrada de escape tradicionales de C](https://en.wikipedia.org/wiki/C_syntax#Backslash_escapes):
 
 ```jldoctest
 julia> Int('\0')
@@ -136,7 +126,7 @@ julia> Int('\xff')
 255
 ```
 
-You can do comparisons and a limited amount of arithmetic with `Char` values:
+Puedes hacer comparaciones y una cantidad limitada de aritmética con los valores `Char`:
 
 ```jldoctest
 julia> 'A' < 'a'
@@ -155,7 +145,7 @@ julia> 'A' + 1
 'B': ASCII/Unicode U+0042 (category Lu: Letter, uppercase)
 ```
 
-## String Basics
+## Fundamentos de Cadenas
 
 String literals are delimited by double quotes or triple double quotes:
 
