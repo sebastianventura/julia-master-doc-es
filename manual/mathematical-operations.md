@@ -413,39 +413,37 @@ Ver [Conversión y Promoción](@ref conversion-and-promotion) para ver cómo def
 
 | Function                | Description                                                |
 |:----------------------- |:---------------------------------------------------------- |
-| [`abs(x)`](@ref)        | a positive value with the magnitude of `x`                 |
-| [`abs2(x)`](@ref)       | the squared magnitude of `x`                               |
-| [`sign(x)`](@ref)       | indicates the sign of `x`, returning -1, 0, or +1          |
-| [`signbit(x)`](@ref)    | indicates whether the sign bit is on (true) or off (false) |
-| [`copysign(x,y)`](@ref) | a value with the magnitude of `x` and the sign of `y`      |
-| [`flipsign(x,y)`](@ref) | a value with the magnitude of `x` and the sign of `x*y`    |
+| [`abs(x)`](@ref)        | Un valor positivo con la magnitud de `x`                   |
+| [`abs2(x)`](@ref)       | El cuadrado de la magnitud de `x`                          |
+| [`sign(x)`](@ref)       | Indica el signo de `x`, devolviendo -1, 0, o +1            |
+| [`signbit(x)`](@ref)    | Indica que si el bit de signo está en **on** (`true`) o en **off** (`false`)|
+| [`copysign(x,y)`](@ref) | Indica un valor con la magnitud de `x` y el signo de `y    |
+| [`flipsign(x,y)`](@ref) |  Indica un valor con la magnitud de `x` y el signo de `x*y`|
 
 ### Potencias, logaritmos y raíces
 
 | Function                 | Description                                                                |
 |:------------------------ |:-------------------------------------------------------------------------- |
-| [`sqrt(x)`](@ref), `√x`  | square root of `x`                                                         |
-| [`cbrt(x)`](@ref), `∛x`  | cube root of `x`                                                           |
-| [`hypot(x,y)`](@ref)     | hypotenuse of right-angled triangle with other sides of length `x` and `y` |
-| [`exp(x)`](@ref)         | natural exponential function at `x`                                        |
-| [`expm1(x)`](@ref)       | accurate `exp(x)-1` for `x` near zero                                      |
-| [`ldexp(x,n)`](@ref)     | `x*2^n` computed efficiently for integer values of `n`                     |
-| [`log(x)`](@ref)         | natural logarithm of `x`                                                   |
-| [`log(b,x)`](@ref)       | base `b` logarithm of `x`                                                  |
-| [`log2(x)`](@ref)        | base 2 logarithm of `x`                                                    |
-| [`log10(x)`](@ref)       | base 10 logarithm of `x`                                                   |
-| [`log1p(x)`](@ref)       | accurate `log(1+x)` for `x` near zero                                      |
-| [`exponent(x)`](@ref)    | binary exponent of `x`                                                     |
-| [`significand(x)`](@ref) | binary significand (a.k.a. mantissa) of a floating-point number `x`        |
+| [`sqrt(x)`](@ref), `√x`  | Raíz cuadrada de `x`                                                       |
+| [`cbrt(x)`](@ref), `∛x`  | Raíz cúbica de `x`                                                         |
+| [`hypot(x,y)`](@ref)     | Hipotenusa del triángulo rectángulo cuyos catetos son de longitudes `x` e `y` |
+| [`exp(x)`](@ref)         | Función exponencial natural sobre `x`                                      |
+| [`expm1(x)`](@ref)       | Valor exacto de `exp(x)-1` para  `x` cercano a zero                        |
+| [`ldexp(x,n)`](@ref)     | `x*2^n` calculado eficientemente para valores enteros de `n`               |
+| [`log(x)`](@ref)         | Logaritmo neperiano de `x`                                                 |
+| [`log(b,x)`](@ref)       | Logaritmo en base `b` de `x`                                               |
+| [`log2(x)`](@ref)        | Logaritmo en base 2 de `x`                                                 |
+| [`log10(x)`](@ref)       | Logaritmo decimal de `x`                                                   |
+| [`log1p(x)`](@ref)       | Valor exacto de `log(1+x)` para `x` cercano a cero                         |
+| [`exponent(x)`](@ref)    | Exponente binario de  `x`                                                  |
+| [`significand(x)`](@ref) | Significando binario (alias *mantisa*) de un número en punto flotante `x`  |
 
-For an overview of why functions like [`hypot()`](@ref), [`expm1()`](@ref), and [`log1p()`](@ref)
-are necessary and useful, see John D. Cook's excellent pair of blog posts on the subject: [expm1, log1p, erfc](https://www.johndcook.com/blog/2010/06/07/math-library-functions-that-seem-unnecessary/),
-and [hypot](https://www.johndcook.com/blog/2010/06/02/whats-so-hard-about-finding-a-hypotenuse/).
+Para una explicación de por qué son necesarias funciones como [`hypot()`](@ref), [`expm1()`](@ref), and [`log1p()`](@ref), véase el excelente par de artículos en el blog de John D. Cook's sobre el tema: [expm1, log1p, erfc](https://www.johndcook.com/blog/2010/06/07/math-library-functions-that-seem-unnecessary/),
+e [hypot](https://www.johndcook.com/blog/2010/06/02/whats-so-hard-about-finding-a-hypotenuse/).
 
-### Trigonometric and hyperbolic functions
+### Funciones Trigonométricas e Hiperbólicas
 
-All the standard trigonometric and hyperbolic functions are also defined:
-
+Todas las funciones trigonométricas e hiperbólicas estándar están también definidas:
 ```
 sin    cos    tan    cot    sec    csc
 sinh   cosh   tanh   coth   sech   csch
@@ -454,28 +452,24 @@ asinh  acosh  atanh  acoth  asech  acsch
 sinc   cosc   atan2
 ```
 
-These are all single-argument functions, with the exception of [atan2](https://en.wikipedia.org/wiki/Atan2),
-which gives the angle in [radians](https://en.wikipedia.org/wiki/Radian) between the *x*-axis
-and the point specified by its arguments, interpreted as *x* and *y* coordinates.
+Son todas funciones de un solo argumento, con la excepción de  [atan2](https://en.wikipedia.org/wiki/Atan2),
+que da el ángulo en [radians](https://en.wikipedia.org/wiki/Radian) entre el eje *x* y el punto especificado por sus argumentos, interpretado como sus coordenadas *x* e *y*.
 
-Additionally, [`sinpi(x)`](@ref) and [`cospi(x)`](@ref) are provided for more accurate computations
-of [`sin(pi*x)`](@ref) and [`cos(pi*x)`](@ref) respectively.
+Adicionalmente, se proporcionan [`sinpi(x)`](@ref) e [`cospi(x)`](@ref) para cálculos más exactos de [`sin(pi*x)`](@ref) y [`cos(pi*x)`](@ref) respectivamente.
 
-In order to compute trigonometric functions with degrees instead of radians, suffix the function
-with `d`. For example, [`sind(x)`](@ref) computes the sine of `x` where `x` is specified in degrees.
-The complete list of trigonometric functions with degree variants is:
+Para computar funciones trigonométricas con grados en lugar de con rdianes, añada al nombre de la función el sufijo `d`. Por ejemplo, [`sind(x)`](@ref) calcula el seno de `x`, donde `x` se especifica en grados. La lista completa de funciones trigonométricas con variantes grados es:
 
 ```
 sind   cosd   tand   cotd   secd   cscd
 asind  acosd  atand  acotd  asecd  acscd
 ```
 
-### Special functions
+### Funciones Especiales
 
-| Function                                                      | Description                                                                                                                                                     |
-|:------------------------------------------------------------- |:--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`gamma(x)`](@ref)                                            | [gamma function](https://en.wikipedia.org/wiki/Gamma_function) at `x`                                                                                           |
-| [`lgamma(x)`](@ref)                                           | accurate `log(gamma(x))` for large `x`                                                                                                                          |
-| [`lfact(x)`](@ref)                                            | accurate `log(factorial(x))` for large `x`; same as `lgamma(x+1)` for `x > 1`, zero otherwise                                                                   |
-| [`beta(x,y)`](@ref)                                           | [beta function](https://en.wikipedia.org/wiki/Beta_function) at `x,y`                                                                                           |
-| [`lbeta(x,y)`](@ref)                                          | accurate `log(beta(x,y))` for large `x` or `y`                                                                                                                  |
+| Función                    | Descripción                        |
+|:-------------------------- |:---------------------------------- |
+| [`gamma(x)`](@ref)         | [Función gamma](https://en.wikipedia.org/wiki/Gamma_function) en `x`|
+| [`lgamma(x)`](@ref)        | Valor exacto de `log(gamma(x))` para valores grandes de `x` |
+| [`lfact(x)`](@ref)         | Valor exacto de  `log(factorial(x))` para valores grandes de  `x`; igual que `lgamma(x+1)` para `x > 1`, cero en otros caso            |
+| [`beta(x,y)`](@ref)        | [Función beta](https://en.wikipedia.org/wiki/Beta_function) en `x,y` |
+| [`lbeta(x,y)`](@ref)       | Valor exacto de  `log(beta(x,y))` para valores grandes de `x` o `y`  |
