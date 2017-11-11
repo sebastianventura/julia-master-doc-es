@@ -42,11 +42,7 @@ Hay algunas características destacadas de alto nivel sobre las cadenas de carac
 
 ## [Caracteres](@id man-characters)
 
-Un valor Char representa un solo carácter: es sólo un bitstype de 32 bits con una representación 
-literal especial y comportamientos aritméticos apropiados, cuyo valor numérico se interpreta como un
-representation and appropriate arithmetic behaviors, whose numeric value is interpreted as a
-[punto de código Unicode](https://en.wikipedia.org/wiki/Code_point). Aquí se muestra cómo se 
-introducen y se muestran los valores `Char`:
+Un valor Char representa un solo carácter: es sólo un bitstype de 32 bits con una representación literal especial y comportamientos aritméticos apropiados, cuyo valor numérico se interpreta como un [punto de código Unicode](https://en.wikipedia.org/wiki/Code_point). Aquí se muestra cómo se introducen y se muestran los valores `Char`:
 
 ```jldoctest
 julia> 'x'
@@ -147,7 +143,7 @@ julia> 'A' + 1
 
 ## Fundamentos de Cadenas
 
-String literals are delimited by double quotes or triple double quotes:
+Los literales de cadenas están delimitados por comillas dobles o comillas dobles triples:
 
 ```jldoctest helloworldstring
 julia> str = "Hello, world.\n"
@@ -157,7 +153,7 @@ julia> """Contains "quote" characters"""
 "Contains \"quote\" characters"
 ```
 
-If you want to extract a character from a string, you index into it:
+Si desea extraer un carácter de una cadena, indéxelo:
 
 ```jldoctest helloworldstring
 julia> str[1]
@@ -170,13 +166,9 @@ julia> str[end]
 '\n': ASCII/Unicode U+000a (category Cc: Other, control)
 ```
 
-All indexing in Julia is 1-based: the first element of any integer-indexed object is found at
-index 1. (As we will see below, this does not necessarily mean that the last element is found
-at index `n`, where `n` is the length of the string.)
+Toda la indexación en Julia está basada en 1: el primer elemento de cualquier objeto indexado medidante enteros se encuentra en el índice `1`, y el último elemento se encuentra en el índice `n`, cuando la cadena tiene una longitud de `n`.
 
-In any indexing expression, the keyword `end` can be used as a shorthand for the last index (computed
-by [`endof(str)`](@ref)). You can perform arithmetic and other operations with `end`, just like
-a normal value:
+En cualquier expresión de indexación, puede usarse la palabra clave `end` como una abreviatura para el último índice (calculado mediante [`endof(str)`](@ref)). Puede realizar operaciones aritméticas y otras con `end`, como si de un valor normal se tratara:
 
 ```jldoctest helloworldstring
 julia> str[end-1]
@@ -186,7 +178,7 @@ julia> str[end÷2]
 ' ': ASCII/Unicode U+0020 (category Zs: Separator, space)
 ```
 
-Using an index less than 1 or greater than `end` raises an error:
+Usar un índice menor que 1 o mayor que `end` lanza un error:
 
 ```jldoctest helloworldstring
 julia> str[0]
@@ -200,14 +192,14 @@ ERROR: BoundsError: attempt to access "Hello, world.\n"
 [...]
 ```
 
-You can also extract a substring using range indexing:
+También puedes extraer una subcadena usando indexación mediante un rango:
 
 ```jldoctest helloworldstring
 julia> str[4:9]
 "lo, wo"
 ```
 
-Notice that the expressions `str[k]` and `str[k:k]` do not give the same result:
+Nótese que las expresiones `str[k]` y `str[k:k]` no dan el mismo resultado:
 
 ```jldoctest helloworldstring
 julia> str[6]
@@ -217,28 +209,18 @@ julia> str[6:6]
 ","
 ```
 
-The former is a single character value of type `Char`, while the latter is a string value that
-happens to contain only a single character. In Julia these are very different things.
+La primera es un valor carácter de tipo `Char`, mientras que la segunda es un valor cadena que tiene un único carácter. En Julia se trata de cosas muy diferentes.happens to contain only a single character. In Julia these are very different things.
 
-## Unicode and UTF-8
+## Unicode y UTF-8
 
-Julia fully supports Unicode characters and strings. As [discussed above](@ref man-characters), in character
-literals, Unicode code points can be represented using Unicode `\u` and `\U` escape sequences,
-as well as all the standard C escape sequences. These can likewise be used to write string literals:
-
+Julia soporta totalmente caracteres y cadenas Unicode. Como se ha [comentado anteriormente](@ref man-characters), en literales de caracteres, los puntos de código Unicode se pueden representar usando las secuencias de escape Unicode `\u` y `\U`, así como todas las secuencias de escape C estándar. Éstos también se pueden utilizar para escribir literales de cadena:
 ```jldoctest unicodestring
+
 julia> s = "\u2200 x \u2203 y"
 "∀ x ∃ y"
 ```
 
-Whether these Unicode characters are displayed as escapes or shown as special characters depends
-on your terminal's locale settings and its support for Unicode. String literals are encoded using
-the UTF-8 encoding. UTF-8 is a variable-width encoding, meaning that not all characters are encoded
-in the same number of bytes. In UTF-8, ASCII characters -- i.e. those with code points less than
-0x80 (128) -- are encoded as they are in ASCII, using a single byte, while code points 0x80 and
-above are encoded using multiple bytes -- up to four per character. This means that not every
-byte index into a UTF-8 string is necessarily a valid index for a character. If you index into
-a string at such an invalid byte index, an error is thrown:
+Si estos caracteres Unicode se muestran como escapes o se muestran como caracteres especiales depende de la configuración regional de tu terminal y su compatibilidad con Unicode. Los literales de cadena se codifican utilizando la codificación UTF-8. UTF-8 es una codificación de ancho variable, lo que significa que no todos los caracteres están codificados en el mismo número de bytes. En UTF-8, los caracteres ASCII -es decir, aquellos con puntos de código inferiores a 0x80 (128) - están codificados como lo están en ASCII, usando un solo byte, mientras que los puntos de código 0x80 y superiores se codifican utilizando múltiples bytes (hasta cuatro por carácter). Esto significa que no todos los índices de bytes en una cadena UTF-8 es necesariamente un índice válido para un carácter. Si indexas una cadena en un índice de bytes no válido, se genera un error:
 
 ```jldoctest unicodestring
 julia> s[1]
@@ -256,16 +238,9 @@ julia> s[4]
 ' ': ASCII/Unicode U+0020 (category Zs: Separator, space)
 ```
 
-In this case, the character `∀` is a three-byte character, so the indices 2 and 3 are invalid
-and the next character's index is 4; this next valid index can be computed by [`nextind(s,1)`](@ref),
-and the next index after that by `nextind(s,4)` and so on.
+En este caso, el carácter ∀ es un carácter de tres bytes, por lo que los índices 2 y 3 no son válidos y el índice del siguiente carácter es 4; este siguiente índice válido puede ser calculado con [`nextind(s,1)`](@ref), y el siguiente índice después de éste con `nextind(s,4)` y así sucesivamente.
 
-Because of variable-length encodings, the number of characters in a string (given by [`length(s)`](@ref))
-is not always the same as the last index. If you iterate through the indices 1 through [`endof(s)`](@ref)
-and index into `s`, the sequence of characters returned when errors aren't thrown is the sequence
-of characters comprising the string `s`. Thus we have the identity that `length(s) <= endof(s)`,
-since each character in a string must have its own index. The following is an inefficient and
-verbose way to iterate through the characters of `s`:
+Debido a las codificaciones de longitud variable, el número de caracteres de una cadena (dada por [`length(s)`](@ref)) no siempre lo mismo que el último índice. Si se itera a través de los índices 1 hasta [`endof(s)`](@ref) y se indexa en `s`, la secuencia de caracteres devueltos cuando no se lanzan errores es la secuencia de caracteres que contiene la cadena `s`. Por tanto, tenemos la identidad de que `length(s) <= endof(s)`, ya que cada carácter en una cadena debe tener su propio índice. La siguiente es una forma ineficaz y verbosa de iterar a través de los caracteres de s:
 
 ```jldoctest unicodestring
 julia> for i = 1:endof(s)
@@ -284,9 +259,7 @@ x
 y
 ```
 
-The blank lines actually have spaces on them. Fortunately, the above awkward idiom is unnecessary
-for iterating through the characters in a string, since you can just use the string as an iterable
-object, no exception handling required:
+Las líneas en blanco en realidad tienen espacios en ellos. Afortunadamente, el idioma anterior incómodo es innecesario para iterar a través de los caracteres de una cadena, ya que se puede utilizar la cadena como un objeto iterable, sin que se requiera el manejo de excepciones:
 
 ```jldoctest unicodestring
 julia> for c in s
