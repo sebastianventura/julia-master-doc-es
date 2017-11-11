@@ -14,7 +14,7 @@
 * [Ámbito de las Variables](manual/variables-and-scoping)
 * [Tipos](manual/types)
 * [Métodos](manual/methods)
-* [Constructor
+* [Constructors](manual/constructors)
 * [Conversion and Promotion](manual/conversion-and-promotion)
 * [Interfaces](manual/interfaces)
 * [Modules](manual/modules)* [Documentation](manual/documentation)
