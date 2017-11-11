@@ -2,7 +2,7 @@
 
 Julia se distribuye con tipos predefinidos que representan números complejos y racionales, 
 y soporta todas las [Operaciones Matemáticas y Funciones Elementales](@ref) estándar sobre ellos. 
-[Conversión and Promoción](@ref conversion-and-promotion) se definen de modo que las operaciones 
+[Conversión and Promoción](conversion-and-promotion) se definen de modo que las operaciones 
 en cualquier combinación de tipos numéricos predefinidos, primitivos o compuestos, se comporten 
 como se esperaba.
 
