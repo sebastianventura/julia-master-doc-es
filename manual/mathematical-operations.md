@@ -135,25 +135,23 @@ Además, los operadores de actualización "vectorizados" como `a .+= b` (o `@. a
 Nótese que la sintaxis de punto es también aplicable a operadores definidos por el usuario. Por ejemplo, si definimos el operador `⊗(A,B) = kron(A,B)` para dar una sintaxis infija `A ⊗ B` al producto de Kronecker ([`kron`](@ref)), entonces
 `[A,B] .⊗ [C,D]` calculará  `[A⊗C, B⊗D]` sin ninguna codificación adicional.
 
-Combining dot operators with numeric literals can be ambiguous.
-For example, it is not clear whether `1.+x` means `1. + x` or `1 .+ x`.
-Therefore this syntax is disallowed, and spaces must be used around
-the operator in such cases.
+Combinar operadores punto con literales numéricos puede ser ambiguo. Por ejemplo, no está claro si `1.+x` significa `1. + x` o `1 .+ x`. Por tanto, esta sintáxis no está permitida, y en estos casos deben usarse espacios alrededos del operador.
 
-## Numeric Comparisons
+## Comparaciones Numéricas
 
-Standard comparison operations are defined for all the primitive numeric types:
+Los operadores de comparación estándar están definidos para todos los tipos numéricos primitivos:
 
-| Operator                     | Name                     |
+
+| Operador                     | Nombre                     |
 |:---------------------------- |:------------------------ |
-| [`==`](@ref)                 | equality                 |
-| [`!=`](@ref), [`≠`](@ref !=) | inequality               |
-| [`<`](@ref)                  | less than                |
-| [`<=`](@ref), [`≤`](@ref <=) | less than or equal to    |
-| [`>`](@ref)                  | greater than             |
-| [`>=`](@ref), [`≥`](@ref >=) | greater than or equal to |
+| [`==`](@ref)                 | Igualdad                 |
+| [`!=`](@ref), [`≠`](@ref !=) | Desigualdad              |
+| [`<`](@ref)                  | Menor que                |
+| [`<=`](@ref), [`≤`](@ref <=) | Menor o igual que        |
+| [`>`](@ref)                  | Mayor que                |
+| [`>=`](@ref), [`≥`](@ref >=) | Mayor o igual que        |
 
-Here are some simple examples:
+He aquí algunos ejemplos:
 
 ```jldoctest
 julia> 1 == 1
@@ -190,16 +188,15 @@ julia> 3 < -0.5
 false
 ```
 
-Integers are compared in the standard manner -- by comparison of bits. Floating-point numbers
-are compared according to the [IEEE 754 standard](https://en.wikipedia.org/wiki/IEEE_754-2008):
+Los enteros se comparan de un modo estándar, mediante comparación de bits. Los números de punto flotante se comparan de acuerdo al [estándar IEEE 754](https://en.wikipedia.org/wiki/IEEE_754-2008):
 
-  * Finite numbers are ordered in the usual manner.
-  * Positive zero is equal but not greater than negative zero.
-  * `Inf` is equal to itself and greater than everything else except `NaN`.
-  * `-Inf` is equal to itself and less then everything else except `NaN`.
-  * `NaN` is not equal to, not less than, and not greater than anything, including itself.
+* Los números finitos son ordenados del modo habitual.
+* El cero positivo es igual pero no mayor que el cero negativo.
+* `Inf` es igual a si mismo y mayor que todo excepto `NaN`
+* `-Inf` es igual a si mismo y menor que todo excepto `NaN`
+* `NaN` no es igual, mayor o menor a nadie, excepto a sí mismo.
 
-The last point is potentially surprising and thus worth noting:
+Este último punto es potencialmente sorprendente y, por tanto, vale la pena señalar que:
 
 ```jldoctest
 julia> NaN == NaN
@@ -215,24 +212,23 @@ julia> NaN > NaN
 false
 ```
 
-and can cause especial headaches with [Arrays](@ref):
+y puede causar dolores de cabeza especiales con [Arrays](@ref):
 
 ```jldoctest
 julia> [1 NaN] == [1 NaN]
 false
 ```
 
-Julia provides additional functions to test numbers for special values, which can be useful in
-situations like hash key comparisons:
+Julia proporciona funciones adicionales para comprobar números para valores especiales, lo cuál pueden ser útil en situaciones como las comparaciones de claves hash:
 
 | Function                | Tests if                  |
 |:----------------------- |:------------------------- |
-| [`isequal(x, y)`](@ref) | `x` and `y` are identical |
-| [`isfinite(x)`](@ref)   | `x` is a finite number    |
-| [`isinf(x)`](@ref)      | `x` is infinite           |
-| [`isnan(x)`](@ref)      | `x` is not a number       |
+| [`isequal(x, y)`](@ref) | `x` e `y` son idénticos   |
+| [`isfinite(x)`](@ref)   | `x` es un número finito   |
+| [`isinf(x)`](@ref)      | `x` es infinito           |
+| [`isnan(x)`](@ref)      | `x` no es un número       |
 
-[`isequal()`](@ref) considers `NaN`s equal to each other:
+[`isequal()`](@ref) considera los `NaN`s iguales entre sí:
 
 ```jldoctest
 julia> isequal(NaN, NaN)
@@ -245,7 +241,7 @@ julia> isequal(NaN, NaN32)
 true
 ```
 
-`isequal()` can also be used to distinguish signed zeros:
+`isequal()` también puede usarse para distinguir los ceros con signo:
 
 ```jldoctest
 julia> -0.0 == 0.0
@@ -255,30 +251,24 @@ julia> isequal(-0.0, 0.0)
 false
 ```
 
-Mixed-type comparisons between signed integers, unsigned integers, and floats can be tricky. A
-great deal of care has been taken to ensure that Julia does them correctly.
+Las comparaciones de tipo mixto entre enteros con signo, enteros sin signo y valores en punto flotante pueden ser complicadas. Se ha tomado mucho cuidado para asegurarse de que Julia los hace correctamente.
 
-For other types, `isequal()` defaults to calling [`==()`](@ref), so if you want to define
-equality for your own types then you only need to add a [`==()`](@ref) method.  If you define
-your own equality function, you should probably define a corresponding [`hash()`](@ref) method
-to ensure that `isequal(x,y)` implies `hash(x) == hash(y)`.
+ `==()`,  `==()`.  `isequal(x, y)` implique `hash(x) == hash(y)`.
+
+Para otros tipos, `isequal()` llama por defecto a [`==()`](@ref), así que si quieres definir la igualdad para nuestros propios tipos, solo tienes que agregar un método [`==()`](@ref).  Si defines tu propia función de igualdad, probablemente deberías definir un método [`hash()`](@ref) correspondiente para asegurarte de que `isequal(x,y)` implica `hash(x) == hash(y)`.
 
 ### Chaining comparisons
 
-Unlike most languages, with the [notable exception of Python](https://en.wikipedia.org/wiki/Python_syntax_and_semantics#Comparison_operators),
-comparisons can be arbitrarily chained:
+A diferencia de la mayoría de los idiomas, [con la notable excepción de Python (https://en.wikipedia.org/wiki/Python_syntax_and_semantics#Comparison_operators), las comparaciones pueden encadenarse arbitrariamente:
 
 ```jldoctest
 julia> 1 < 2 <= 2 < 3 == 3 > 2 >= 1 == 1 < 3 != 5
 true
 ```
 
-Chaining comparisons is often quite convenient in numerical code. Chained comparisons use the
-`&&` operator for scalar comparisons, and the [`&`](@ref) operator for elementwise comparisons,
-which allows them to work on arrays. For example, `0 .< A .< 1` gives a boolean array whose entries
-are true where the corresponding elements of `A` are between 0 and 1.
+El encadenamiento de comparaciones suele ser bastante conveniente en el código numérico. Las comparaciones encadenadas utilizan el operador `&&` para comparaciones escalares y el operador [`&`](@ref) para comparaciones elemento a elemento, lo que les permite trabajar en matrices. Por ejemplo, `0 .< A .< 1` da una matriz booleana cuyas entradas son verdaderas donde los elementos correspondientes de A están entre 0 y 1.
 
-Note the evaluation behavior of chained comparisons:
+Nótese el comportamiento de evaluación de las comparaciones encadenadas:
 
 ```jldoctest
 julia> v(x) = (println(x); x)
@@ -296,24 +286,15 @@ julia> v(1) > v(2) <= v(3)
 false
 ```
 
-The middle expression is only evaluated once, rather than twice as it would be if the expression
-were written as `v(1) < v(2) && v(2) <= v(3)`. However, the order of evaluations in a chained
-comparison is undefined. It is strongly recommended not to use expressions with side effects (such
-as printing) in chained comparisons. If side effects are required, the short-circuit `&&` operator
-should be used explicitly (see [Short-Circuit Evaluation](@ref)).
+La expresión del medio sólo se evalúa una vez, en lugar de dos veces como lo sería si la expresión se escribiera como `v(1) < v(2) && v(2) <= v(3)`. Sin embargo, el orden de las evaluaciones en una comparación encadenada no está definido. Se recomienda encarecidamente no utilizar expresiones que puedan tener efectos secundarios (como la impresión) en comparaciones encadenadas. Si se requieren efectos secundarios, se debe utilizar explícitamente el operador de cortocircuito `&&` (ver [Evaluación en cortocircuito](short-circuit-evaluation)).
 
-### Elementary Functions
+### Funciones elementales
 
-Julia provides a comprehensive collection of mathematical functions and operators. These mathematical
-operations are defined over as broad a class of numerical values as permit sensible definitions,
-including integers, floating-point numbers, rationals, and complex numbers,
-wherever such definitions make sense.
+Julia proporciona una colección completa de funciones matemáticas y operadores. Estas operaciones matemáticas se definen como una clase de valores numéricos que permiten definiciones sensibles, incluyendo enteros, números de punto flotante, racionales y complejos, dondequiera que tales definiciones tengan sentido.
 
-Moreover, these functions (like any Julia function) can be applied in "vectorized" fashion to
-arrays and other collections with the [dot syntax](@ref man-vectorized) `f.(A)`,
-e.g. `sin.(A)` will compute the sine of each element of an array `A`.
+Además, estas funciones (como cualquier función de Julia) se pueden aplicar de manera "vectorizada" a matrices y otras colecciones con la [sintaxis vectorizada](@ref man-vectorized)   `f.(A)`, por ejemplo, sin.(A) calculará el seno de cada elemento de una matriz `A`. 
 
-## Operator Precedence
+## Precedencia de Operadores
 
 Julia applies the following order of operations, from highest precedence to lowest:
 
