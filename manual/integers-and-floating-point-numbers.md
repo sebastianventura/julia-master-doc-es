@@ -1,4 +1,4 @@
-# Números enteros y en punto flotante
+# [Números enteros y en punto flotante](@id integers-and-floating-point-numbers)
 
 Los valores enteros y punto flotante son los bloques constructivos básicos de la aritmética y la computación. Las representaciones construidas para estos valores son denominadas *tipos primitivos*, mientras que las reprentacionesde números enteros y en punto flotante como valores inmediatos en código se conocen como *literales numéricos*. Por ejemplo, `1` es un literal entero, mientras que `1.0` es un literal en punto flotante; sus representaciones binarias en memoria como objetos son los tipos primitivos.
 
