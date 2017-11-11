@@ -1,4 +1,4 @@
-# Operaciones Matemáticas y Funciones Elementales
+# [Operaciones Matemáticas y Funciones Elementales](@id mathematical-operations)
 
 Julia proporciona una colección completa de operadores aritméticos básicos y de operadores de bits para todos sus tipos numéricos primitivos, así como implementaciones portables y eficientes de una colección comprensiva de funciones matemática estándar.
 
@@ -40,26 +40,23 @@ julia> 3*2/12
 0.5
 ```
 
-(By convention, we tend to space operators more tightly if they get applied before other nearby
-operators. For instance, we would generally write `-x + 2` to reflect that first `x` gets negated,
-and then `2` is added to that result.)
+(Por convención, tendemos a los operadores de espacio más estrechamente si se aplican antes de otros operadores cercanos.Por ejemplo, generalmente escribimos `-x + 2` para reflejar que `x` primero se niega y, a continuación, `2` se agrega a ese resultado.)
 
 ## Bitwise Operators
 
-The following [bitwise operators](https://en.wikipedia.org/wiki/Bitwise_operation#Bitwise_operators)
-are supported on all primitive integer types:
+Los siguientes [operadores bit a bit](https://en.wikipedia.org/wiki/Bitwise_operation#Bitwise_operators) son soportados sobre todos los tipos enteros primitivos:
 
 | Expression | Name                                                                     |
 |:---------- |:------------------------------------------------------------------------ |
-| `~x`       | bitwise not                                                              |
-| `x & y`    | bitwise and                                                              |
-| `x \| y`   | bitwise or                                                               |
-| `x ⊻ y`    | bitwise xor (exclusive or)                                               |
-| `x >>> y`  | [logical shift](https://en.wikipedia.org/wiki/Logical_shift) right       |
-| `x >> y`   | [arithmetic shift](https://en.wikipedia.org/wiki/Arithmetic_shift) right |
-| `x << y`   | logical/arithmetic shift left                                            |
+| `~x`       | Negación bit a bit                                                       |
+| `x & y`    | Conjunción (*and*) bit a bit                                             |
+| `x \| y`   | Disyunción (*or*) bit a bit                                              |
+| `x ⊻ y`    | *Or* exclusivo bit a bit (*xor*)                                         |
+| `x >>> y`  | [Desplazamiento lógico](https://en.wikipedia.org/wiki/Logical_shift) hacia la derecha        |
+| `x >> y`   | [Desplazamiento aritmético](https://en.wikipedia.org/wiki/Arithmetic_shift) hacia la derecha |
+| `x << y`   | Desplazamiento hacia la izquierda lógico/aritmético                                          |
 
-Here are some examples with bitwise operators:
+He aquí algunos ejemplos de uso de operadores bit a bit:
 
 ```jldoctest
 julia> ~123
@@ -84,12 +81,9 @@ julia> ~UInt8(123)
 0x84
 ```
 
-## Updating operators
+## Operaciones de actualización
 
-Every binary arithmetic and bitwise operator also has an updating version that assigns the result
-of the operation back into its left operand. The updating version of the binary operator is formed
-by placing a `=` immediately after the operator. For example, writing `x += 3` is equivalent to
-writing `x = x + 3`:
+Cada operador binario aritmético y bit a bit también tiene una versión de actualización que asigna el resultado de la operación de nuevo a su operando izquierdo. La versión de actualización del operador binario se forma colocando a = inmediatamente después del operador. Por ejemplo, escribir `x += 3` es equivalente a escribir `x = x + 3`:
 
 ```jldoctest
 julia> x = 1
@@ -102,15 +96,14 @@ julia> x
 4
 ```
 
-The updating versions of all the binary arithmetic and bitwise operators are:
+Las versiones de actualización de todos los operadores binarios, aritméticos de bits son:
 
 ```
 +=  -=  *=  /=  \=  ÷=  %=  ^=  &=  |=  ⊻=  >>>=  >>=  <<=
 ```
 
-!!! note
-    An updating operator rebinds the variable on the left-hand side. As a result, the type of the
-    variable may change.
+!!! nota
+    Un operador de actualización reasigna la variable sobre la parte izquierda de la ecuación. Como resultado, el tipo de la variable puede cambiar:
 
     ```jldoctest
     julia> x = 0x01; typeof(x)
@@ -123,17 +116,9 @@ The updating versions of all the binary arithmetic and bitwise operators are:
     Int64
     ```
 
-## [Vectorized "dot" operators](@id man-dot-operators)
+## [Operadores vectorizados con "punto"](@id man-dot-operators)
 
-For *every* binary operation like `^`, there is a corresponding
-"dot" operation `.^` that is *automatically* defined
-to perform `^` element-by-element on arrays. For example,
-`[1,2,3] ^ 3` is not defined, since there is no standard
-mathematical meaning to "cubing" an array, but `[1,2,3] .^ 3`
-is defined as computing the elementwise
-(or "vectorized") result `[1^3, 2^3, 3^3]`.  Similarly for unary
-operators like `!` or `√`, there is a corresponding `.√` that
-applies the operator elementwise.
+Para cada operación binaria como `^` hay su correspondiente operación "con punto" `.^` que se define *automáticamente* para realizar la operación `^` elemento a elemento sobre arrays. Por ejemplo, la operación `[1, 2, 3]^3` no está definidia, porque no hay un significado matemático estándar para calcular el cubo de un array, pero `[1, 2, 3].^3` si lo está como el cálculo de la operación cubo elemento a elemento (o vectorizada) `[1^3, 2^3, 3^3]`. Lo mismo puede decirse para operaciones unarios tales como `!` o `√`, que existe el correspondiente `.√` que aplica el operador elemento a elemento.
 
 ```jldoctest
 julia> [1,2,3] .^ 3
@@ -143,27 +128,12 @@ julia> [1,2,3] .^ 3
  27
 ```
 
-More specifically, `a .^ b` is parsed as the ["dot" call](@ref man-vectorized)
-`(^).(a,b)`, which performs a [broadcast](@ref Broadcasting) operation:
-it can combine arrays and scalars, arrays of the same size (performing
-the operation elementwise), and even arrays of different shapes (e.g.
-combining row and column vectors to produce a matrix). Moreover, like
-all vectorized "dot calls," these "dot operators" are
-*fusing*. For example, if you compute `2 .* A.^2 .+ sin.(A)` (or
-equivalently `@. 2A^2 + sin(A)`, using the [`@.`](@ref @__dot__) macro) for
-an array `A`, it performs a *single* loop over `A`, computing `2a^2 + sin(a)`
-for each element of `A`. In particular, nested dot calls like `f.(g.(x))`
-are fused, and "adjacent" binary operators like `x .+ 3 .* x.^2` are
-equivalent to nested dot calls `(+).(x, (*).(3, (^).(x, 2)))`.
+Más específicamente, `a .^ b` es analizado como la [llamada vectorizada ( o *"dot" call*)](@ref man-vectorized) `(^).(a,b)`, que realiza una operación de [retransmisión (*broadcast*)](@ref Broadcasting): ella puede combinar arrays y escalares, arrays del mismo tamaño (realizando la operación elemento a elemento), o incluso arrays de diferentes formas (por ejemplo, combinar vectores fila y columna para producir una matriz). Además, como todas las llamadas vectorizadas, estos operadores son *fusing*. Por ejemplo, si calculas `2 .* A.^2 .+ sin.(A)` (o, equivalentemente `@. 2A^2 + sin(A)`, usando la macro [`@.`](@ref @__dot__)) para un array `A`, se realiza un *único* bucle sobre `A`, computando `2a^2 + sin(a)` para cada elemento de `A`. En particular, las llamadas vectorizadas anidadas como `f.(g.(x))` son *fused*, y los operadores binarios adyacentes como `x .+ 3 .* x.^2` son equivalentes a llamadas vectorizadas anidadas `(+).(x, (*).(3, (^).(x, 2)))`.
 
-Furthermore, "dotted" updating operators like `a .+= b` (or `@. a += b`) are parsed
-as `a .= a .+ b`, where `.=` is a fused *in-place* assignment operation
-(see the [dot syntax documentation](@ref man-vectorized)).
+Además, los operadores de actualización "vectorizados" como `a .+= b` (o `@. a += b`) son transformados en `a .= a .+ b`, donde `.=` es un opeador de asignación *fused* *in-place* (ver la [documentación de la sintaxis vectorizada](@ref man-vectorized)).
 
-Note the dot syntax is also applicable to user-defined operators.
-For example, if you define `⊗(A,B) = kron(A,B)` to give a convenient
-infix syntax `A ⊗ B` for Kronecker products ([`kron`](@ref)), then
-`[A,B] .⊗ [C,D]` will compute `[A⊗C, B⊗D]` with no additional coding.
+Nótese que la sintaxis de punto es también aplicable a operadores definidos por el usuario. Por ejemplo, si definimos el operador `⊗(A,B) = kron(A,B)` para dar una sintaxis infija `A ⊗ B` al producto de Kronecker ([`kron`](@ref)), entonces
+`[A,B] .⊗ [C,D]` calculará  `[A⊗C, B⊗D]` sin ninguna codificación adicional.
 
 Combining dot operators with numeric literals can be ambiguous.
 For example, it is not clear whether `1.+x` means `1. + x` or `1 .+ x`.
