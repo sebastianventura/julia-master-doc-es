@@ -705,36 +705,17 @@ julia> b"\uff"
  0xbf
 ```
 
-In character literals, this distinction is glossed over and `\xff` is allowed to represent the
-code point 255, because characters *always* represent code points. In strings, however, `\x` escapes
-always represent bytes, not code points, whereas `\u` and `\U` escapes always represent code points,
-which are encoded in one or more bytes. For code points less than `\u80`, it happens that the
-UTF-8 encoding of each code point is just the single byte produced by the corresponding `\x` escape,
-so the distinction can safely be ignored. For the escapes `\x80` through `\xff` as compared to
-`\u80` through `\uff`, however, there is a major difference: the former escapes all encode single
-bytes, which -- unless followed by very specific continuation bytes -- do not form valid UTF-8
-data, whereas the latter escapes all represent Unicode code points with two-byte encodings.
+En los literales de caracteres, esta distinción se pasa por alto y `\xff` está autorizado a  representar el punto de código 255, porque los caracteres *siempre* representan puntos de código. En las cadenas, sin embargo, los escapes `\x` siempre representan bytes, no puntos de código, mientras que los escapes `\u` y `\U` siempre representan puntos de código, que están codificados en uno o más bytes. Para los puntos de código inferiores a `\u80`, ocurre que la codificación UTF-8 de cada punto de código es sólo el byte producido por el escape `\x` correspondiente, por lo que la distinción puede ignorarse con seguridad. Sin embargo, para los escapes `\x80` a `\xff` en comparación con `\u80` a `\uff`, existe una diferencia importante: el primero escapa a todos los bytes sencillos de codificación, los cuales -a menos que sean seguidos por bytes de continuación muy específicos- no forman UTF-8 válido, mientras que los últimos escapes representan puntos de código Unicode con codificaciones de dos bytes.
 
-If this is all extremely confusing, try reading ["The Absolute Minimum Every
-Software Developer Absolutely, Positively Must Know About Unicode and Character
-Sets"](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/).
-It's an excellent introduction to Unicode and UTF-8, and may help alleviate
-some confusion regarding the matter.
+Si todo esto es muy confuso, intente leer ["The Absolute Minimum Every
+Software Developer Absolutely, Positively Must Know About Unicode and Character 
+Sets"](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/). Es una excelente introducción a Unicode y UTF-8, y puede ayudar a aliviar cierta confusión sobre el asunto.
 
-## [Version Number Literals](@id man-version-number-literals)
+## [Literales Número de Versión](@id man-version-number-literals)
 
-Version numbers can easily be expressed with non-standard string literals of the form `v"..."`.
-Version number literals create `VersionNumber` objects which follow the specifications of [semantic versioning](http://semver.org),
-and therefore are composed of major, minor and patch numeric values, followed by pre-release and
-build alpha-numeric annotations. For example, `v"0.2.1-rc1+win64"` is broken into major version
-`0`, minor version `2`, patch version `1`, pre-release `rc1` and build `win64`. When entering
-a version literal, everything except the major version number is optional, therefore e.g.  `v"0.2"`
-is equivalent to `v"0.2.0"` (with empty pre-release/build annotations), `v"2"` is equivalent to
-`v"2.0.0"`, and so on.
+Los números de versión se pueden expresar fácilmente con literales de cadena no estándar del forma `v"..."`. Los literales de número de versión crean objetos `VersionNumber` que siguen las especificaciones del [control de versiones semánticas](http://semver.org/) y, por lo tanto, se componen de valores numéricos mayor, menor y de parche, seguidos de anotaciones alfanuméricas de pre-liberación y construcción. Por ejemplo, `v "0.2.1-rc1 + win64"` se divide en versión principal `0`, versión secundaria `2`, versión de revisión `1`, `rc1` de pre-lanzamiento y construcción `win64`. Al introducir una versión literal, todo excepto el número de versión principal es opcional, por ejemplo, `v"0.2"` es equivalente a `v"0.2.0"` (con anotaciones previas / de compilación vacías), `v"2"` equivale a `v"2.0.0"`, y así sucesivamente.
 
-`VersionNumber` objects are mostly useful to easily and correctly compare two (or more) versions.
-For example, the constant `VERSION` holds Julia version number as a `VersionNumber` object, and
-therefore one can define some version-specific behavior using simple statements as:
+Los objetos `VersionNumber` son en su mayoría útiles para comparar fácilmente y correctamente dos (o más) versiones. Por ejemplo, la constante `VERSION` contiene el número de versión de Julia como un objeto `VersionNumber` y, por lo tanto, se puede definir algún comportamiento específico de la versión utilizando declaraciones simples como:
 
 ```julia
 if v"0.2" <= VERSION < v"0.3-"
@@ -742,32 +723,14 @@ if v"0.2" <= VERSION < v"0.3-"
 end
 ```
 
-Note that in the above example the non-standard version number `v"0.3-"` is used, with a trailing
-`-`: this notation is a Julia extension of the standard, and it's used to indicate a version which
-is lower than any `0.3` release, including all of its pre-releases. So in the above example the
-code would only run with stable `0.2` versions, and exclude such versions as `v"0.3.0-rc1"`. In
-order to also allow for unstable (i.e. pre-release) `0.2` versions, the lower bound check should
-be modified like this: `v"0.2-" <= VERSION`.
+Obsérvese que en el ejemplo anterior se utiliza el número de versión no estándar `v"0.3-"`, con un guión `-` en cola: esta notación es una extensión Julia del estándar, y se usa para indicar una versión que es más baja que cualquier versión `0.3`, Incluyendo todas sus pre-lanzamientos. Por lo tanto, en el ejemplo anterior, el código sólo se ejecuta con versiones estable `0.2` y excluye las versiones `v"0.3.0-rc1"`. Para permitir también versiones `0.2` inestables (es decir, pre-liberación), la verificación del límite inferior debería modificarse de la siguiente manera: `v"0.2-" <= VERSION`.
 
-Another non-standard version specification extension allows one to use a trailing `+` to express
-an upper limit on build versions, e.g.  `VERSION > v"0.2-rc1+"` can be used to mean any version
-above `0.2-rc1` and any of its builds: it will return `false` for version `v"0.2-rc1+win64"` and
-`true` for `v"0.2-rc2"`.
+Otra extensión de especificación de versión no estándar permite usar un `+` de cola para expresar un límite superior en las versiones de compilación, por ej. `VERSIÓN> v "0.2-rc1 +"` se puede utilizar para significar cualquier versión por encima de `0.2-rc1` y cualquiera de sus compilaciones: devolverá `false` para la versión `v"0.2-rc1+win64"` y `true` para `v"0.2-rc2"`.
 
-It is good practice to use such special versions in comparisons (particularly, the trailing `-`
-should always be used on upper bounds unless there's a good reason not to), but they must not
-be used as the actual version number of anything, as they are invalid in the semantic versioning
-scheme.
+Es una buena práctica utilizar estas versiones especiales en comparaciones (en particular, el valor `-`de cola siempre debe utilizarse en los límites superiores a menos que haya una buena razón para no hacerlo), pero no deben utilizarse como el número de versión real de nada, ya que son inválidos en el esquema de versiones semánticas.
 
-Besides being used for the [`VERSION`](@ref) constant, `VersionNumber` objects are widely used
-in the `Pkg` module, to specify packages versions and their dependencies.
+Además de ser utilizados por la constante [`VERSION`](@ref), los objetos `VersionNumber` son ampliamente utilizados en el módulo `Pkg`, para especificar las versiones de paquetes y sus dependencias.
 
-## [Raw String Literals](@id man-raw-string-literals)
+## [Literales *Raw String*](@id man-raw-string-literals)
 
-Raw strings without interpolation or unescaping can be expressed with
-non-standard string literals of the form `raw"..."`. Raw string literals create
-ordinary `String` objects which contain the enclosed contents exactly as
-entered with no interpolation or unescaping. This is useful for strings which
-contain code or markup in other languages which use `$` or `\` as special
-characters. The exception is quotation marks that still must be
-escaped, e.g. `raw"\""` is equivalent to `"\""`.
+Las cadenas en bruto (*raw*) sin interpolación o *unescaping* pueden ser expresadas con literales cadena no estándar de la forma `raw"..."`. Los literales cadena en bruto crean objetos `String` ordinarios que contienen los contenidos encerrados exactamente como entrados sin interpolación ni separación. Esto es útil para cadenas que contiene código o marcado en otros idiomas que usan `$` o `\` como caracteres especiales. La excepción son las comillas que aún deben ser escapadas, por ejemplo,  `raw" \ "" `es equivalente a` "\" "`.
