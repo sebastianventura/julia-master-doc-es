@@ -274,17 +274,11 @@ x
 y
 ```
 
-Julia uses the UTF-8 encoding by default, and support for new encodings can be added by packages.
-For example, the [LegacyStrings.jl](https://github.com/JuliaArchive/LegacyStrings.jl) package
-implements `UTF16String` and `UTF32String` types. Additional discussion of other encodings and
-how to implement support for them is beyond the scope of this document for the time being. For
-further discussion of UTF-8 encoding issues, see the section below on [byte array literals](@ref man-byte-array-literals).
-The [`transcode()`](@ref) function is provided to convert data between the various UTF-xx encodings,
-primarily for working with external data and libraries.
+Julia utiliza la codificación UTF-8 de forma predeterminada y el soporte para nuevas codificaciones puede agregarse mediante paquetes. Por ejemplo, el paquete [LegacyStrings.jl](https://github.com/JuliaArchive/LegacyStrings.jl) implementa los tipos `UTF16String` y `UTF32String`. Una mayor discusión sobre otras codificaciones y cómo implementar el soporte para ellas está más allá del alcance de este documento por el momento. Para más información sobre los problemas de codificación UTF-8, consulte la sección siguiente sobre [literales byte array](@ref man-byte-array-literals). La función [`transcode()`](@ref) se proporciona para convertir datos entre las distintas codificaciones UTF-xx, principalmente para trabajar con datos y bibliotecas externas.
 
 ## Concatenation
 
-One of the most common and useful string operations is concatenation:
+Una de las operaciones de cadena más comunes y útiles es la concatenación:
 
 ```jldoctest stringconcat
 julia> greet = "Hello"
@@ -297,55 +291,38 @@ julia> string(greet, ", ", whom, ".\n")
 "Hello, world.\n"
 ```
 
-Julia also provides `*` for string concatenation:
+Julia también proporciona el operador `*` para concatenar cadenas:
 
 ```jldoctest stringconcat
 julia> greet * ", " * whom * ".\n"
 "Hello, world.\n"
 ```
 
-While `*` may seem like a surprising choice to users of languages that provide `+` for string
-concatenation, this use of `*` has precedent in mathematics, particularly in abstract algebra.
+Aunque `*` puede parecer una opción sorprendente a los usuarios de lenguajes que proporcionan `+` para concatenación de cadenas, este uso de `*`tiene precedentes en matemáticas, particularmente en álgebra abstracta.
 
-In mathematics, `+` usually denotes a *commutative* operation, where the order of the operands does
-not matter. An example of this is matrix addition, where `A + B == B + A` for any matrices `A` and `B`
-that have the same shape. In contrast, `*` typically denotes a *noncommutative* operation, where the
-order of the operands *does* matter. An example of this is matrix multiplication, where in general
-`A * B != B * A`. As with matrix multiplication, string concatenation is noncommutative:
-`greet * whom != whom * greet`. As such, `*` is a more natural choice for an infix string concatenation
-operator, consistent with common mathematical use.
+En matemáticas, `+` suele denotar una operación conmutativa, donde el orden de los operandos no importan. Un ejemplo de eesto es la suma de matrices, donde`A + B == B + A` para dos matrices cualesquiera `A` y `B` que tengan la misma forma. En contraste, `*` suele denotar una opración no conmutativa, donde el orden de los operandos importa. Un ejemplo de esto es la multiplicación de matrices donde, en general, `A * B != B * A`. Como con la multiplicación de matrices, la concatenación es no conmutativa: `greet * whom != whom * greet`. Por tanto, `*` es una elección más natural para el operador infijo de concatenación, consistente con el uso matemático común.
 
-More precisely, the set of all finite-length strings *S* together with the string concatenation operator
-`*` forms a [free monoid](https://en.wikipedia.org/wiki/Free_monoid) (*S*, `*`). The identity element
-of this set is the empty string, `""`. Whenever a free monoid is not commutative, the operation is
-typically represented as `\cdot`, `*`, or a similar symbol, rather than `+`, which as stated usually
-implies commutativity.
+Más precisamente, el conjunto de todas las cadenas *S* de longitud finita junto con el operador de concatenación `*` forman un [monoide libre](https://en.wikipedia.org/wiki/Free_monoid) (S, `*`). El elemento identidad de este conjunto es la cadena vacía "". Siempre que un monoide libre es no conmutativo, la operación suele ser representada por `\cdot`, `*`, o un símbolo similar, en luga de con `+` que implica conmutatividad.
 
-## [Interpolation](@id string-interpolation)
+## [Interpolación](@id string-interpolation)
 
-Constructing strings using concatenation can become a bit cumbersome, however. To reduce the need for these
-verbose calls to [`string()`](@ref) or repeated multiplications, Julia allows interpolation into string literals
-using `$`, as in Perl:
+Construir cadenas mediante concatenación puede llegar a ser un poco engorroso, sin embargo. Para reducir la necesidad de estas llamadas verbosas a [`string()`](@ref) o multiplicaciones repetidas, Julia permite la interpolación en literales de cadena usando `$`, como en Perl:
 
 ```jldoctest stringconcat
 julia> "$greet, $whom.\n"
 "Hello, world.\n"
 ```
 
-This is more readable and convenient and equivalent to the above string concatenation -- the system
-rewrites this apparent single string literal into a concatenation of string literals with variables.
+Esto es más legible y conveniente, y equivalente a la concatenación de cadena anterior - el sistema rescribe este aparente literal de cadena única en una concatenación de literales de cadena con variables.
 
-The shortest complete expression after the `$` is taken as the expression whose value is to be
-interpolated into the string. Thus, you can interpolate any expression into a string using parentheses:
+La expresión completa más corta después de `$` se toma como la expresión cuyo valor debe ser interpolado en la cadena. Por lo tanto, puede interpolar cualquier expresión en una cadena usando paréntesis:
 
 ```jldoctest
 julia> "1 + 2 = $(1 + 2)"
 "1 + 2 = 3"
 ```
 
-Both concatenation and string interpolation call [`string()`](@ref) to convert objects into string
-form. Most non-`AbstractString` objects are converted to strings closely corresponding to how
-they are entered as literal expressions:
+Tanto la concatenación como la interpolación de cadena llaman a [`string()`](@ref) para convertir objetos al formato de cadena. La mayoría de los objetos que no son `AbstractString` se convierten en cadenas que se corresponden estrechamente con la forma en que se introducen como expresiones literales:
 
 ```jldoctest
 julia> v = [1,2,3]
@@ -358,8 +335,7 @@ julia> "v: $v"
 "v: [1, 2, 3]"
 ```
 
-[`string()`](@ref) is the identity for `AbstractString` and `Char` values, so these are interpolated
-into strings as themselves, unquoted and unescaped:
+[`string()`](@ref) es la identidad para los valores `AbstractString` y `Char` values, por lo que estos se interpolan en cadenas como ellos mismos, sin entrecomilla y sin escapar:
 
 ```jldoctest
 julia> c = 'x'
@@ -369,31 +345,29 @@ julia> "hi, $c"
 "hi, x"
 ```
 
-To include a literal `$` in a string literal, escape it with a backslash:
+Para incluir un literal `$` en una cadena, lo escaparemos con un backslash:
 
 ```jldoctest
 julia> print("I have \$100 in my account.\n")
 I have $100 in my account.
 ```
 
-## Triple-Quoted String Literals
+## Literales cadena con triples comillas
 
-When strings are created using triple-quotes (`"""..."""`) they have some special behavior that
-can be useful for creating longer blocks of text. First, if the opening `"""` is followed by a
-newline, the newline is stripped from the resulting string.
+Cuando las cadenas se crean utilizando comillas triples (`"""..."""`) tienen un comportamiento especial que puede ser útil para crear bloques de texto más largos. En primer lugar, si la apertura """ es seguida por una nueva línea, la nueva línea se quita de la cadena resultante:
 
 ```julia
 """hello"""
 ```
 
-is equivalent to
+es equivalente a
 
 ```julia
 """
 hello"""
 ```
 
-but
+pero
 
 ```julia
 """
@@ -401,10 +375,7 @@ but
 hello"""
 ```
 
-will contain a literal newline at the beginning. Trailing whitespace is left unaltered. They can
-contain `"` symbols without escaping. Triple-quoted strings are also dedented to the level of
-the least-indented line. This is useful for defining strings within code that is indented. For
-example:
+contendrá un literal *new line* al principio. Los espacios en blanco no se modifican. Pueden contener símbolos `"` sin escapar. Las cadenas de triple comilla también se dedican al nivel de la línea menos indentada. Esto es útil para definir cadenas dentro del código que está sangrado Por ejemplo:   
 
 ```jldoctest
 julia> str = """
@@ -414,16 +385,13 @@ julia> str = """
 "  Hello,\n  world.\n"
 ```
 
-In this case the final (empty) line before the closing `"""` sets the indentation level.
+En este caso la línea final (vacía) antes del cierre `"""` establece el nivel de indentación.
 
-Note that line breaks in literal strings, whether single- or triple-quoted, result in a newline
-(LF) character `\n` in the string, even if your editor uses a carriage return `\r` (CR) or CRLF
-combination to end lines. To include a CR in a string, use an explicit escape `\r`; for example,
-you can enter the literal string `"a CRLF line ending\r\n"`.
+Tenga en cuenta que las saltos de línea en cadenas literales, sean de una sola o triple comilla, resultan en un carácter de línea nueva (LF) `\n` en la cadena, incluso si su editor usa una combinación de retorno de carro (CR) o CRLF para finalizar líneas. Para incluir un CR en una cadena, utilice un escape explícito `\r`; Por ejemplo, puede introducir la cadena literal `"una línea CRLF que termina \r \n"`.
 
-## Common Operations
+## Operaciones comunes
 
-You can lexicographically compare strings using the standard comparison operators:
+Los operadores de comparación estándar permiten comparar cadenas lexicográficamente:
 
 ```jldoctest
 julia> "abracadabra" < "xylophone"
@@ -439,7 +407,7 @@ julia> "1 + 2 = 3" == "1 + 2 = $(1 + 2)"
 true
 ```
 
-You can search for the index of a particular character using the [`search()`](@ref) function:
+La función [`search()`](@ref) permite buscar el índice de una carácter en una cadena:
 
 ```jldoctest
 julia> search("xylophone", 'x')
@@ -452,7 +420,7 @@ julia> search("xylophone", 'z')
 0
 ```
 
-You can start the search for a character at a given offset by providing a third argument:
+Y se puede arrancar la búsqueda de un carácter a partir de un desplazamiento proporcionado por un tercer argumento:
 
 ```jldoctest
 julia> search("xylophone", 'o')
@@ -465,7 +433,7 @@ julia> search("xylophone", 'o', 8)
 0
 ```
 
-You can use the [`contains()`](@ref) function to check if a substring is contained in a string:
+La función [`contains()`](@ref) se usa para comprobar si una subcadena está contenida en una cadena:
 
 ```jldoctest
 julia> contains("Hello, world.", "world")
@@ -484,11 +452,10 @@ Closest candidates are:
   contains(::AbstractString, !Matched::AbstractString) at strings/search.jl:378
 ```
 
-The last error is because `'o'` is a character literal, and [`contains()`](@ref) is a generic
-function that looks for subsequences. To look for an element in a sequence, you must use [`in()`](@ref)
-instead.
+Este último error es debido a que 'o'  es un literal carácter, y [`contains()`](@ref) es una función genérica que busca subsecuencias. Para buscar un elemento en una secuencia, debemos usar la función [`in()`](@ref) en lugra de la anterior.
 
-Two other handy string functions are [`repeat()`](@ref) and [`join()`](@ref):
+instead.
+[`repeat()`](@ref) y  [`join()`](@ref) son otras dos funciones de cadena muy útiles:
 
 ```jldoctest
 julia> repeat(".:Z:.", 10)
@@ -498,7 +465,7 @@ julia> join(["apples", "bananas", "pineapples"], ", ", " and ")
 "apples, bananas and pineapples"
 ```
 
-Some other useful functions include:
+Algunas otras funciones útiles son:
 
   * [`endof(str)`](@ref) gives the maximal (byte) index that can be used to index into `str`.
   * [`length(str)`](@ref) the number of characters in `str`.
