@@ -37,38 +37,31 @@ matemáticas, sin embargo, el despacho múltiple ha resultado ser un paradigma p
 conveniente para estructurar y organizar los programas.
 
 [^1]:
-    In C++ or Java, for example, in a method call like `obj.meth(arg1,arg2)`, the object obj "receives"
-    the method call and is implicitly passed to the method via the `this` keyword, rather than as
-    an explicit method argument. When the current `this` object is the receiver of a method call,
-    it can be omitted altogether, writing just `meth(arg1,arg2)`, with `this` implied as the receiving
-    object.
+    En C++ o Java, por ejemplo, en una llamada a un método como `obj.meth(arg1,arg2)`, el objeto
+    obj "recibe" la llamada al método y es pasado implícitamente vía la palabra clave `this`, 
+    en lugar de con un argumento de método explícito. Cuando el objeto `this` actual es el 
+    receptor de una llamada a método él puede ser omitido, escribiendo justo `meth(arg1,arg2)`, 
+    con `this` implicito como objeto receptor.
 
-## Defining Methods
+## Definir Métodos
 
-Until now, we have, in our examples, defined only functions with a single method having unconstrained
-argument types. Such functions behave just like they would in traditional dynamically typed languages.
-Nevertheless, we have used multiple dispatch and methods almost continually without being aware
-of it: all of Julia's standard functions and operators, like the aforementioned `+` function,
-have many methods defining their behavior over various possible combinations of argument type
-and count.
+En los ejemplos estudiados hasta ahora, sólo se han definido funciones con un único método que tienen argumentos con los tipos no restringidos. Estas funciones se comporta como las que hay en lenguajes con tipos dinámicos tradicionales. Sin embargo, también se han usado despacho múltiple y métodos sin ser consciente de ello: todas las funciones estándar y operadores de Julia, tal como función `+`, tiene muchos métodos que definen su comportamiento sobre varias combinaciones posibles número y tipo de argumentos.
 
-When defining a function, one can optionally constrain the types of parameters it is applicable
-to, using the `::` type-assertion operator, introduced in the section on [Composite Types](@ref):
+Cuando se define una función, uno puede opcionalmente restringir los tipos de los parámetros sobre los que se aplica usando el operador de la selección de tipos `::`, introducido en la sección [Tipos compuestos](@ref):
 
 ```jldoctest fofxy
 julia> f(x::Float64, y::Float64) = 2x + y
 f (generic function with 1 method)
 ```
 
-This function definition applies only to calls where `x` and `y` are both values of type
-[`Float64`](@ref):
+Esta definición de función se aplica sólo a llamadas en las que `x` e `y` sean ambos valores del tipo [`Float64`](@ref):
 
 ```jldoctest fofxy
 julia> f(2.0, 3.0)
 7.0
 ```
 
-Applying it to any other types of arguments will result in a [`MethodError`](@ref):
+Aplicar esta definición a otros tipos de argumentos dará como resultado un [`MethodError`](@ref):
 
 ```jldoctest fofxy
 julia> f(2.0, 3)
@@ -90,12 +83,7 @@ julia> f("2.0", "3.0")
 ERROR: MethodError: no method matching f(::String, ::String)
 ```
 
-As you can see, the arguments must be precisely of type [`Float64`](@ref). Other numeric
-types, such as integers or 32-bit floating-point values, are not automatically converted
-to 64-bit floating-point, nor are strings parsed as numbers. Because `Float64` is a concrete
-type and concrete types cannot be subclassed in Julia, such a definition can only be applied
-to arguments that are exactly of type `Float64`. It may often be useful, however, to write
-more general methods where the declared parameter types are abstract:
+Como puede comprobarse, los argumentos tienen que ser exactamente del tipo [`Float64`](@ref). Otros tipos numéricos tales como `Float32` o `Int` no serán convertidos automáticamente en `Float64`. Algo parecido sucede con los datos `String`. Como el tipo `Float64` es un tipo concreto y los tipos concretos no pueden tener subclases en Julia, esta definición sólo puede aplicarse a argumentos que sean exactamente del tipo `Float64`. Esto puede ser útil en ocasiones, sin embargo, para escribir métodos más generales se hace uso de parámetros cuyos tipos sean abstractos:
 
 ```jldoctest fofxy
 julia> f(x::Number, y::Number) = 2x - y
@@ -105,20 +93,10 @@ julia> f(2.0, 3)
 1.0
 ```
 
-This method definition applies to any pair of arguments that are instances of [`Number`](@ref).
-They need not be of the same type, so long as they are each numeric values. The problem of
-handling disparate numeric types is delegated to the arithmetic operations in the
-expression `2x - y`.
+Esta definición de método se aplica a cualquier par de argumentos que sean instancias de  [`Number`](@ref).
+Ellas no tienen que ser del mismo tipo, mientras que ambas sean valores numéricos. El problema de manejar tipos numéricos dispares se delega a las operaciones aritméticas en la expresión `2x - y`.
 
-To define a function with multiple methods, one simply defines the function multiple times, with
-different numbers and types of arguments. The first method definition for a function creates the
-function object, and subsequent method definitions add new methods to the existing function object.
-The most specific method definition matching the number and types of the arguments will be executed
-when the function is applied. Thus, the two method definitions above, taken together, define the
-behavior for `f` over all pairs of instances of the abstract type `Number` -- but with a different
-behavior specific to pairs of [`Float64`](@ref) values. If one of the arguments is a 64-bit
-float but the other one is not, then the `f(Float64,Float64)` method cannot be called and
-the more general `f(Number,Number)` method must be used:
+Para definir una función con múltiples métodos, uno simplemente define la función varías veces, con diferentes números de argumentos y tipos. La primera definición de método para la función crea el objeto función y las definiciones de métodos subsecuentes añaden nuevos métodos al objeto función existente. La definición de método más específica que case con el número los tipos de argumentos será la ejecutada cuando se aplique la función. Por tanto, las dos definiciones de métodos anteriores, considerados juntas, define el comportamiento de la función `f` sobre todos los padres de instancias del tipo abstracto `Number` (pero con un comportamiento específico para pares de valores [`Float64`](@ref). Si uno de los argumentos es un valor en punto flotante de 64 bits, pero el otro no lo es, entonces el método `f(Float64,Float64)` no puede ser invocado y se utilizará el método más general `f(Number,Number)`:
 
 ```jldoctest fofxy
 julia> f(2.0, 3.0)
@@ -134,14 +112,9 @@ julia> f(2, 3)
 1
 ```
 
-The `2x + y` definition is only used in the first case, while the `2x - y` definition is used
-in the others. No automatic casting or conversion of function arguments is ever performed: all
-conversion in Julia is non-magical and completely explicit. [Conversion and Promotion](@ref conversion-and-promotion),
-however, shows how clever application of sufficiently advanced technology can be indistinguishable
-from magic. [^Clarke61]
+La definición `2x+y` sólo se usa en el primer caso, mientras que la definición `2x-y` se usa en los demás. Nunca se realiza conversión automática en los otros: todas las conversiones son no mágicas y completamente exlícitas. En la sección [Conversión y promoción](@ref conversion-and-promotion), sin embargo, se muestra cómo las aplicaciones inteligentes de tecnología suficientemente avanzada pueden ser indistinguibles de la magic [^Clarke61]
 
-For non-numeric values, and for fewer or more than two arguments, the function `f` remains undefined,
-and applying it will still result in a [`MethodError`](@ref):
+Para valores no numéricos, ,y para menores de dos argumentos, la función `f` permanece indefinida, y aplicándola se obtendrá como resultado un [`MethodError`](@ref):
 
 ```jldoctest fofxy
 julia> f("foo", 3)
@@ -156,16 +129,14 @@ Closest candidates are:
   f(!Matched::Number, !Matched::Number) at none:1
 ```
 
-You can easily see which methods exist for a function by entering the function object itself in
-an interactive session:
+Puedes ver fácilmente que métodos existen para una función entrando el propio nombre del objeto en una sesión interactiva:
 
 ```jldoctest fofxy
 julia> f
 f (generic function with 2 methods)
 ```
 
-This output tells us that `f` is a function object with two methods. To find out what the signatures
-of those methods are, use the [`methods()`](@ref) function:
+La salida nos dice que `f` es un objeto función con dos métodos. Para encontrar cuáles son las signaturas de esos métodos, utilizaremos la función [`methods()`](@ref):
 
 ```julia-repl
 julia> methods(f)
@@ -174,13 +145,9 @@ julia> methods(f)
 [2] f(x::Number, y::Number) in Main at none:1
 ```
 
-which shows that `f` has two methods, one taking two `Float64` arguments and one taking arguments
-of type `Number`. It also indicates the file and line number where the methods were defined: because
-these methods were defined at the REPL, we get the apparent line number `none:1`.
+que muestra que `f` tiene dos métodos: uno que toma dos argumentos `Float64` y una que toma dos argumentos de tipo `Number`. También indica el fichero y el número de línea donde los métodos fueron definidos aunque, si los métodos fueron definidos en el REPL, se obtendrá `none:1`.
 
-In the absence of a type declaration with `::`, the type of a method parameter is `Any` by default,
-meaning that it is unconstrained since all values in Julia are instances of the abstract type
-`Any`. Thus, we can define a catch-all method for `f` like so:
+En ausencia de una declaración de tipo con  `::` el tipo de un parámetro de un método es `Any` por defecto, lo que significa que está sin restricciones ya que todos los valores en Julia son instancias del tipo abstracto `Any`. Por tanto, podemos definir un método atrapatodo para `f` tal como:
 
 ```jldoctest fofxy
 julia> f(x,y) = println("Whoa there, Nelly.")
@@ -190,12 +157,9 @@ julia> f("foo", 1)
 Whoa there, Nelly.
 ```
 
-This catch-all is less specific than any other possible method definition for a pair of parameter
-values, so it will only be called on pairs of arguments to which no other method definition applies.
+Este atrapatodo es menos específico que cualquier otra posible definición de método para un par de valores de parámetros, por lo que sólo será llamada sobre pares de argumentos a los cuales no pueda aplicarse otra definición de método.
 
-Although it seems a simple concept, multiple dispatch on the types of values is perhaps the single
-most powerful and central feature of the Julia language. Core operations typically have dozens
-of methods:
+Aunque parece un concepto simple, el despacho múltiple sobre los tipos de valores es quizás la característica más potente y central del lenguaje Julia. Las operaciones del núcleo tienen típicamente docenas de metodos:
 
 ```julia-repl
 julia> methods(+)
@@ -221,14 +185,11 @@ julia> methods(+)
 [180] +(a, b, c, xs...) in Base at operators.jl:424
 ```
 
-Multiple dispatch together with the flexible parametric type system give Julia its ability to
-abstractly express high-level algorithms decoupled from implementation details, yet generate efficient,
-specialized code to handle each case at run time.
+El despacho múltiple junto con el sistema de tipos paramétrico flexible dan a Julia su capacidad para expresar de forma abstract algoritmos de alto nivel desacoplados de los detalles de implementación, generando aún código eficiente y especializado para manejar cada caso en tiempo de ejecución.
 
-## [Method Ambiguities](@id man-ambiguities)
+## [Ambigüedades de Métodos](@id man-ambiguities)
 
-It is possible to define a set of function methods such that there is no unique most specific
-method applicable to some combinations of arguments:
+Es posible definir un conjunto de métodos de función tales que no haya un método único más específico aplicable a alguna combinación de argumentos:
 
 ```jldoctest gofxy
 julia> g(x::Float64, y) = 2x + y
@@ -248,10 +209,7 @@ ERROR: MethodError: g(::Float64, ::Float64) is ambiguous.
 [...]
 ```
 
-Here the call `g(2.0, 3.0)` could be handled by either the `g(Float64, Any)` or the `g(Any, Float64)`
-method, and neither is more specific than the other. In such cases, Julia raises a [`MethodError`](@ref)
-rather than arbitrarily picking a method. You can avoid method ambiguities by specifying an appropriate
-method for the intersection case:
+Aquí, la llamada `g(2.0, 3.0)` podría ser manejada por los métodos `g(Float64, Any)` o `g(Any, Float64)` y ninguno es más específico que el otro. En tales casos, Julia lanza un [`MethodError`](@ref) en lugar de elegir uno de los métodos arbitrariamente. Podemos obviar las ambigüedades de los métodos especificando un método apropiado para el caso intersección:
 
 ```jldoctest gofxy
 julia> g(x::Float64, y::Float64) = 2x + 2y
@@ -267,15 +225,13 @@ julia> g(2.0, 3.0)
 10.0
 ```
 
-It is recommended that the disambiguating method be defined first, since otherwise the ambiguity
-exists, if transiently, until the more specific method is defined.
+Se recomienda que el método que suprime la ambigüedad sea definido primero, ya que en caso contrario la ambigüedad existe, transitoriamente, hasta que el método más especifico sea definido.
 
-In more complex cases, resolving method ambiguities involves a certain
-element of design; this topic is explored further [below](@ref man-method-design-ambiguities).
+En casos ms complejos, resolver ambigüedades de métodos implica un cierto elemento de diseño; este tema se explorará [posteriormente](@ref man-method-design-ambiguities).
 
-## Parametric Methods
+## Métodos paramétricos
 
-Method definitions can optionally have type parameters qualifying the signature:
+Las definiciones de métodos pueden tener, opcionalmente, parámetros de tipo cualificando la signatura:
 
 ```jldoctest same_typefunc
 julia> same_type(x::T, y::T) where {T} = true
@@ -285,10 +241,7 @@ julia> same_type(x,y) = false
 same_type (generic function with 2 methods)
 ```
 
-The first method applies whenever both arguments are of the same concrete type, regardless of
-what type that is, while the second method acts as a catch-all, covering all other cases. Thus,
-overall, this defines a boolean function that checks whether its two arguments are of the same
-type:
+El primer método se aplica cuando ambos argumentos son del mismo tipo concreto, independientemente del tipo que sea, mientras que el segundo actúa como un atrapatodo, cubriendo todos los demás casos. Por tanto, en conjunto, esto define una función booleana que comprueba si dos argumentos son del mismo tipo:
 
 ```jldoctest same_typefunc
 julia> same_type(1, 2)
@@ -310,14 +263,9 @@ julia> same_type(Int32(1), Int64(2))
 false
 ```
 
-Such definitions correspond to methods whose type signatures are `UnionAll` types
-(see [UnionAll Types](@ref)).
+Tales definiciones corresponden a métodos cuyas signaturas de tipo son tipos `UnionAll` (ver [tipos UnionAll](@ref).
 
-This kind of definition of function behavior by dispatch is quite common -- idiomatic, even --
-in Julia. Method type parameters are not restricted to being used as the types of arguments:
-they can be used anywhere a value would be in the signature of the function or body of the function.
-Here's an example where the method type parameter `T` is used as the type parameter to the parametric
-type `Vector{T}` in the method signature:
+Esta clase de definición del comportamiento de una función mediante despacho es bastante común (incluso idiomático) en Julia. Los métodos con parámetros de tipo no están restringidos a ser usados como los tipos de los parámetros: ellos pueden ser usados en cualquier parte donde un palo estaría en la signatura de la función o cuerpo de la función. He aquí un eemplo donde el parámetro de tipo del método `T` se sa como el parámetro de tipo al tipo paramétrico `Vector{T}` en la signatura del método:
 
 ```jldoctest
 julia> myappend(v::Vector{T}, x::T) where {T} = [v..., x]
@@ -348,9 +296,7 @@ Closest candidates are:
   myappend(::Array{T,1}, !Matched::T) where T at none:1
 ```
 
-As you can see, the type of the appended element must match the element type of the vector it
-is appended to, or else a [`MethodError`](@ref) is raised. In the following example, the method type parameter
-`T` is used as the return value:
+Como puedes ver, el tipo del elemento añadido tiene que corresponderse con el tipo de elemento del vector al que se está añadiendo, o se lanzará un [`MethodError`](@ref).  En el siguiente ejemplo, el parámetro de tipo del método `T` se usa como valor de retorno:
 
 ```jldoctest
 julia> mytypeof(x::T) where {T} = T
@@ -363,8 +309,7 @@ julia> mytypeof(1.0)
 Float64
 ```
 
-Just as you can put subtype constraints on type parameters in type declarations (see [Parametric Types](@ref)),
-you can also constrain type parameters of methods:
+Así como puedes poner restricciones de subtipo para los parámetros de tipo en declaraciones de tipo (ver [Tipos Paramétricos](@ref)) también puedes restringir los parámetros de tipo de los métodos:
 
 ```jldoctest
 julia> same_type_numeric(x::T, y::T) where {T<:Number} = true
@@ -395,15 +340,13 @@ julia> same_type_numeric(Int32(1), Int64(2))
 false
 ```
 
-The `same_type_numeric` function behaves much like the `same_type` function defined above, but
-is only defined for pairs of numbers.
+La función `same_type_numeric` se comporta como la función `same_type` descrita antes, pero sólo está definida para pares de números.
 
-Parametric methods allow the same syntax as `where` expressions used to write types
-(see [UnionAll Types](@ref)).
-If there is only a single parameter, the enclosing curly braces (in `where {T}`) can be omitted,
-but are often preferred for clarity.
-Multiple parameters can be separated with commas, e.g. `where {T, S<:Real}`, or written using
-nested `where`, e.g. `where S<:Real where T`.
+Los métodos paramétricos permiten la misma sintaxis que las expresiones `where` usadas para escribir tipos (ver [tipos UnionAll](@ref)). 
+
+Si hay un único parámetro, las llaves que lo encierran (en `where {T}`) pueden ser omitidas, aunque suele ser preferible mantenerlas por claridad.
+
+Los parámetros múltiples pueden ser separados con comas, por ejemplo `where {T, S<:Real}`, o escritos usando `where` anidados, por ejemplo, `where S<:Real where T`.
 
 Redefining Methods
 ------------------
