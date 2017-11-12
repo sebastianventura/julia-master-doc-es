@@ -1,9 +1,6 @@
 # [Constructors](@id man-constructors)
 
-Constructors [^1] are functions that create new objects -- specifically, instances of [Composite Types](@ref).
-In Julia, type objects also serve as constructor functions: they create new instances of themselves
-when applied to an argument tuple as a function. This much was already mentioned briefly when
-composite types were introduced. For example:
+Los constructores [^1] son funciones que crean nuevos objetos (específicamente instancias de tipos compuestos). En Julia, los objetos también sirven como funciones constructor: ellos crean instancias de sí mismos cuando se aplican a una dupla de argumentos como una función. Esto se mencionó brevemente cuando se habló de tipos compuestos. Por ejemplo:
 
 ```jldoctest footype
 julia> struct Foo
@@ -21,15 +18,8 @@ julia> foo.baz
 2
 ```
 
-For many types, forming new objects by binding their field values together is all that is ever
-needed to create instances. There are, however, cases where more functionality is required when
-creating composite objects. Sometimes invariants must be enforced, either by checking arguments
-or by transforming them. [Recursive data structures](https://en.wikipedia.org/wiki/Recursion_%28computer_science%29#Recursive_data_structures_.28structural_recursion.29),
-especially those that may be self-referential, often cannot be constructed cleanly without first
-being created in an incomplete state and then altered programmatically to be made whole, as a
-separate step from object creation. Sometimes, it's just convenient to be able to construct objects
-with fewer or different types of parameters than they have fields. Julia's system for object construction
-addresses all of these cases and more.
+Para muchos tipos, formar nuevos objetos enlazando valores de campo juntos es todo se necesita para crear instancias. Hay, sin embargo, casos donde se requiere más funcionalidad cuando se crean objetos compuestos. Algunas invariantes deben ser forzadas, bien chequeando argumentos o transformándolos. Las [estructuras de datos recursivas](https://en.wikipedia.org/wiki/Recursion_%28computer_science%29#Recursive_data_structures_.28structural_recursion.29),
+especialmente aquellas que pueden ser auto referenciadas frecuentemente, no pueden construirse limpiamente sin que primero sean creadas en un estado incompleto y después sean alteradas programáticamente para ser completadas, como un paso separado de la creación del objeto. Algunas veces, es conveniente ser capaz de construir objetos con menos o diferentes tipos de parámetros que el número de campos que tiene. El sistema Julia para construcción de objetos cubre estos casos y más.
 
 [^1]:
     Nomenclature: while the term "constructor" generally refers to the entire function which constructs
@@ -38,13 +28,9 @@ addresses all of these cases and more.
     is used to mean "constructor method" rather than "constructor function", especially as it is often
     used in the sense of singling out a particular method of the constructor from all of the others.
 
-## Outer Constructor Methods
+## Métodos constructores externos
 
-A constructor is just like any other function in Julia in that its overall behavior is defined
-by the combined behavior of its methods. Accordingly, you can add functionality to a constructor
-by simply defining new methods. For example, let's say you want to add a constructor method for
-`Foo` objects that takes only one argument and uses the given value for both the `bar` and `baz`
-fields. This is simple:
+Un constructor es como cualquier otro función en Julia en que es su comportamiento global está definido por el comportamiento combinado de sus métodos. Según esto, se puede añadir funcionalidad a ún constructor simplemente definiendo nuevos métodos. Por ejemplo, supóngase que se desea añadir un método constructor para objetos `Foo` que tomar un argumento y usa el valor dado para los dos campos que presentan `baz` y `bar`. Esto es sencillo::
 
 ```jldoctest footype
 julia> Foo(x) = Foo(x,x)
@@ -54,8 +40,7 @@ julia> Foo(1)
 Foo(1, 1)
 ```
 
-You could also add a zero-argument `Foo` constructor method that supplies default values for both
-of the `bar` and `baz` fields:
+Podría también añadirse un constructor `Foo` sin argumentos que proporciona valores por defecto para los campos `bar` y `baz`:
 
 ```jldoctest footype
 julia> Foo() = Foo(0)
@@ -65,27 +50,18 @@ julia> Foo()
 Foo(0, 0)
 ```
 
-Here the zero-argument constructor method calls the single-argument constructor method, which
-in turn calls the automatically provided two-argument constructor method. For reasons that will
-become clear very shortly, additional constructor methods declared as normal methods like this
-are called *outer* constructor methods. Outer constructor methods can only ever create a new instance
-by calling another constructor method, such as the automatically provided default ones.
+Aquí, el método constructor sin argumentos llama al método constructor con un argumento, que a su vez llama al método constructor de dos argumentos proporcionado automáticamente. Por razones que se aclararán pronto, los metodos constructor adicionales declarados como métodos formales como éstos se denominan *métodos constructores externos*. Los métodos constructores externos sólo puede crear una nueva instancia llamando a otro método constructor, tal como los  proporcionados automáticamente por defecto.
 
 ## Inner Constructor Methods
 
-While outer constructor methods succeed in addressing the problem of providing additional convenience
-methods for constructing objects, they fail to address the other two use cases mentioned in the
-introduction of this chapter: enforcing invariants, and allowing construction of self-referential
-objects. For these problems, one needs *inner* constructor methods. An inner constructor method
-is much like an outer constructor method, with two differences:
+Métodos constructores internos
 
-1. It is declared inside the block of a type declaration, rather than outside of it like normal methods.
-2. It has access to a special locally existent function called `new` that creates objects of the
-   block's type.
+Aunque los constructores externos resuelven con éxito el problema de proporcionar métodos adicionales para construir objetos, ellos fallan en los otros dos casos de uso mencionados en la introducción este capítulo: forzar invariantes y permitir la construcción de objetos autorreferenciales. Para estos problemas, se necesitan los *métodos constructores internos*. Un método constructor interno es parecido a uno externo, con dos diferencias:
 
-For example, suppose one wants to declare a type that holds a pair of real numbers, subject to
-the constraint that the first number is not greater than the second one. One could declare it
-like this:
+1. Se declara dentro del bloque de la declaración del tipo, el lugar donde fuera como los métodos normales.
+2. Tiene acceso a una función especial, existente totalmente, llamada `new` que crea objetos del tipo del bloque.
+
+Poner ejemplo, supóngase que uno quiere declarar un tipo que almacene un par de elementos reales, sujetos a la restricción de que el primer número no es mayor que el segundo. Uno podría declararlo así:
 
 ```jldoctest pairtype
 julia> struct OrderedPair
@@ -96,7 +72,7 @@ julia> struct OrderedPair
 
 ```
 
-Now `OrderedPair` objects can only be constructed such that `x <= y`:
+Ahora sólo pueden construirse objetos `OrderedPair` tales que `x <= y`:
 
 ```jldoctest pairtype
 julia> OrderedPair(1, 2)
