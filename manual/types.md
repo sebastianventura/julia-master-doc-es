@@ -222,7 +222,7 @@ nominativo: si la estructura determinara el tipo, que a su vez dicta el comporta
 sería imposible hacer que los valores  [`Bool`](@ref) se comportaran de forma diferente a los
 [`Int8`](@ref) o los [`UInt8`](@ref).
 
-## Composite Types
+## Tipos Compuestos
 
 [Los tipos compuestos](https://en.wikipedia.org/wiki/Composite_data_type) se llaman registros, estructuras (*structs*) u objetos en distintos lenguajes. Un tipo compuesto es una colección de campos nombrados, una instancia de los cuales puede ser tratada como un único valor. En muchos lenguajes, los tiempos compuestos sos la única clase de tipos definidos por el usuario, y ellos son de lejos el tiempo definido por el usuario  que se usa mas comúnmente en el lenguaje Julia.
 
@@ -272,7 +272,7 @@ julia> fieldnames(Foo)
  :qux
 ```
 
-You can access the field values of a composite object using the traditional `foo.bar` notation:
+Para acceder a los valores de los campis de un objeto compuesto puede usarse la notación tradicional `foo.bar`:
 
 ```jldoctest footype
 julia> foo.bar
@@ -329,43 +329,25 @@ julia> bar.baz = 1//2
 1//2
 ```
 
-In order to support mutation, such objects are generally allocated on the heap, and have
-stable memory addresses.
-A mutable object is like a little container that might hold different values over time,
-and so can only be reliably identified with its address.
-In contrast, an instance of an immutable type is associated with specific field values ---
-the field values alone tell you everything about the object.
-In deciding whether to make a type mutable, ask whether two instances
-with the same field values would be considered identical, or if they might need to change independently
-over time. If they would be considered identical, the type should probably be immutable.
+Para soportar la mutación, tales objetos se alojan generalmente en el montón y tienen direcciones de memoria estables. Un objeto mutable es como un pequeño contenedor que podría almacenar distintos valores en el tiempo, y por tanto sólo puede ser identificado de forma confiable con su dirección. En contraste, una instancia de un tipo inmutable está asociada con valores de campos específicos - los valores de campos solos te dicen todo sobre el objeto. En decidir si hacer un tipo mutable, pregúntat si dos instanciasa con los mismos valores de campos tendrían que ser consideradas idénticas, o si ellas podrían necesitar cambiar independientemente con el tiempo. Si ellas fueran consideradas idénticas, el tipo probablemente debería ser inmutable. 
 
-To recap, two essential properties define immutability in Julia:
+Para recapitular, dos propiedades esenciales definen la inmutabilidad en Julia:
 
-  * An object with an immutable type is passed around (both in assignment statements and in function
-    calls) by copying, whereas a mutable type is passed around by reference.
-  * It is not permitted to modify the fields of a composite immutable type.
+* Un objeto con un tipo inmutable es pasado (tanto en instrucciones de asignación como en llamadas a función) mediante copia, mientras que un tipo mutable es pasado mediante referencia.
+* No está permitido modificar los campos de un tipo compuesto inmutable.
 
-It is instructive, particularly for readers whose background is C/C++, to consider why these two
-properties go hand in hand.  If they were separated, i.e., if the fields of objects passed around
-by copying could be modified, then it would become more difficult to reason about certain instances
-of generic code.  For example, suppose `x` is a function argument of an abstract type, and suppose
-that the function changes a field: `x.isprocessed = true`.  Depending on whether `x` is passed
-by copying or by reference, this statement may or may not alter the actual argument in the calling
-routine.  Julia sidesteps the possibility of creating functions with unknown effects in this scenario
-by forbidding modification of fields of objects passed around by copying.
+Es instructivo, particularmente para lectores cuyo background es C/C++, considerar por qué estas dos propiedades van juntas. Si fueran separadas, es decir, si los campos de los objetos pasados mediante copia pudieran ser modificados, entonces sería más difícil razonar sobre ciertas instancias de código genérico. Por ejemplo, supongamos que `x` es un argumento de función de un tipo abstracto, y supongamos que la función cambia un campo: `x.isprocessed = true`. Dependiendo de si `x`se pasa mediante copia o mediante referencia, esta instrucción puede alterar o no el argumento actual en la rutina que hace la llamada. Julia evita la posibilidad de crear funciones con efectos desconocidos en este escenario prohibiendo modificación de campos de objetos pasados mediante copia. 
 
-## Declared Types
+## Tipos declarados
 
-The three kinds of types discussed in the previous three sections are actually all closely related.
-They share the same key properties:
+Las tres clases de tipos discutidos en las tres secciones anteriores están muy relacionados. Ellos comparten las mismas propiedades clave:
 
-  * They are explicitly declared.
-  * They have names.
-  * They have explicitly declared supertypes.
-  * They may have parameters.
+* Ellos son declarados explícitamente.
+* Ellos tienen nombres.
+* Ellos tienen supertipos declarados explícitamente.
+* Ellos pueden tener parámeros.
 
-Because of these shared properties, these types are internally represented as instances of the
-same concept, `DataType`, which is the type of any of these types:
+Debido a estas propiedades compartidas, estos tipos son representados internamene  como instancias del mismo concepto, `DataType` , que es el tipo de cualquiera de estos tipos:
 
 ```jldoctest
 julia> typeof(Real)
@@ -375,16 +357,13 @@ julia> typeof(Int)
 DataType
 ```
 
-A `DataType` may be abstract or concrete. If it is concrete, it has a specified size, storage
-layout, and (optionally) field names. Thus a bits type is a `DataType` with nonzero size, but
-no field names. A composite type is a `DataType` that has field names or is empty (zero size).
+Un `DataType` puede ser abstracto o concreto. Si es concreto, tiene un tamaño, disposición de almacenamiento y (opcionalmente) nombres de campos especificados. Por tanto, un tipo bits es un `DataType` con tamaño no nulo, pero sin nombres de campos. Un tipo compuesto es un `DataType` que tiene nombres de campos o es acío (tamaño cero).
 
-Every concrete value in the system is an instance of some `DataType`.
+Cada valor concreto en el sistema es una instancia de algún `DataType`.
 
-## Type Unions
+## Uniones de Tipo
 
-A type union is a special abstract type which includes as objects all instances of any of its
-argument types, constructed using the special `Union` function:
+Una unión de tipo es un tipo abstracto especial que incluye como objetos todas las instancias de alguno de sus tipos argumentos, construidos usando la función especial `Union`:
 
 ```jldoctest
 julia> IntOrString = Union{Int,AbstractString}
@@ -400,33 +379,17 @@ julia> 1.0 :: IntOrString
 ERROR: TypeError: typeassert: expected Union{AbstractString, Int64}, got Float64
 ```
 
-The compilers for many languages have an internal union construct for reasoning about types; Julia
-simply exposes it to the programmer.
+Los compiladores de muchos lenguajes tienen una construcción unión interna para razonar sobre los tipos; Julia simplemente la pone a disposición del programador.
 
-## Parametric Types
+## Tipos Paramétricos
 
-An important and powerful feature of Julia's type system is that it is parametric: types can take
-parameters, so that type declarations actually introduce a whole family of new types -- one for
-each possible combination of parameter values. There are many languages that support some version
-of [generic programming](https://en.wikipedia.org/wiki/Generic_programming), wherein data structures
-and algorithms to manipulate them may be specified without specifying the exact types involved.
-For example, some form of generic programming exists in ML, Haskell, Ada, Eiffel, C++, Java, C#,
-F#, and Scala, just to name a few. Some of these languages support true parametric polymorphism
-(e.g. ML, Haskell, Scala), while others support ad-hoc, template-based styles of generic programming
-(e.g. C++, Java). With so many different varieties of generic programming and parametric types
-in various languages, we won't even attempt to compare Julia's parametric types to other languages,
-but will instead focus on explaining Julia's system in its own right. We will note, however, that
-because Julia is a dynamically typed language and doesn't need to make all type decisions at compile
-time, many traditional difficulties encountered in static parametric type systems can be relatively
-easily handled.
+Una característica importante y potente del sistema de tipos de Julia es que es paramétrico: los tipos pueden toomar parámetros, por lo que las declaraciones de tipo introducen de hecho un afamilia completa de nuevos tipos (uno por cada posible combinación de valores de parámetros). Hay muchos lenguajes que soportan alguna versión de la [programación genérica](https://en.wikipedia.org/wiki/Generic_programming), donde las estructuras de datos y algoritmos para manipularlos pueden ser especificadas sin especificar los tipos exactos implicados. Por ejemplo, existe alguna forma de programación genérica en ML, Haskell, Ada, Eiffel, C++, Java, C#, F# y Scala, por nombrar unos pocos. Algunos de estos lenguajes soportan un verdadero polimorfismo paramétrico (Por ej., ML, Haskell, Scala) mientras otros soportan estilos de programación genérica *ad-hoc*, basados en plantillas (Por eje., C++ y Java). Con tantas variedades diferentes de programación genérica y de tipos paramétricos en los distintos lenguajes, no queremos ni siquiera intentar comparar los tipos paramétricos de Julia a otros lenguajes, sino que nos centraremos en explicar el propio sistema de Julia. Notaremos, sin embargo, que como Julia es un lenguaje tipado dinámicamente y no necesita hacer todas las decisiones de tipos en tiempo de compilacíon, muchas dificultades tradicionales encontradas en los sistemas de tipos paramétricos estáticos pueden ser manejadas con relativa facilidad.
 
-All declared types (the `DataType` variety) can be parameterized, with the same syntax in each
-case. We will discuss them in the following order: first, parametric composite types, then parametric
-abstract types, and finally parametric bits types.
+Todos los tipos declarados (la variedad `DataType`)  pueden ser parametrizados, con la misma sintaxis en cada caso. Los discutiremos en el siguiente orden: primero tipos compuestos paramétricos, luego tipos abstractos paramétricos y por último tipos bits paramétricos.
 
-### Parametric Composite Types
+### Tipos compuestos paramétricos
 
-Type parameters are introduced immediately after the type name, surrounded by curly braces:
+Los parámetros de tipo se introducen inmediatamente después del nombre de tipo, rodeado por llaves:
 
 ```jldoctest pointtype
 julia> struct Point{T}
@@ -435,13 +398,7 @@ julia> struct Point{T}
        end
 ```
 
-This declaration defines a new parametric type, `Point{T}`, holding two "coordinates" of type
-`T`. What, one may ask, is `T`? Well, that's precisely the point of parametric types: it can be
-any type at all (or a value of any bits type, actually, although here it's clearly used as a type).
-`Point{Float64}` is a concrete type equivalent to the type defined by replacing `T` in the definition
-of `Point` with [`Float64`](@ref). Thus, this single declaration actually declares an unlimited
-number of types: `Point{Float64}`, `Point{AbstractString}`, `Point{Int64}`, etc. Each of these
-is now a usable concrete type:
+Esta declaración define un nuevo tipo paramétrico, `Point{T}`, que almacena dos coordenadas de tipo `T`. Uno podría preguntarse, ¿qué es `T`? Bien, este es precisamente el punto de los tipos paramétricos: puede ser cualquier tipo (o un valor de cualquier tipo bits, aunque en esta ocasión usado como un tipo, claramente). `Point{Float64}` es un tipo concreto equivalente al tipo definido reemplazando `T` en la definición de `Point` con [`Float64`](@ref). Por tanto, esta única  declaración declara un número de tipos ilimitado: `Point{Float64}`, `Point{AbstractString}`, `Point{Int64}`, etc. Cada uno de ellos es un tipo concreto usable: 
 
 ```jldoctest pointtype
 julia> Point{Float64}
@@ -451,11 +408,9 @@ julia> Point{AbstractString}
 Point{AbstractString}
 ```
 
-The type `Point{Float64}` is a point whose coordinates are 64-bit floating-point values, while
-the type `Point{AbstractString}` is a "point" whose "coordinates" are string objects (see [Strings](@ref)).
+El tipo `Point{Float64}` es un punto cuyas coordenadas son valores en punto flotante de 64-bits, mientras que el tipo `Point{AbstractString}` es un “punto” cuyas “coordenadas” son objetos `String` (see [Strings](@ref)).
 
-`Point` itself is also a valid type object, containing all instances `Point{Float64}`, `Point{AbstractString}`,
-etc. as subtypes:
+`Point` es en si mismo un tipo objeto válido también, que contiene todas las instancias `Point{Float64}`, `Point{AbstractString}`, etc. como subtipos:
 
 ```jldoctest pointtype
 julia> Point{Float64} <: Point
@@ -465,7 +420,7 @@ julia> Point{AbstractString} <: Point
 true
 ```
 
-Other types, of course, are not subtypes of it:
+Otros tipos, por supuesto, no son subtipos de él:
 
 ```jldoctest pointtype
 julia> Float64 <: Point
@@ -475,7 +430,7 @@ julia> AbstractString <: Point
 false
 ```
 
-Concrete `Point` types with different values of `T` are never subtypes of each other:
+Tipos `Point` concretos con valores diferentes de `T` no son nunca subtipos uno de otro:
 
 ```jldoctest pointtype
 julia> Point{Float64} <: Point{Int64}
@@ -486,30 +441,19 @@ false
 ```
 
 !!! warning
-    This last point is *very* important: even though `Float64 <: Real` we **DO NOT** have `Point{Float64} <: Point{Real}`.
+    Este último punto es importante: **Incluso aunque `Float64 <: Real` no es cierto que `Point{Float64} <: Point{Real}`**. 
 
-In other words, in the parlance of type theory, Julia's type parameters are *invariant*, rather
-than being [covariant (or even contravariant)](https://en.wikipedia.org/wiki/Covariance_and_contravariance_%28computer_science%29). This is for practical reasons: while any instance
-of `Point{Float64}` may conceptually be like an instance of `Point{Real}` as well, the two types
-have different representations in memory:
+En otras palabras, en términos de teoría de tipos, los parámetros de tipo de Julia son *invariantes*, en lugar de ser [covariantes (o incluso contravariantes)](https://en.wikipedia.org/wiki/Covariance_and_contravariance_%28computer_science%29). Esto es por razones prácticas: aunque alguna instancia de `Point{Float64}` puede ser conceptualmente como una instancia de `Point{Real}`, los dos tipos tienen representaciones en memoria diferentes:
 
-  * An instance of `Point{Float64}` can be represented compactly and efficiently as an immediate pair
-    of 64-bit values;
-  * An instance of `Point{Real}` must be able to hold any pair of instances of [`Real`](@ref).
-    Since objects that are instances of `Real` can be of arbitrary size and structure, in
-    practice an instance of `Point{Real}` must be represented as a pair of pointers to
-    individually allocated `Real` objects.
+  * Una instancia de `Point{Float64}` puede ser representada compactamente y eficientemente como un par inmediato 
+    de valores de 64 bits
+  * Una instancia de `Point{Real}` debe ser capaz de alojar cualquier par de instancias de [`Real`](@ref). Como los 
+    objetos son instancias de `Real` pueden ser de tamaño y estructura arbitrarios, en la práctica una instancia de
+    `Point{Real` debe ser representada como un par de punteros a objetos `Real` asignados individualmente.
 
-The efficiency gained by being able to store `Point{Float64}` objects with immediate values is
-magnified enormously in the case of arrays: an `Array{Float64}` can be stored as a contiguous
-memory block of 64-bit floating-point values, whereas an `Array{Real}` must be an array of pointers
-to individually allocated [`Real`](@ref) objects -- which may well be
-[boxed](https://en.wikipedia.org/wiki/Object_type_%28object-oriented_programming%29#Boxing)
-64-bit floating-point values, but also might be arbitrarily large, complex objects, which are
-declared to be implementations of the `Real` abstract type.
+La eficiencia ganada por ser capaz de almacenar objetos `Point{Float64}` con valores inmediatos es magnificada enormemente en el caso de arrays: un `Array{Float64}` puede almacenarse como un bloque contiguo de memoria de valores en punto flotante de 64 bits, mientras que un `Array{Real}` debe ser un array de punteros a objetos [`Real`](@ref) asignados individualmente (que puede ser valores en punto flotante de 64 bits [envueltos (*boxed*)](https://en.wikipedia.org/wiki/Object_type_%28object-oriented_programming%29#Boxing), pero que también pueden ser objetos complejos, arbitrariamente grandes, que han sido declarados como implementaciones del tipo abstracto `Real`.
 
-Since `Point{Float64}` is not a subtype of `Point{Real}`, the following method can't be applied
-to arguments of type `Point{Float64}`:
+Como `Point{Float64}` no es un subtipo de `Point{Real}`,  el siguiente método no puede ser aplicado a argumentos de tipo `Point{Float64}`:
 
 ```julia
 function norm(p::Point{Real})
@@ -517,8 +461,7 @@ function norm(p::Point{Real})
 end
 ```
 
-A correct way to define a method that accepts all arguments of type `Point{T}` where `T` is
-a subtype of [`Real`](@ref) is:
+Una forma correcta de definir un método que acepte todos los argumentos de tipo `Point{T}`, donde `T` es un subtipo de [`Real`](@ref) es:
 
 ```julia
 function norm(p::Point{<:Real})
@@ -526,19 +469,13 @@ function norm(p::Point{<:Real})
 end
 ```
 
-(Equivalently, one could define `function norm{T<:Real}(p::Point{T})` or
-`function norm(p::Point{T} where T<:Real)`; see [UnionAll Types](@ref).)
+(Equivalentemente, uno podría definir `function norm{T<:Real}(p::Point{T})` o `function norm(p::Point{T} where T<:Real)`; ver [tipos UnionAll](@ref).)
 
-More examples will be discussed later in [Methods](@ref).
+Más ejemplos se discutirán después en [Métodos](@ref).
 
-How does one construct a `Point` object? It is possible to define custom constructors for composite
-types, which will be discussed in detail in [Constructors](@ref man-constructors), but in the absence of any special
-constructor declarations, there are two default ways of creating new composite objects, one in
-which the type parameters are explicitly given and the other in which they are implied by the
-arguments to the object constructor.
+¿Cómo construye uno un objeto `Point`? Es posible definir constructores personalizados para tipos compuestos, que serán discutidos en detalle en el capítulo [Constructores](@ref man-constructors), pero en ausencia de ninguna declaración especial de constructor, hay dos formas por defecto de crear nuevos objetos compuestos, uno en el que se dan explícitamente los parámetros de tipo y otro en el que ellos son implicados por los argumentos al objeto constructor.
 
-Since the type `Point{Float64}` is a concrete type equivalent to `Point` declared with [`Float64`](@ref)
-in place of `T`, it can be applied as a constructor accordingly:
+Como el tipo `Point{Float64}` es un tipo concreto equivalente a `Point` declarado con `Float64` en lugar de `T`, se puede aplicar como un constructor ede acuerdo a ésto:
 
 ```jldoctest pointtype
 julia> Point{Float64}(1.0, 2.0)
@@ -548,7 +485,7 @@ julia> typeof(ans)
 Point{Float64}
 ```
 
-For the default constructor, exactly one argument must be supplied for each field:
+Para el constructor por defecto, debe proporcionarse exactamente un argumento por cada campo: 
 
 ```jldoctest pointtype
 julia> Point{Float64}(1.0)
@@ -562,13 +499,9 @@ julia> Point{Float64}(1.0,2.0,3.0)
 ERROR: MethodError: no method matching Point{Float64}(::Float64, ::Float64, ::Float64)
 ```
 
-Only one default constructor is generated for parametric types, since overriding it is not possible.
-This constructor accepts any arguments and converts them to the field types.
+Sólo se ha generado un constructor por defecto para tipos paramétricos, ya que sobreescribirlo no es posible. Este constructor acepta cualquier argumento y los convierte a los tipos de los campos.
 
-In many cases, it is redundant to provide the type of `Point` object one wants to construct, since
-the types of arguments to the constructor call already implicitly provide type information. For
-that reason, you can also apply `Point` itself as a constructor, provided that the implied value
-of the parameter type `T` is unambiguous:
+En muchos casos es redundante proporcionar el tipo del objeto `Point` que uno quiere construir, ya que los tipos de los argumentos en la llamada al constructor ya proporcionan la información de tipos de forma implícita. Por esta razón, también podemos aplicar el propio `Point` como un constructor, dado que el valor implícito del parámetro de tipo `T` no es ambiguo:
 
 ```jldoctest pointtype
 julia> Point(1.0,2.0)
@@ -584,8 +517,7 @@ julia> typeof(ans)
 Point{Int64}
 ```
 
-In the case of `Point`, the type of `T` is unambiguously implied if and only if the two arguments
-to `Point` have the same type. When this isn't the case, the constructor will fail with a [`MethodError`](@ref):
+En el caso de `Point` es implicado sin ambigüedad si y sólo si los dos argumentos a `Point` tienen el mismo tipo. Cuando este no es el caso, el constructor fallará con un [`MethodError`](@ref):
 
 ```jldoctest pointtype
 julia> Point(1,2.5)
@@ -594,20 +526,17 @@ Closest candidates are:
   Point(::T, !Matched::T) where T at none:2
 ```
 
-Constructor methods to appropriately handle such mixed cases can be defined, but that will not
-be discussed until later on in [Constructors](@ref man-constructors).
+Los método constructores para manejar apropiadamente estos casos mixtos pueden ser definidos, pero esto no será discutido hasta después en [Constructores](@ref man-constructors).
 
-### Parametric Abstract Types
+### Tipos Abstractos Paramétricos  
 
-Parametric abstract type declarations declare a collection of abstract types, in much the same
-way:
+Las declaraciones de tipos abstractos paramétricos declaran una colección de tipos abstractos, de la misma forma:
 
 ```jldoctest pointytype
 julia> abstract type Pointy{T} end
 ```
 
-With this declaration, `Pointy{T}` is a distinct abstract type for each type or integer value
-of `T`. As with parametric composite types, each such instance is a subtype of `Pointy`:
+Con esta declaración, `Pointy{T}` es un tipo abstracto distinto para cada tipo o valor entero de `T`. Como con los tipos compuestos paramétricos, cada una de tales instancias es un subtipo de `Pointy`:
 
 ```jldoctest pointytype
 julia> Pointy{Int64} <: Pointy
@@ -617,7 +546,7 @@ julia> Pointy{1} <: Pointy
 true
 ```
 
-Parametric abstract types are invariant, much as parametric composite types are:
+Los tipos abstractos paramétricos son invariantes, tal como los tipos compuestos paramétricos:
 
 ```jldoctest pointytype
 julia> Pointy{Float64} <: Pointy{Real}
@@ -627,9 +556,8 @@ julia> Pointy{Real} <: Pointy{Float64}
 false
 ```
 
-The notation `Pointy{<:Real}` can be used to express the Julia analogue of a
-*covariant* type, while `Pointy{>:Int}` the analogue of a *contravariant* type,
-but technically these represent *sets* of types (see [UnionAll Types](@ref)).
+La notación `Pointy{<:Real}` puede usarse para expresar el análogo Julia de un tipo *covariante*, mientras que  `Pointy{>:Int}` es el análogo de un tipo *contravariante*, pero técnicamente estos representan *conjuntos* de tipos (ver [tipos UnionAll](@ref)).
+
 ```jldoctest pointytype
 julia> Pointy{Float64} <: Pointy{<:Real}
 true
@@ -638,9 +566,7 @@ julia> Pointy{Real} <: Pointy{>:Int}
 true
 ```
 
-Much as plain old abstract types serve to create a useful hierarchy of types over concrete types,
-parametric abstract types serve the same purpose with respect to parametric composite types. We
-could, for example, have declared `Point{T}` to be a subtype of `Pointy{T}` as follows:
+De la misma manera que los tipos abstractos antiguos sirven para crear una jerarquía útil de tipos sobre tipos concretos, los tipos abstractos paramétricos tienen el mismo propósito con respecto a los tipos compuestos paramétricos. Podríamos, por ejemplo, haber declarado `Point {T}` ser un subtipo de `Pointy {T}` de la siguiente manera:
 
 ```jldoctest pointytype
 julia> struct Point{T} <: Pointy{T}
@@ -649,7 +575,7 @@ julia> struct Point{T} <: Pointy{T}
        end
 ```
 
-Given such a declaration, for each choice of `T`, we have `Point{T}` as a subtype of `Pointy{T}`:
+Dada tal declaración, para cada elección de `T` tenemos `Point{T}` como un subtipo de `Pointy{T}`:
 
 ```jldoctest pointytype
 julia> Point{Float64} <: Pointy{Float64}
@@ -662,7 +588,7 @@ julia> Point{AbstractString} <: Pointy{AbstractString}
 true
 ```
 
-This relationship is also invariant:
+Esta relación es también invariante:
 
 ```jldoctest pointytype
 julia> Point{Float64} <: Pointy{Real}
