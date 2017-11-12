@@ -467,36 +467,20 @@ julia> join(["apples", "bananas", "pineapples"], ", ", " and ")
 
 Algunas otras funciones útiles son:
 
-  * [`endof(str)`](@ref) gives the maximal (byte) index that can be used to index into `str`.
-  * [`length(str)`](@ref) the number of characters in `str`.
-  * [`i = start(str)`](@ref start) gives the first valid index at which a character can be found in `str`
-    (typically 1).
-  * [`c, j = next(str,i)`](@ref next) returns next character at or after the index `i` and the next valid
-    character index following that. With [`start()`](@ref) and [`endof()`](@ref), can be used to iterate
-    through the characters in `str`.
-  * [`ind2chr(str,i)`](@ref) gives the number of characters in `str` up to and including any at index
-    `i`.
-  * [`chr2ind(str,j)`](@ref) gives the index at which the `j`th character in `str` occurs.
+  * [`endof(str)`](@ref) el índice máximo (byte) que se puede utilizar para indexar en `str`.
+  * [`length(str)`](@ref) el número de caracteres en `str`.
+  * [`i = start(str)`](@ref start) da el primer índice válido en el que se puede encontrar un carácter en `str (típicamente 1).
+  * [`c, j = next(str,i)`](@ref next) devuelve el carácter siguiente en o después del índice `i` y el siguiente índice de carácter válido que sigue a éste. Con [`start()`](@ref) y [`endof()`](@ref), se puede utilizar para iterar a través de los caracteres en str`.
+  * [`ind2chr(str,i)`](@ref) da el número de caracteres en `str` hasta e incluyendo cualquiera en el índice `i`.
+  * [`chr2ind(str,j)`](@ref) da el índice en el cual ocurre el carácter `j`-ésimo en `str`.
 
-## [Non-Standard String Literals](@id non-standard-string-literals)
+## [Literales cadena no estándar](@id non-standard-string-literals)
 
-There are situations when you want to construct a string or use string semantics, but the behavior
-of the standard string construct is not quite what is needed. For these kinds of situations, Julia
-provides [non-standard string literals](@ref). A non-standard string literal looks like a regular
-double-quoted string literal, but is immediately prefixed by an identifier, and doesn't behave
-quite like a normal string literal.  Regular expressions, byte array literals and version number
-literals, as described below, are some examples of non-standard string literals. Other examples
-are given in the [Metaprogramming](@ref) section.
+Hay situaciones en las que se desea construir una cadena o utilizar semántica de cadenas, pero el comportamiento de la construcción de cadena estándar no es lo que se necesita. Para este tipo de situaciones, Julia proporciona [literales cadena no estándar](@ref). Un literal de cadena no estándar es como una cadena literal normal de doble comilla, pero va inmediatamente precedido de un identificador y no se comporta como un literal de cadena normal. El convenio es que los literales no estándar con prefijos en mayúsculas producen objetos cadena reales, mientras que aquellos con prefijos en minúsculas producen objetos que no cadena, como arrays de bytes o expresiones regulares compiladas. Las expresiones regulares, literales arrays de bytes y literales de números de versión, como se describe a continuación, son algunos ejemplos de literales de cadena no estándar. Otros ejemplos se dan en la sección [Metaprogramación](@ref).
 
-## Regular Expressions
+## Expresiones Regulares
 
-Julia has Perl-compatible regular expressions (regexes), as provided by the [PCRE](http://www.pcre.org/)
-library. Regular expressions are related to strings in two ways: the obvious connection is that
-regular expressions are used to find regular patterns in strings; the other connection is that
-regular expressions are themselves input as strings, which are parsed into a state machine that
-can be used to efficiently search for patterns in strings. In Julia, regular expressions are input
-using non-standard string literals prefixed with various identifiers beginning with `r`. The most
-basic regular expression literal without any options turned on just uses `r"..."`:
+Julia tiene expresiones regulares compatibles con Perl (expresiones regulares), tal y como las proporciona la biblioteca [PCRE](http://www.pcre.org/). Las expresiones regulares se relacionan con las cadenas de dos maneras: la conexión obvia es que las expresiones regulares se utilizan para encontrar patrones regulares en cadenas; La otra conexión es que las expresiones regulares se introducen ellas mismas como cadenas, que se analizan en una máquina de estado que puede utilizarse para buscar patrones en cadenas de forma eficiente. En Julia, las expresiones regulares se introducen usando literales de cadena no estándar prefijados con varios identificadores comenzando por `r`. El literal de expresión regular más básico sin ninguna opción activada sólo utiliza `r"..."`:
 
 ```jldoctest
 julia> r"^\s*(?:#|$)"
@@ -506,7 +490,7 @@ julia> typeof(ans)
 Regex
 ```
 
-To check if a regex matches a string, use [`ismatch()`](@ref):
+Para comprobar si una *regex* se corresponde con una cadena, se utiliza  [`ismatch()`](@ref):
 
 ```jldoctest
 julia> ismatch(r"^\s*(?:#|$)", "not a comment")
@@ -516,10 +500,7 @@ julia> ismatch(r"^\s*(?:#|$)", "# a comment")
 true
 ```
 
-As one can see here, [`ismatch()`](@ref) simply returns true or false, indicating whether the
-given regex matches the string or not. Commonly, however, one wants to know not just whether a
-string matched, but also *how* it matched. To capture this information about a match, use the
-[`match()`](@ref) function instead:
+Como puede verse aquí, [`ismatch()`](@ref) simplemente devuelve `true` o `false`, indicando si la *regex* dada coincide o no con la cadena. Es común, sin embargo, que uno quiera saber no sólo si una cadena coincide, sino también *cómo* coincide. Para capturar esta información sobre una coincidencia, se utiliza la función [`match()`](@ref):
 
 ```jldoctest
 julia> match(r"^\s*(?:#|$)", "not a comment")
@@ -528,9 +509,7 @@ julia> match(r"^\s*(?:#|$)", "# a comment")
 RegexMatch("#")
 ```
 
-If the regular expression does not match the given string, [`match()`](@ref) returns `nothing`
--- a special value that does not print anything at the interactive prompt. Other than not printing,
-it is a completely normal value and you can test for it programmatically:
+Si la expresión regular no coincide con la cadena dada, [`match()`](@ref)  no devuelve nada` -- un valor especial que no imprime nada en el indicador interactivo. Aparte de no imprimir, es un valor completamente normal, como podemos comprobar en el siguiente código:
 
 ```julia
 m = match(r"^\s*(?:#|$)", line)
@@ -541,19 +520,14 @@ else
 end
 ```
 
-If a regular expression does match, the value returned by [`match()`](@ref) is a `RegexMatch`
-object. These objects record how the expression matches, including the substring that the pattern
-matches and any captured substrings, if there are any. This example only captures the portion
-of the substring that matches, but perhaps we want to capture any non-blank text after the comment
-character. We could do the following:
+Si la expresión regular coincide, el valor devuelto por [`match()`](@ref)  es un objeto `RegexMatch`. Estos objetos registran cómo coincide la expresión, incluyendo la subcadena que coincide con el patrón y cualquier subcadena capturada, si la hay. Este ejemplo sólo captura la parte de la subcadena que coincide, pero tal vez quisiéramos capturar cualquier texto no en blanco después del carácter de comentario. Podríamos hacer lo siguiente:
 
 ```jldoctest
 julia> m = match(r"^\s*(?:#\s*(.*?)\s*$|$)", "# a comment ")
 RegexMatch("# a comment ", 1="a comment")
 ```
 
-When calling [`match()`](@ref), you have the option to specify an index at which to start the
-search. For example:
+Al invocar a [`match()`](@ref), tenemos la opción de especificar un índice en el que iniciar la búsqueda. Por ejemplo:
 
 ```jldoctest
 julia> m = match(r"[0-9]","aaaa1aaaa2aaaa3",1)
@@ -566,16 +540,14 @@ julia> m = match(r"[0-9]","aaaa1aaaa2aaaa3",11)
 RegexMatch("3")
 ```
 
-You can extract the following info from a `RegexMatch` object:
+Puede extraer la siguiente información de un objeto `RegexMatch`:
 
-  * the entire substring matched: `m.match`
-  * the captured substrings as an array of strings: `m.captures`
-  * the offset at which the whole match begins: `m.offset`
-  * the offsets of the captured substrings as a vector: `m.offsets`
+* La totalidad de la subcadena emparejada: `m.match`
+* Las subcadenas capturadas como una matriz de cadenas: `m.captures`
+* El desplazamiento en el que comienza la coincidencia del patrón: `m.offset`
+* Los desplazamientos de las subcadenas capturadas como un vector: `m.offsets`
 
-For when a capture doesn't match, instead of a substring, `m.captures` contains `nothing` in that
-position, and `m.offsets` has a zero offset (recall that indices in Julia are 1-based, so a zero
-offset into a string is invalid). Here is a pair of somewhat contrived examples:
+Para cuando una captura no coincide, en lugar de una subcadena, `m.captures` no contiene nada en esa posición, y `m.offsets` tiene un desplazamiento de cero (recuerde que los índices en Julia son *1-based*, por lo que un desplazamiento de cero en una cadena es inválido). Aquí hay un par de ejemplos algo artificiales:
 
 ```jldoctest acdmatch
 julia> m = match(r"(a|b)(c)?(d)", "acd")
@@ -621,16 +593,14 @@ julia> m.offsets
  2
 ```
 
-It is convenient to have captures returned as an array so that one can use destructuring syntax
-to bind them to local variables:
+Es conveniente que las capturas sean retornadas como un array para que uno pueda usar la sintaxis de desestructurante para enlazarlas a variables locales: 
 
 ```jldoctest acdmatch
 julia> first, second, third = m.captures; first
 "a"
 ```
 
-Captures can also be accessed by indexing the `RegexMatch` object with the number or name of the
-capture group:
+Las capturas también está accesibles indexando el objeto `RegexMatch` con el número o nombre del grupo captura:
 
 ```jldoctest
 julia> m=match(r"(?<hour>\d+):(?<minute>\d+)","12:45")
@@ -643,58 +613,44 @@ julia> m[2]
 "45"
 ```
 
-Captures can be referenced in a substitution string when using [`replace()`](@ref) by using `\n`
-to refer to the nth capture group and prefixing the subsitution string with `s`. Capture group
-0 refers to the entire match object. Named capture groups can be referenced in the substitution
-with `g<groupname>`. For example:
-
+Las capturas pueden referenciarse en una cadena de sustitución cuando se utiliza [`replace()`](@ref) utilizando `\n` para referirse al grupo de captura `n`-ésimo y prefijando la cadena de subsitución con `s`. El grupo de captura `0` se refiere a todo el objeto de coincidencia. Los grupos de captura nombrados se pueden hacer referencia en la sustitución con g<groupname>. Por ejemplo:
+ 
 ```jldoctest
 julia> replace("first second", r"(\w+) (?<agroup>\w+)", s"\g<agroup> \1")
 "second first"
 ```
 
-Numbered capture groups can also be referenced as `\g<n>` for disambiguation, as in:
-
+Los grupos de captura numerados pueden también ser referenciados como `\g<n>` para evitar ambigüedad, como en:
 ```jldoctest
 julia> replace("a", r".", s"\g<0>1")
 "a1"
 ```
 
-You can modify the behavior of regular expressions by some combination of the flags `i`, `m`,
-`s`, and `x` after the closing double quote mark. These flags have the same meaning as they do
-in Perl, as explained in this excerpt from the [perlre manpage](http://perldoc.perl.org/perlre.html#Modifiers):
+Puedes modificar el comportamiento de las expresiones regulares mediante una combinación de los flags `i`, `m`, `s` y `x` después de la marca de comillas dobles de cierre. Estas banderas tienen el mismo significado que en Perl, tal y como se describe en este fragmento de la [página de manual del referencia de Perl(http://perldoc.perl.org/perlre.html#Modifiers):
 
 ```
-i   Do case-insensitive pattern matching.
+i   Hace coincidencia de patrón insensible a mayúsculas y minúsculas.
 
-    If locale matching rules are in effect, the case map is taken
-    from the current locale for code points less than 255, and
-    from Unicode rules for larger code points. However, matches
-    that would cross the Unicode rules/non-Unicode rules boundary
-    (ords 255/256) will not succeed.
+    Si las reglas de concordancia de configuración local están en vigor, se toma el mapa de casos desde la ubicación 
+    actual para puntos de código inferiores a 255, y desde reglas Unicode para puntos de código mayores. Sin embargo, 
+    los partidos que cruzaría el límite de reglas Unicode / reglas no Unicode (Ords 255/256) no tendrá éxito.
 
-m   Treat string as multiple lines.  That is, change "^" and "$"
-    from matching the start or end of the string to matching the
-    start or end of any line anywhere within the string.
+m   Trate la cadena como varias líneas.  Es decir, cambiar "^" y "$" de coincidir con el inicio o el final de la cadena 
+    con la inicio o fin de cualquier línea en cualquier parte de la cadena.
 
-s   Treat string as single line.  That is, change "." to match any
-    character whatsoever, even a newline, which normally it would
-    not match.
+s   Trate la cadena como una sola línea.  Es decir, cambiar "." Para igualar cualquier carácter, incluso una nueva 
+    línea, que normalmente sería No coinciden. 
 
-    Used together, as r""ms, they let the "." match any character
-    whatsoever, while still allowing "^" and "$" to match,
-    respectively, just after and just before newlines within the
-    string.
+    Utilizados juntos, como r "" ms, dejan que el "." Coincidir con cualquier personaje sea cual sea, mientras todavía 
+    permite que "^" y "$" coincidan, respectivamente, justo después y justo antes de las nuevas líneas dentro de la cadena.
 
-x   Tells the regular expression parser to ignore most whitespace
-    that is neither backslashed nor within a character class. You
-    can use this to break up your regular expression into
-    (slightly) more readable parts. The '#' character is also
-    treated as a metacharacter introducing a comment, just as in
-    ordinary code.
+x   Indica al analizador de expresiones regulares que ignore la mayoría de los espacios en blanco. Que no está ni 
+    retrocedido ni dentro de una clase de caracteres. Tú puede utilizar esto para romper su expresión regular en 
+    (ligeramente) más legibles. El carácter '#' también es como un metacaracter introduciendo un comentario, como en 
+    código ordinario.
 ```
 
-For example, the following regex has all three flags turned on:
+Por ejemplo, la siguiente regex tiene activados los tres *flags*:
 
 ```jldoctest
 julia> r"a+.*b+.*?d$"ism
@@ -704,23 +660,17 @@ julia> match(r"a+.*b+.*?d$"ism, "Goodbye,\nOh, angry,\nBad world\n")
 RegexMatch("angry,\nBad world")
 ```
 
-Triple-quoted regex strings, of the form `r"""..."""`, are also supported (and may be convenient
-for regular expressions containing quotation marks or newlines).
+Las cadenas *regex* con triples comillas, de la forma `r"""..."""` están también soportadas (y puede ser conveniente para expresiones regulares que contengan comillas o caracteres de salto de línea).
 
 ## [Byte Array Literals](@id man-byte-array-literals)
 
-Another useful non-standard string literal is the byte-array string literal: `b"..."`. This form
-lets you use string notation to express literal byte arrays -- i.e. arrays of
-[`UInt8`](@ref) values. The rules for byte array literals are the following:
+Otro literal de cadena no estándar útil es el literal de cadena de bytes: `b "..."`. Esta forma nos permite usar la notación de cadena para expresar arrays de bytes literales, es decir, arrays de valores [`UInt8`](@ref). Las reglas para los literales de arrays de bytes son las siguientes:
 
-  * ASCII characters and ASCII escapes produce a single byte.
-  * `\x` and octal escape sequences produce the *byte* corresponding to the escape value.
-  * Unicode escape sequences produce a sequence of bytes encoding that code point in UTF-8.
+* Los caracteres ASCII y los escapes ASCII producen un solo byte.
+* `\x` y las secuencias de escape octales producen el *byte* correspondiente al valor de escape.
+* Las secuencias de escape Unicode producen una secuencia de bytes que codifican ese punto de código en UTF-8.
 
-There is some overlap between these rules since the behavior of `\x` and octal escapes less than
-0x80 (128) are covered by both of the first two rules, but here these rules agree. Together, these
-rules allow one to easily use ASCII characters, arbitrary byte values, and UTF-8 sequences to
-produce arrays of bytes. Here is an example using all three:
+Hay una cierta superposición entre estas reglas ya que el comportamiento de `\x` y escapes octales menores de `0x80` (128) están cubiertos por las dos primeras reglas, pero aquí estas reglas están de acuerdo. Juntas, estas reglas permiten usar fácilmente caracteres ASCII, valores arbitrarios de bytes y secuencias UTF-8 para producir matrices de bytes. Aquí hay un ejemplo usando los tres:
 
 ```jldoctest
 julia> b"DATA\xff\u2200"
@@ -735,19 +685,14 @@ julia> b"DATA\xff\u2200"
  0x80
 ```
 
-The ASCII string "DATA" corresponds to the bytes 68, 65, 84, 65. `\xff` produces the single byte 255.
-The Unicode escape `\u2200` is encoded in UTF-8 as the three bytes 226, 136, 128. Note that the
-resulting byte array does not correspond to a valid UTF-8 string -- if you try to use this as
-a regular string literal, you will get a syntax error:
+La secuencia ASCII "DATA" corresponde a los bytes 68, 65, 84, 65. `\xff` produce el byte simple 255. El escape Unicode `\u2200` está codificado en UTF-8 como los tres bytes 226, 136, 128. Nótese que la matriz de bytes resultante no corresponde a una cadena UTF-8 válida - si intenta utilizar esto como una cadena literal normal, obtendrá un error de sintaxis:
 
 ```julia-repl
 julia> "DATA\xff\u2200"
 ERROR: syntax: invalid UTF-8 sequence
 ```
 
-Also observe the significant distinction between `\xff` and `\uff`: the former escape sequence
-encodes the *byte 255*, whereas the latter escape sequence represents the *code point 255*, which
-is encoded as two bytes in UTF-8:
+Observe también la distinción significativa entre `\xff` y `\uff`: la secuencia de escape anterior codifica el *byte 255*, mientras que la última secuencia de escape representa el *punto de código 255*, que se codifica como dos bytes en UTF-8:
 
 ```jldoctest
 julia> b"\xff"
