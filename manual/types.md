@@ -224,28 +224,11 @@ sería imposible hacer que los valores  [`Bool`](@ref) se comportaran de forma d
 
 ## Composite Types
 
-[Composite types](https://en.wikipedia.org/wiki/Composite_data_type) are called records, structs,
-or objects in various languages. A composite type is a collection of named fields,
-an instance of which can be treated as a single value. In many languages, composite types are
-the only kind of user-definable type, and they are by far the most commonly used user-defined
-type in Julia as well.
+[Los tipos compuestos](https://en.wikipedia.org/wiki/Composite_data_type) se llaman registros, estructuras (*structs*) u objetos en distintos lenguajes. Un tipo compuesto es una colección de campos nombrados, una instancia de los cuales puede ser tratada como un único valor. En muchos lenguajes, los tiempos compuestos sos la única clase de tipos definidos por el usuario, y ellos son de lejos el tiempo definido por el usuario  que se usa mas comúnmente en el lenguaje Julia.
 
-In mainstream object oriented languages, such as C++, Java, Python and Ruby, composite types also
-have named functions associated with them, and the combination is called an "object". In purer
-object-oriented languages, such as Ruby or Smalltalk, all values are objects whether they are
-composites or not. In less pure object oriented languages, including C++ and Java, some values,
-such as integers and floating-point values, are not objects, while instances of user-defined composite
-types are true objects with associated methods. In Julia, all values are objects, but functions
-are not bundled with the objects they operate on. This is necessary since Julia chooses which
-method of a function to use by multiple dispatch, meaning that the types of *all* of a function's
-arguments are considered when selecting a method, rather than just the first one (see [Methods](@ref)
-for more information on methods and dispatch). Thus, it would be inappropriate for functions to
-"belong" to only their first argument. Organizing methods into function objects rather than having
-named bags of methods "inside" each object ends up being a highly beneficial aspect of the language
-design.
+En el mundo de los lenguajes orientados a objetos tales como C++, Java, Python o Rubi, los tiempos compuestos también tienen funciones nombrados asociados con ellos, y la combinación se denomina "objeto". En los lenguajes orientados a objetos puros, tales como Ruby o SmallTalk, todo los valores son objetos sean compuestos uno. En lenguajes orientados objetos menos puros incuyendo C++ y Java, algunos valores tales como los enteros no se consideran objetos, mientras que las instancias de los tipos compuestos definidos por el usuario son verdaderos objetos con métodos asociados. En Julia, todos los valores son objetos, pero las funciones no están ligadas a los objetos sobre los que opera. Esto es necesario ya que Julia exige que método de una función usar mediante despacho múltiple, lo que significa que los tipos de todos los argumentos de una función son considerados cuando se selecciona un método en lugar de sólo el primero (ver la sección [Métodos](@ref) para más información). Por tanto, sería inapropiado para las funciones pertenecer a su primer argumento solo. Organizar métodos en objetos función en lugar de tener bolsas de métodos nombrados "dentro" de cada objeto termina por ser un aspecto muy beneficioso de diseño del lenguaje.
 
-Composite types are introduced with the `struct` keyword followed by a block of field names, optionally
-annotated with types using the `::` operator:
+Los tipos compuestos son introducidos por la palabra clave `struct` seguida por un bloque de nombres de campos, opcionalmente anotados con tipos usando el operador `::`
 
 ```jldoctest footype
 julia> struct Foo
@@ -255,10 +238,9 @@ julia> struct Foo
        end
 ```
 
-Fields with no type annotation default to `Any`, and can accordingly hold any type of value.
+Los campos sin anotación de tipos tiene asignado `Any` como tipo por defecto, y pueden según esto almacenar cualquier tipo de valor.
 
-New objects of type `Foo` are created by applying the `Foo` type object like a function
-to values for its fields:
+Para crear nuevos objetos del tipo compuesto `Foo` se crean aplicando el tipo objeto `Foo` como una función con valores para sus campos:
 
 ```jldoctest footype
 julia> foo = Foo("Hello, world.", 23, 1.5)
@@ -268,14 +250,9 @@ julia> typeof(foo)
 Foo
 ```
 
-When a type is applied like a function it is called a *constructor*. Two constructors are generated
-automatically (these are called *default constructors*). One accepts any arguments and calls
-[`convert()`](@ref) to convert them to the types of the fields, and the other accepts arguments
-that match the field types exactly. The reason both of these are generated is that this makes
-it easier to add new definitions without inadvertently replacing a default constructor.
+Cuando un tipo es aplicado como una función es llamado *constructor*. Hay dos constructores, denominados *constructores por defecto* que se generan automáticamente al crear el tipo. Uno acepta cualquier argumento y llama a [`convert()`](@ref) para convertirlos a los tipos de los campos, y el otro acepta argumentos que se corresponden exactamente a los tipos de los campos. La razón de que ambos métodos sean generados es que esto hace más sencillo añadir nuevas definiciones sin reemplazar inadvertidamente a un constructor por defecto.
 
-Since the `bar` field is unconstrained in type, any value will do. However, the value for `baz`
-must be convertible to `Int`:
+Como el campo `bar` no está restringido en tipo, cualquier valor es válido. Sin embargo, el valor para `baz` debe ser convertible a `Int`:
 
 ```jldoctest footype
 julia> Foo((), 23.5, 1)
@@ -285,7 +262,7 @@ Stacktrace:
  [2] Foo(::Tuple{}, ::Float64, ::Int64) at ./none:2
 ```
 
-You may find a list of field names using the `fieldnames` function.
+La función `fieldnames` devuelve una lista de los nombres de campos de un objeto:
 
 ```jldoctest footype
 julia> fieldnames(Foo)
@@ -308,22 +285,18 @@ julia> foo.qux
 1.5
 ```
 
-Composite objects declared with `struct` are *immutable*; they cannot be modified
-after construction. This may seem odd at first, but it has several advantages:
+Los tipos compuestos declarados con `struct` son *inmutables*, es decir, no pueden ser modificados después de su construcción. Esto puede parecer raro al principio, pero tiene varias ventajas:
 
-  * It can be more efficient. Some structs can be packed efficiently into arrays, and in some cases the
-    compiler is able to avoid allocating immutable objects entirely.
-  * It is not possible to violate the invariants provided by the type's constructors.
-  * Code using immutable objects can be easier to reason about.
+   * Puede ser más eficiciente. Algunos `struct` pueden ser empquetados eficientemente dentro de los arrays, y 
+     en algunos casos el compilador es capaz de evitar asignar objetos inmutables completamente.
+   * No es posible violar las invariantes proporcionadas por los contructores de tipo.
+   * El código con objetos inmutables puede ser más sencillo de interpretar.
 
-An immutable object might contain mutable objects, such as arrays, as fields. Those contained
-objects will remain mutable; only the fields of the immutable object itself cannot be changed
-to point to different objects.
+Un objeto inmutable puede contener objetos mutables, tales como arrays, como campos. Esos objetos contenidos permanecerán inmutables, sólo los cambos del objeto inmutable en sí no podrán ser cambiados para apuntar a objetos distintos. 
 
-Where required, mutable composite objects can be declared with the keyword `mutable struct`, to be
-discussed in the next section.
+Cuando se requiera, los objetos compuestos mutables podrán ser declarados con la palabra clave `mutable struct`, lo que será discutido en la siguiente sección. 
 
-Composite types with no fields are singletons; there can be only one instance of such types:
+Los tipos compuestos sin campos son *singletons*, es decir, sólo puede haber una instancia de tales tipos:
 
 ```jldoctest
 julia> struct NoFields
@@ -333,17 +306,13 @@ julia> NoFields() === NoFields()
 true
 ```
 
-The `===` function confirms that the "two" constructed instances of `NoFields` are actually one
-and the same. Singleton types are described in further detail [below](@ref man-singleton-types).
+La función `===` confirma que las dos instancias construidas de `NoFields` son de hecho una y la misma. Los tipos *singleton* se describirán en más detalle [posteriormente](@ref man-singleton-types).
 
-There is much more to say about how instances of composite types are created, but that discussion
-depends on both [Parametric Types](@ref) and on [Methods](@ref), and is sufficiently important
-to be addressed in its own section: [Constructors](@ref man-constructors).
+Hay mucho más que decir sobre cómo se crean las instancias de los tipos compuestos, pero esta discusión depende de los [Tipos Paramétricos](@ref) y de los [Métodos](@ref), y es suficientemente importante para ser tratada en su propia sección: [Constructores](@ref man-constructors).
 
-## Mutable Composite Types
+## Tipos Compuestos Mutables
 
-If a composite type is declared with `mutable struct` instead of `struct`, then instances of
-it can be modified:
+Si un tipo compuesto es declarado como `mutable struct` en lugar de como `struct`, sus instancias pueden ser modificadas:
 
 ```jldoctest bartype
 julia> mutable struct Bar
