@@ -1,26 +1,25 @@
-# Running External Programs
+# Ejecutando programas externos
 
-Julia borrows backtick notation for commands from the shell, Perl, and Ruby. However, in Julia,
-writing
+Julia toma prestada la notación de tilde inversa para ejecutar mandatos de la shell y programas en Perl y en Ruby.  Sin embargo, en Julia, escribir
 
 ```jldoctest
 julia> `echo hello`
 `echo hello`
 ```
 
-differs in several aspects from the behavior in various shells, Perl, or Ruby:
+difiere en algunos aspectos del comportamiento en varios shells, Perl y Ruby:
 
-  * Instead of immediately running the command, backticks create a `Cmd` object to represent the command.
-    You can use this object to connect the command to others via pipes, run it, and read or write
-    to it.
-  * When the command is run, Julia does not capture its output unless you specifically arrange for
-    it to. Instead, the output of the command by default goes to [`STDOUT`](@ref) as it would using
-    `libc`'s `system` call.
-  * The command is never run with a shell. Instead, Julia parses the command syntax directly, appropriately
-    interpolating variables and splitting on words as the shell would, respecting shell quoting syntax.
-    The command is run as `julia`'s immediate child process, using `fork` and `exec` calls.
+   * En lugar de ejecutar el mandato inmediatamente, las tildes invertidas crean un objeto `Cmd` para representar el 
+     mandato. Uno puede usar este objeto para conectar los mandatos a otros vía tuberías (*pipes*), ejecutarlo y leer 
+     o escribir en él.
+   * Cuando el mandato se está ejecutando, Julia no captura su salida a menos que uno lo organice específicamente. En 
+     lugar de ello, la salida del mandato va por defecto a [`STDOUT`](@ref) como si se estuviera realizando una llamada 
+     al sistema con la `libc`.
+   * El mandato nunca es ejecutado con un shell. En su lugar, Julia analiza directamente la sintaxis del mandato, 
+     interpola variables adecuadametne y dividiendo en palabras como el shell lo haría, respetando su sintaxis. 
+     El mandato se ejecuta como un proceso hijo inmediato de Julia, usando las llamadas `fork` y `exec`.
 
-Here's a simple example of running an external program:
+He aquí un ejemplo sencillo de ejecución de un programa externo:
 
 ```jldoctest
 julia> mycommand = `echo hello`
@@ -33,11 +32,9 @@ julia> run(mycommand)
 hello
 ```
 
-The `hello` is the output of the `echo` command, sent to [`STDOUT`](@ref). The run method itself
-returns `nothing`, and throws an [`ErrorException`](@ref) if the external command fails to run
-successfully.
+El mensaje `hello` es la salida de este mandato `echo`, enviado a [`STDOUT`](@ref). El mensaje `hello` es la salida de este mandato `echo`, enviado a `STDOUT`. El método ejecutado devuelve en si mismo `nothing`, y lanza una [`ErrorException`](@ref) si el mandato externo falla en ejecutarse con éxito.
 
-If you want to read the output of the external command, [`read`](@ref) can be used instead:
+Si se desea leer la salida de un mandato externo puede usarse `readstring()`:  
 
 ```jldoctest
 julia> a = read(`echo hello`, String)
@@ -47,7 +44,7 @@ julia> chomp(a) == "hello"
 true
 ```
 
-More generally, you can use [`open()`](@ref) to read from or write to an external command.
+Más generalmente, puedes usar [`open()`](@ref) para leer desde o escribir hacia un mandato externo.
 
 ```jldoctest
 julia> open(`less`, "w", STDOUT) do io
@@ -60,8 +57,8 @@ julia> open(`less`, "w", STDOUT) do io
 3
 ```
 
-The program name and the individual arguments in a command can be accessed
-and iterated over as if the command were an array of strings:
+El nombre del programa y los argumentos individuales de un mandato pueden ser accedidos e iterados como si el mandato fuera un array de cadenas:
+
 ```jldoctest
 julia> collect(`echo "foo bar"`)
 2-element Array{String,1}:
@@ -72,11 +69,9 @@ julia> `echo "foo bar"`[2]
 "foo bar"
 ```
 
-## [Interpolation](@id command-interpolation)
+## [Interpolación](@id command-interpolation)
 
-Suppose you want to do something a bit more complicated and use the name of a file in the variable
-`file` as an argument to a command. You can use `$` for interpolation much as you would in a string
-literal (see [Strings](@ref)):
+Supongamos que uno quiere algo un poco más complicado y usa el nombre de un fichero en la variable `file` como argumento a un mandato. Se puede usar `$` para interpolar tal como lo haríamos con un literal cadena (ver la sección [Strings](@ref)):
 
 ```jldoctest
 julia> file = "/etc/passwd"
@@ -86,10 +81,7 @@ julia> `sort $file`
 `sort /etc/passwd`
 ```
 
-A common pitfall when running external programs via a shell is that if a file name contains characters
-that are special to the shell, they may cause undesirable behavior. Suppose, for example, rather
-than `/etc/passwd`, we wanted to sort the contents of the file `/Volumes/External HD/data.csv`.
-Let's try it:
+Un error común es que cuando se ejecutan programas externos a través de un shell es que si el nombre del fichero contiene caracteres que son especiales para el shell, ellos pueden causar un comportamiento indeseaddo. Por ejemplo, en lugar de `/etc/passwd` se desea ordenar los contenidos del fichero `/volumes/External HD/data.csv`. Intentémoslo:
 
 ```jldoctest
 julia> file = "/Volumes/External HD/data.csv"
@@ -99,11 +91,7 @@ julia> `sort $file`
 `sort '/Volumes/External HD/data.csv'`
 ```
 
-How did the file name get quoted? Julia knows that `file` is meant to be interpolated as a single
-argument, so it quotes the word for you. Actually, that is not quite accurate: the value of `file`
-is never interpreted by a shell, so there's no need for actual quoting; the quotes are inserted
-only for presentation to the user. This will even work if you interpolate a value as part of a
-shell word:
+¿Cómo se entrecomilla el nombre de fichero? Julia sabe que `file` va a ser interpolado por un solo argumento, por lo que él entrecomilla la cadena. De hecho, esto no es bastante exacto: el valor de `file` no va a ser interpretado por el shell nunca, por lo que no hay necesidad de entrecomillar. Las comillas se insertan sólo para presentar al usuario. Eso funcionará incluso si uno interpola un valor como parte de una palabra del shell:
 
 ```jldoctest
 julia> path = "/Volumes/External HD"
@@ -119,8 +107,7 @@ julia> `sort $path/$name.$ext`
 `sort '/Volumes/External HD/data.csv'`
 ```
 
-As you can see, the space in the `path` variable is appropriately escaped. But what if you *want*
-to interpolate multiple words? In that case, just use an array (or any other iterable container):
+Como puedes ver, el espacio en la variable `path` es apropiadamente "escapado". Pero, ¿qué pasa si lo que uno desea es interpolar múltiples palabras? En este caso, se utilizará un array (u otro contenedor iterable):
 
 ```jldoctest
 julia> files = ["/etc/passwd","/Volumes/External HD/data.csv"]
@@ -132,8 +119,7 @@ julia> `grep foo $files`
 `grep foo /etc/passwd '/Volumes/External HD/data.csv'`
 ```
 
-If you interpolate an array as part of a shell word, Julia emulates the shell's `{a,b,c}` argument
-generation:
+Si interpolas un array como parte de una palabra de la shell, Julia emula la generación de argumentos de la shell `{a, b, c}`:
 
 ```jldoctest
 julia> names = ["foo","bar","baz"]
@@ -146,8 +132,7 @@ julia> `grep xylophone $names.txt`
 `grep xylophone foo.txt bar.txt baz.txt`
 ```
 
-Moreover, if you interpolate multiple arrays into the same word, the shell's Cartesian product
-generation behavior is emulated:
+Además, si interpolas múltiples arrays en la misma palabra, se emula el comportamiento de generación del shell haciendo el producto cartesiano: 
 
 ```jldoctest
 julia> names = ["foo","bar","baz"]
@@ -165,18 +150,16 @@ julia> `rm -f $names.$exts`
 `rm -f foo.aux foo.log bar.aux bar.log baz.aux baz.log`
 ```
 
-Since you can interpolate literal arrays, you can use this generative functionality without needing
-to create temporary array objects first:
+Como pudes interpolar arrays de literales, puedes usar esta funcionalidad generativa sin necesidad de crer objetos array temporales primero: 
 
 ```jldoctest
 julia> `rm -rf $["foo","bar","baz","qux"].$["aux","log","pdf"]`
 `rm -rf foo.aux foo.log foo.pdf bar.aux bar.log bar.pdf baz.aux baz.log baz.pdf qux.aux qux.log qux.pdf`
 ```
 
-## Quoting
+## Entrecomillado
 
-Inevitably, one wants to write commands that aren't quite so simple, and it becomes necessary
-to use quotes. Here's a simple example of a Perl one-liner at a shell prompt:
+Inevitablemente, uno quiere escribir mandatos que no sean tan simples, y se vueve necesario usar comillas. He aquí un ejemplo simple de un script Perl de una línea en el prompt del shell:
 
 ```
 sh$ perl -le '$|=1; for (0..3) { print }'
@@ -186,10 +169,7 @@ sh$ perl -le '$|=1; for (0..3) { print }'
 3
 ```
 
-The Perl expression needs to be in single quotes for two reasons: so that spaces don't break the
-expression into multiple shell words, and so that uses of Perl variables like `$|` (yes, that's
-the name of a variable in Perl), don't cause interpolation. In other instances, you may want to
-use double quotes so that interpolation *does* occur:
+La expresión Perl necesita estar entre comillas sencillas por dos razones: para que los espacios no rompan la expresión en múltiples palabras en el shell, y para que el uso de variables de Perl, como `$|` no cause interpolación. En otras instancias, puedes querer usar dobles comillas para que la interpolación SI tenga lugar:
 
 ```
 sh$ first="A"
@@ -199,11 +179,7 @@ sh$ perl -le '$|=1; print for @ARGV' "1: $first" "2: $second"
 2: B
 ```
 
-In general, the Julia backtick syntax is carefully designed so that you can just cut-and-paste
-shell commands as is into backticks and they will work: the escaping, quoting, and interpolation
-behaviors are the same as the shell's. The only difference is that the interpolation is integrated
-and aware of Julia's notion of what is a single string value, and what is a container for multiple
-values. Let's try the above two examples in Julia:
+En general, la sintaxis de comillas invertidas de Julia está diseñada cuidadosamente para que puedas cortar y pegar comendos del shell, los pongas entre comillas y funcionen: los comportamientos del escape, las comillas y las interpolaciones son los mismos que los del shell. La única diferencia es que la interpolación está integrada y consciente de la noción de Julia de que es un valor de cadena simple, y qué es un contenedor para valores múltiples. Intentemos los dos ejemplos anteriores en Julia:
 
 ```jldoctest
 julia> A = `perl -le '$|=1; for (0..3) { print }'`
@@ -225,15 +201,11 @@ julia> run(B)
 2: B
 ```
 
-The results are identical, and Julia's interpolation behavior mimics the shell's with some improvements
-due to the fact that Julia supports first-class iterable objects while most shells use strings
-split on spaces for this, which introduces ambiguities. When trying to port shell commands to
-Julia, try cut and pasting first. Since Julia shows commands to you before running them, you can
-easily and safely just examine its interpretation without doing any damage.
+Los resultados son idénticos, y el comportamiento de interpolación de Julia imita el shell con algunas mejoras debido a que Julia soporta objetos iterables de primera clase mientras la mayoría de los shells usan división de cadenas mediante espacios para ésto, lo cuál introduce ambigüedades. Cuando intentamos portar mandatos del shell a Julia, intentemos cortar y pegar primero. Como Julia te muestra los mandatos antes de que los ejecutes, puedes examinar fácilmente y de forma segura su interpretación sin hacer ningún daño.
 
-## Pipelines
+## Tuberías
 
-Shell metacharacters, such as `|`, `&`, and `>`, need to be quoted (or escaped) inside of Julia's backticks:
+Los metacaracteres del shell tales como `|`, `&`, and `>`, necesitan ser acotados o escapados dentro de las comillas invertidas de Julia:
 
 ```jldoctest
 julia> run(`echo hello '|' sort`)
@@ -243,18 +215,14 @@ julia> run(`echo hello \| sort`)
 hello | sort
 ```
 
-This expression invokes the `echo` command with three words as arguments: `hello`, `|`, and `sort`.
-The result is that a single line is printed: `hello | sort`. How, then, does one construct a
-pipeline? Instead of using `'|'` inside of backticks, one uses [`pipeline()`](@ref):
+Esta expresión invoca el mandato `echo` con tres palabras como argumentos, "hello", "|" y "sort". El resultados es que se imprime una sola línea "hello | sort". Dentro de las comillas traseras, el símbolo "|" no tiene un significado especial. ¿Cómo entonces, podemos construir una tubería? En lugar de usar el símbolo "|" dentro de la tubería, utilizaremos la función [`pipeline()`](@ref):
 
 ```jldoctest
 julia> run(pipeline(`echo hello`, `sort`))
 hello
 ```
 
-This pipes the output of the `echo` command to the `sort` command. Of course, this isn't terribly
-interesting since there's only one line to sort, but we can certainly do much more interesting
-things:
+Esto entuba la salida del mandato `echo` al mandato `sort`. Por supuesto, esto no es terriblemente interesante ya que sólo hay una línea que ordenar, pero podemos cosas mucho más interesantes:
 
 ```julia-repl
 julia> run(pipeline(`cut -d: -f3 /etc/passwd`, `sort -n`, `tail -n5`))
@@ -265,13 +233,9 @@ julia> run(pipeline(`cut -d: -f3 /etc/passwd`, `sort -n`, `tail -n5`))
 214
 ```
 
-This prints the highest five user IDs on a UNIX system. The `cut`, `sort` and `tail` commands
-are all spawned as immediate children of the current `julia` process, with no intervening shell
-process. Julia itself does the work to setup pipes and connect file descriptors that is normally
-done by the shell. Since Julia does this itself, it retains better control and can do some things
-that shells cannot.
+Esto imprime los cinco identificadores de usuario mayores dentro de un sistema UNIX. Los mandatos `cut`, `sort` y `tail` son "criados" como hijos inmediatos del proceso `julia` actual, sin que intervenga el proceso shell. Julia en sí mismo hace el trabajo (normalmente hecho por el shell) de inicializar las tuberías y conectar los descriptores de fichero.  Como Julia hace este trabajo, retiene un mejor control y puede hacer algunas cosas que el shell no puede.
 
-Julia can run multiple commands in parallel:
+Julia puede ejecutar múltiples órdenes en paralelo:
 
 ```julia-repl
 julia> run(`echo hello` & `echo world`)
@@ -279,10 +243,7 @@ world
 hello
 ```
 
-The order of the output here is non-deterministic because the two `echo` processes are started
-nearly simultaneously, and race to make the first write to the [`STDOUT`](@ref) descriptor they
-share with each other and the `julia` parent process. Julia lets you pipe the output from both
-of these processes to another program:
+El orden de esta salida es no determinista debido a que los dos procesos `echo` se lanzan casi simultáneamente, y compiten para hacer la primera escritura al descriptor [`STDOUT`](@ref) que ambas comparten con el proceso padre `julia`.  Julia te premite entubar la salida desde estos procesos a otro programa:
 
 ```jldoctest
 julia> run(pipeline(`echo world` & `echo hello`, `sort`))
@@ -290,27 +251,21 @@ hello
 world
 ```
 
-In terms of UNIX plumbing, what's happening here is that a single UNIX pipe object is created
-and written to by both `echo` processes, and the other end of the pipe is read from by the `sort`
-command.
+En términos de fontanería UNIX, lo que está pasando aquí es que un único objeto tubería de UNIX se ha creado y es escrito por dos procesos `echo` y el otro extremo al final de la tubería es leído por la orden `sort`.
 
-IO redirection can be accomplished by passing keyword arguments stdin, stdout, and stderr to the
-`pipeline` function:
+La redirección de la E/S puede conseguirse pasando los argumentos clave stdin, stdout y stderr a la función `pipeline`:
 
 ```julia
 pipeline(`do_work`, stdout=pipeline(`sort`, "out.txt"), stderr="errs.txt")
 ```
 
-### Avoiding Deadlock in Pipelines
+### Evitar interbloqueos en tuberías
 
-When reading and writing to both ends of a pipeline from a single process, it is important to
-avoid forcing the kernel to buffer all of the data.
+Cuando leemos y escribirmos en los dos extremos de una tubería desde un solo proceso, es importante evitar forzar el núcleo a almacenar todos los datos en el buffer.
 
-For example, when reading all of the output from a command, call `read(out, String)`, not `wait(process)`,
-since the former will actively consume all of the data written by the process, whereas the latter
-will attempt to store the data in the kernel's buffers while waiting for a reader to be connected.
+Por ejemplo, cuando leemos toda la salida de un mandato, llamamos a `readstring(out)`, no `wait(process)`, ya que el primero consumirá activamente todos los datos exritos por el proceso, mientras que el último interntará almacenar los datos en los búferes del kernel mientras espera a que un lector esté conectado. 
 
-Another common solution is to separate the reader and writer of the pipeline into separate Tasks:
+Otra solución común es separar el lector y el escritor de la tuberían en tareas separadas:
 
 ```julia
 writer = @async write(process, "data")
@@ -319,12 +274,9 @@ wait(process)
 fetch(reader)
 ```
 
-### Complex Example
+### Ejemplo complicado
 
-The combination of a high-level programming language, a first-class command abstraction, and automatic
-setup of pipes between processes is a powerful one. To give some sense of the complex pipelines
-that can be created easily, here are some more sophisticated examples, with apologies for the
-excessive use of Perl one-liners:
+La combinación de un lenguaje de programación de alto nivel, una abstracción de mandatos de primera clase y la inicialización automática de tuberías entre procesos es muy poderos. Para dar algun sentido a las tuberías complejas que pueden ser creadas facilmente, he aquí algunos ejemplos más sofisticado, con nuestras disculpas por el excesito uso de scripts Perl con una sola línea:
 
 ```julia-repl
 julia> prefixer(prefix, sleep) = `perl -nle '$|=1; print "'$prefix' ", $_; sleep '$sleep';'`;
@@ -342,15 +294,9 @@ A 8
 B 9
 ```
 
-This is a classic example of a single producer feeding two concurrent consumers: one `perl` process
-generates lines with the numbers 0 through 9 on them, while two parallel processes consume that
-output, one prefixing lines with the letter "A", the other with the letter "B". Which consumer
-gets the first line is non-deterministic, but once that race has been won, the lines are consumed
-alternately by one process and then the other. (Setting `$|=1` in Perl causes each print statement
-to flush the [`STDOUT`](@ref) handle, which is necessary for this example to work. Otherwise all
-the output is buffered and printed to the pipe at once, to be read by just one consumer process.)
+Este es el ejemplo típico de un solo productor que alimenta dos consumidores concurrentes: un proceso `perl` genera líneas con los número 0 a 9, el otro con la letra "B". Qué consumidor llega el primero es no determinista, pero una vez que se ha ganado la carrera, las líneas son consumidas alternativamente primero por un proceso y después por el otro. (Fijas `$|=1` en Perl causa que cada instrucción de impresión vuelque al flujo [`STDOUT`](@ref), lo cuál es necesario para que este ejemplo funcione. En caso contrario toda la salida va a un buffer y sería impresa en la tubería de una vez, para ser leída por un solo proceso consumidor).
 
-Here is an even more complex multi-stage producer-consumer example:
+He aquí un ejemplo incluso más complicado de productor consumidor multi-etapa:
 
 ```julia-repl
 julia> run(pipeline(`perl -le '$|=1; for(0..9){ print; sleep 1 }'`,
@@ -368,8 +314,6 @@ A Z 8
 B X 9
 ```
 
-This example is similar to the previous one, except there are two stages of consumers, and the
-stages have different latency so they use a different number of parallel workers, to maintain
-saturated throughput.
+Este ejemplo es similar al anterior, excepto en que hay dos etapas de consumidores y las estapas tiene diferente latencia por lo que usan un número de workers paralelos diferrentes, para mantener saturado el throughput .
 
-We strongly encourage you to try all these examples to see how they work.
+Se recomienda intentar todos estos ejemplos y ver cómo funcionan.
