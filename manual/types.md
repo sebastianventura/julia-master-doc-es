@@ -1148,40 +1148,26 @@ julia> get(Nullable(1.0), 0.0)
     la inestabilidad de tipo, lo que podría perjudicar el rendimiento. Utilice [`convert ()`] (@ ref) manualmente si 
     es necesario.
 
-### Performing operations on `Nullable` objects
+### Realizando operaciones sobre objetos `Nullable`
 
-`Nullable` objects represent values that are possibly missing, and it
-is possible to write all code using these objects by first testing to see if
-the value is missing with [`isnull()`](@ref), and then doing an appropriate
-action. However, there are some common use cases where the code could be more
-concise or clear by using a higher-order function.
+Los objetos `Nullable` representan valores que están posiblemente perdidos, y es posible escribir todo el código usando estos objetos primero comprobando para ver si el valor está perdido con [`isnull()`](@ref), y luego realizar la accin apropiada. Sin embargo, hay algunos casos de uso comunes donde el código podría ser ms conciso o claro usando una función de orden superior.
 
-The [`map`](@ref) function takes as arguments a function `f` and a `Nullable` value
-`x`. It produces a `Nullable`:
+La función [`map`](@ref) toma como argumentos una función `f` y un valor `x` de tipo `Nullable`. Ella produce un `Nullable`:
 
- - If `x` is a missing value, then it produces a missing value;
- - If `x` has a value, then it produces a `Nullable` containing
-   `f(get(x))` as value.
+ - Si `x` es un valor perdido, entonces produce un valor perdido;
+ - Si `x` tiene un valor, entonces produce un objeto `Nullable` que contiene `f(get(x))` como valor.
 
-This is useful for performing simple operations on values that might be missing
-if the desired behaviour is to simply propagate the missing values forward.
+Esto es útil para realizar operaciones simples sobre valores que podrían estar perdidos si el comportamiento deseado es simplemente propagar hacia adelante los valores perdidos.
 
-The [`filter`](@ref) function takes as arguments a predicate function `p`
-(that is, a function returning a boolean) and a `Nullable` value `x`.
-It produces a `Nullable` value:
+La función [`filter`](@ref) toma como argumentos una función predicado `p` (es decir, una función que devuelve un boolean) y un valor `x` de tipo `Nullable`. Ella produce un `Nullable`:
 
- - If `x` is a missing value, then it produces a missing value;
- - If `p(get(x))` is true, then it produces the original value `x`;
- - If `p(get(x))` is false, then it produces a missing value.
+ - Si `x` es un valor perdido, entonces produce un valor perdido;
+ - Si `p(get(x))` es true, entoces produce el valor original `x`;
+ - Si `p(get(x))` es false, entonces produce un valor perdido.
 
-In this way, `filter` can be thought of as selecting only allowable
-values, and converting non-allowable values to missing values.
+De esta forma, `filter` puede ser considerado como seleccionar sólo valores permisibles, y convertir valores no permisibles en valores perdidos.
 
-While `map` and `filter` are useful in specific cases, by far the most useful
-higher-order function is [`broadcast`](@ref), which can handle a wide variety of cases,
-including making existing operations work and propagate `Nullable`s. An example
-will motivate the need for `broadcast`. Suppose we have a function that computes the
-greater of two real roots of a quadratic equation, using the quadratic formula:
+Mientras que `map` y `filter` son útiles para casos específicos, la función de orden superior más útil es, con diferencia, [`broadcast`](@ref), que puede manejar una amplia variedad de casos, incluyendo hacer operaciones existentes funcionen y propaguen `Nullable`s. El siguiente ejemplo motivará la necesidad de `broadcast`. Supongamos que tenemos una funcion que calcula la mayor de las dos raices reales de una ecuacion cuadratica, usando la formula cuadratica:
 
 ```jldoctest nullableroot
 julia> root(a::Real, b::Real, c::Real) = (-b + √(b^2 - 4a*c)) / 2a
