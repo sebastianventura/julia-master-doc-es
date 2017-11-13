@@ -23,16 +23,16 @@ behavior, should take care to create a copy of inputs that it may modify.
 
 | Function               | Description                                                                      |
 |:---------------------- |:-------------------------------------------------------------------------------- |
-| [`eltype(A)`](@ref)    | the type of the elements contained in `A`                                        |
-| [`length(A)`](@ref)    | the number of elements in `A`                                                    |
-| [`ndims(A)`](@ref)     | the number of dimensions of `A`                                                  |
-| [`size(A)`](@ref)      | a tuple containing the dimensions of `A`                                         |
-| [`size(A,n)`](@ref)    | the size of `A` along dimension `n`                                              |
-| [`indices(A)`](@ref)   | a tuple containing the valid indices of `A`                                      |
-| [`indices(A,n)`](@ref) | a range expressing the valid indices along dimension `n`                         |
-| [`eachindex(A)`](@ref) | an efficient iterator for visiting each position in `A`                          |
-| [`stride(A,k)`](@ref)  | the stride (linear index distance between adjacent elements) along dimension `k` |
-| [`strides(A)`](@ref)   | a tuple of the strides in each dimension                                         |
+| [`eltype(A)`](@ref)    | Tipo de los elementos contenidos en `A`                                          |
+| [`length(A)`](@ref)    | Número de elementos en `A`                                                       |
+| [`ndims(A)`](@ref)     | Número de dimensiones de `A`                                                     |
+| [`size(A)`](@ref)      | Una tupla que contien las dimensiones de `A`                                     |
+| [`size(A,n)`](@ref)    | El tamaño de `A` a lo largo de una dimensión particular `n`                      |
+| [`indices(A)`](@ref)   | Una tupla que contiene los índices válidos de `A`                                |
+| [`indices(A,n)`](@ref) | Un rango expresando los úndices válidos a lo largo de la dimensión `n            |
+| [`eachindex(A)`](@ref) | Un iterador eficiente para visitar cada posición en `A`                          |
+| [`stride(A,k)`](@ref)  | La zancada (*stride*, distancia de índice lineal entre elementos adyacentes) a lo largo de la dimensión `k`. |
+| [`strides(A)`](@ref)   | Una tupla de las zancadas en cada dimensión                                      |
 
 ### Construcción e Inicialización
 
