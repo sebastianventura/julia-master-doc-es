@@ -1174,21 +1174,12 @@ julia> root(a::Real, b::Real, c::Real) = (-b + √(b^2 - 4a*c)) / 2a
 root (generic function with 1 method)
 ```
 
-We may verify that the result of `root(1, -9, 20)` is `5.0`, as we expect,
-since `5.0` is the greater of two real roots of the quadratic equation.
+Podemos verificar que el resultado de `root (1, -9, 20)` es `5.0` como esperamos,
+ya que `5.0` es la mayor de dos raíces reales de la ecuación cuadrática.
 
-Suppose now that we want to find the greatest real root of a quadratic
-equations where the coefficients might be missing values. Having missing values
-in datasets is a common occurrence in real-world data, and so it is important
-to be able to deal with them. But we cannot find the roots of an equation if we
-do not know all the coefficients. The best solution to this will depend on the
-particular use case; perhaps we should throw an error. However, for this
-example, we will assume that the best solution is to propagate the missing
-values forward; that is, if any input is missing, we simply produce a missing
-output.
+Supongamos ahora que queremos encontrar la mayor raíz real de una ecuación cuadrática donde los coeficientes pueden ser valores perdidos. Tener valores perdidos en los conjuntos de datos es una ocurrencia común en los datos del mundo real, por lo que es importante poder tratar con ellos. Pero no podemos encontrar las raíces de una ecuación si no conocemos todos los coeficientes. La mejor solución para esto dependerá del caso de uso particular; quizás deberíamos arrojar un error. Sin embargo, para este ejemplo, asumiremos que la mejor solución es propagar los valores perdidos; es decir, si falta alguna entrada, simplemente producimos una salida faltante.
 
-The `broadcast()` function makes this task easy; we can simply pass the
-`root` function we wrote to `broadcast`:
+La función `broadcast ()` facilita esta tarea; simplemente podemos pasar la función `root` que escribimos a` broadcast`:
 
 ```jldoctest nullableroot
 julia> broadcast(root, Nullable(1), Nullable(-9), Nullable(20))
@@ -1201,19 +1192,16 @@ julia> broadcast(root, Nullable{Int}(), Nullable(-9), Nullable(20))
 Nullable{Float64}()
 ```
 
-If one or more of the inputs is missing, then the output of
-`broadcast()` will be missing.
+Si faltan una o más de las entradas, faltará la salida de `broadcast ()`.
 
-There exists special syntactic sugar for the `broadcast()` function
-using a dot notation:
+Existe un convenio sintáctico especial para la función `broadcast()` usando la notación punto:
 
 ```jldoctest nullableroot
 julia> root.(Nullable(1), Nullable(-9), Nullable(20))
 Nullable{Float64}(5.0)
 ```
 
-In particular, the regular arithmetic operators can be `broadcast()`
-conveniently using `.`-prefixed operators:
+En particular, los operadores aritméticos regulares pueden ser `broadcast ()` convenientemente usando operadores `.`-prefijo:
 
 ```jldoctest
 julia> Nullable(2) ./ Nullable(3) .+ Nullable(1.0)
