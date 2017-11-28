@@ -1,4 +1,4 @@
-# [Constructors](@id man-constructors)
+# [Constructores](@id man-constructors)
 
 Los constructores [^1] son funciones que crean nuevos objetos (específicamente instancias de tipos compuestos). En Julia, los objetos también sirven como funciones constructor: ellos crean instancias de sí mismos cuando se aplican a una dupla de argumentos como una función. Esto se mencionó brevemente cuando se habló de tipos compuestos. Por ejemplo:
 
@@ -52,9 +52,7 @@ Foo(0, 0)
 
 Aquí, el método constructor sin argumentos llama al método constructor con un argumento, que a su vez llama al método constructor de dos argumentos proporcionado automáticamente. Por razones que se aclararán pronto, los metodos constructor adicionales declarados como métodos formales como éstos se denominan *métodos constructores externos*. Los métodos constructores externos sólo puede crear una nueva instancia llamando a otro método constructor, tal como los  proporcionados automáticamente por defecto.
 
-## Inner Constructor Methods
-
-Métodos constructores internos
+## Métodos Constructores Internos
 
 Aunque los constructores externos resuelven con éxito el problema de proporcionar métodos adicionales para construir objetos, ellos fallan en los otros dos casos de uso mencionados en la introducción este capítulo: forzar invariantes y permitir la construcción de objetos autorreferenciales. Para estos problemas, se necesitan los *métodos constructores internos*. Un método constructor interno es parecido a uno externo, con dos diferencias:
 
@@ -84,20 +82,9 @@ Stacktrace:
  [1] OrderedPair(::Int64, ::Int64) at ./none:4
 ```
 
-If the type were declared `mutable`, you could reach in and directly change the field values to
-violate this invariant, but messing around with an object's internals uninvited is considered poor form.
-You (or someone else) can also provide additional outer constructor methods at any later point, but
-once a type is declared, there is no way to add more inner constructor methods. Since outer constructor
-methods can only create objects by calling other constructor methods, ultimately, some inner constructor
-must be called to create an object. This guarantees that all objects of the declared type must come into
-existence by a call to one of the inner constructor methods provided with the type, thereby giving
-some degree of enforcement of a type's invariants.
+Si el tipo se declara `mutable`, se puede acceder y cambiar directamente los valores de campo para violar esta invariante, pero se considera deficiente la interacción con las partes internas de un objeto sin invitación. Usted (u otra persona) también puede proporcionar más métodos constructores externos en cualquier momento posterior, pero una vez que se declara un tipo, no hay forma de agregar más métodos internos de construcción. Como los métodos constructores externos solo pueden crear objetos llamando a otros métodos de construcción, en última instancia, se debe llamar a algún constructor interno para crear un objeto. Esto garantiza que todos los objetos del tipo declarado deben existir mediante una llamada a uno de los métodos de constructor internos proporcionados con el tipo, dando así cierto grado de cumplimiento de las invariantes de un tipo.
 
-If any inner constructor method is defined, no default constructor method is provided: it is presumed
-that you have supplied yourself with all the inner constructors you need. The default constructor
-is equivalent to writing your own inner constructor method that takes all of the object's fields
-as parameters (constrained to be of the correct type, if the corresponding field has a type),
-and passes them to `new`, returning the resulting object:
+Si se define cualquier método de constructor interno, no se proporciona ningún método constructor predeterminado: se supone que se ha provisto de todos los constructores internos que necesita. El constructor predeterminado es equivalente a escribir su propio método constructor interno que toma todos los campos del objeto como parámetros (restringidos para ser del tipo correcto, si el campo correspondiente tiene un tipo), y los pasa a `new`, devolviendo el objeto resultante: 
 
 ```jldoctest
 julia> struct Foo
@@ -108,9 +95,7 @@ julia> struct Foo
 
 ```
 
-This declaration has the same effect as the earlier definition of the `Foo` type without an explicit
-inner constructor method. The following two types are equivalent -- one with a default constructor,
-the other with an explicit constructor:
+Esta declaración tiene el mismo efecto que la definición anterior del tipo `Foo` sin un método constructor interno específico. Los siguientes dos tipos son equivalentes (uno con un constructor por defecto y el otro con un constructor explícito):
 
 ```jldoctest
 julia> struct T1
@@ -134,18 +119,11 @@ T1(1)
 julia> T2(1.0)
 T2(1)
 ```
+Se considera una buena práctica proporcionar tan pocos constructores internos como sea posible: sólo aquellos que tomen todos los argumentos explícitamente y fuercen la comprobación de errores y las transformaciones esenciales. Los demás constructores proporcionados, que proporcionan valores por defecto o transformaciones auxiliares, deberían proporcionarse como constructores externos que llaman a los internos para hacer el trabajo pesado. Esta situación suele ser bastante natural.
 
-It is considered good form to provide as few inner constructor methods as possible: only those
-taking all arguments explicitly and enforcing essential error checking and transformation. Additional
-convenience constructor methods, supplying default values or auxiliary transformations, should
-be provided as outer constructors that call the inner constructors to do the heavy lifting. This
-separation is typically quite natural.
+## Inicialización incompleta
 
-## Incomplete Initialization
-
-The final problem which has still not been addressed is construction of self-referential objects,
-or more generally, recursive data structures. Since the fundamental difficulty may not be immediately
-obvious, let us briefly explain it. Consider the following recursive type declaration:
+El problema final que aún no se ha resuelto es la construcción de objetos autorreferenciales o, más generalmente, estructuras de datos recursivas. Como la dificultad fundamental puede no ser obvia de inmediato, se explicará brevemente. Considere la siguiente declararción de tipo recursivo:
 
 ```jldoctest selfrefer
 julia> mutable struct SelfReferential
@@ -154,24 +132,15 @@ julia> mutable struct SelfReferential
 
 ```
 
-This type may appear innocuous enough, until one considers how to construct an instance of it.
-If `a` is an instance of `SelfReferential`, then a second instance can be created by the call:
+Este tipo puede parecer bastante inócuo a menos que uno considere cómo construir una instancia de él. Si `a` es una instancia de `SelfReferential`, entonces una segunda instancia `b` podría crearse mediante la llamada:
 
 ```julia-repl
 julia> b = SelfReferential(a)
 ```
 
-But how does one construct the first instance when no instance exists to provide as a valid value
-for its `obj` field? The only solution is to allow creating an incompletely initialized instance
-of `SelfReferential` with an unassigned `obj` field, and using that incomplete instance as a valid
-value for the `obj` field of another instance, such as, for example, itself.
+¿Pero cómo se construye la primera instancia cuando no existe ninguna otra instancia para propocionar un valor válido para el campo `obj`? La única solución es permitir la creación de una instancia de `SelfReferential` que no esté inicializada por completo, con el campo `obj` no asignado, y usar esta instancia incompleta como un valor válido que se podcría asignar al campo `obj` de otra instancia, o incluso al de ella misma.
 
-To allow for the creation of incompletely initialized objects, Julia allows the `new` function
-to be called with fewer than the number of fields that the type has, returning an object with
-the unspecified fields uninitialized. The inner constructor method can then use the incomplete
-object, finishing its initialization before returning it. Here, for example, we take another crack
-at defining the `SelfReferential` type, with a zero-argument inner constructor returning instances
-having `obj` fields pointing to themselves:
+Para permitir la creación de objetos inicializados de forma incompleta, Julia permite que la  función `new` sea llamada con menos argumentos del número de campos que el objeto tiene, devolviendo un objeto con los campos no especificados sin inicializar. El método constructor interno pues entonces usar el método incompleto, finalizando su inicialización antes de devolverlo. Aquí por ejemplo, se intenta definir el tipo `SelfReferental` con un constructor interno con cero argumentos que devuelve instancias con sus campos `obj` apuntando a ellos mismos:
 
 ```jldoctest selfrefer2
 julia> mutable struct SelfReferential
@@ -181,7 +150,7 @@ julia> mutable struct SelfReferential
 
 ```
 
-We can verify that this constructor works and constructs objects that are, in fact, self-referential:
+Podemos verificar que este constructor funciona y construye objetos que son, de hecho, autorreferenciados:
 
 ```jldoctest selfrefer2
 julia> x = SelfReferential();
@@ -196,8 +165,7 @@ julia> x === x.obj.obj
 true
 ```
 
-Although it is generally a good idea to return a fully initialized object from an inner constructor,
-incompletely initialized objects can be returned:
+Aunque se permite crear objetos con campos no inicializados, cualquier objeto a una referencia no inicializada es un eror inmediato:
 
 ```jldoctest incomplete
 julia> mutable struct Incomplete
@@ -208,19 +176,14 @@ julia> mutable struct Incomplete
 julia> z = Incomplete();
 ```
 
-While you are allowed to create objects with uninitialized fields, any access to an uninitialized
-reference is an immediate error:
+Aunque se permite crear objetos con campos no inicializados, cualquier objeto a una referencia no inicializada es un eror inmediato:
 
 ```jldoctest incomplete
 julia> z.xx
 ERROR: UndefRefError: access to undefined reference
 ```
 
-This avoids the need to continually check for `null` values. However, not all object fields are
-references. Julia considers some types to be "plain data", meaning all of their data is self-contained
-and does not reference other objects. The plain data types consist of primitive types (e.g. `Int`)
-and immutable structs of other plain data types. The initial contents of a plain data type is
-undefined:
+Esto evita la necesidad de estar comprobando datos `null` continuamente. Sin embargo, no todos los campos de objetos son referencias. Julia considera algunos tipos Como "datos planos", Lo que significa que todos sus datos son auto contenidos y que no referencian otros objetos. Los tipos de datos planos son los tipos primitivos (es decir `Int`) y las estructuras inmutables de otros tipos de datos planos. Los contenidos iniciales de un tipo de datos planos son indefinidos:
 
 ```julia-repl
 julia> struct HasPlain
@@ -232,9 +195,9 @@ julia> HasPlain()
 HasPlain(438103441441)
 ```
 
-Arrays of plain data types exhibit the same behavior.
+Los arrays de tipos de datos planos exhiben el mismo comportamiento.
 
-You can pass incomplete objects to other functions from inner constructors to delegate their completion:
+Uno puede pasar objetos incompletos a otras funciones desde los constructores internos para  delegar su terminación:
 
 ```jldoctest
 julia> mutable struct Lazy
@@ -243,9 +206,7 @@ julia> mutable struct Lazy
        end
 ```
 
-As with incomplete objects returned from constructors, if `complete_me` or any of its callees
-try to access the `xx` field of the `Lazy` object before it has been initialized, an error will
-be thrown immediately.
+Como sucede con los objetos incompletos devueltos desde los constructores, si `complete_me` o alguno de los métodos que lo llaman intenta acceder al campo `xx` del objeto `Lazy` antes de que éste sea inicializado, se lanzará un error de inmediato.
 
 ## Parametric Constructors
 
