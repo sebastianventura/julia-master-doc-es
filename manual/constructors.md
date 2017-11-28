@@ -208,12 +208,9 @@ julia> mutable struct Lazy
 
 Como sucede con los objetos incompletos devueltos desde los constructores, si `complete_me` o alguno de los métodos que lo llaman intenta acceder al campo `xx` del objeto `Lazy` antes de que éste sea inicializado, se lanzará un error de inmediato.
 
-## Parametric Constructors
+## Constructores paramétricos
 
-Parametric types add a few wrinkles to the constructor story. Recall from [Parametric Types](@ref)
-that, by default, instances of parametric composite types can be constructed either with explicitly
-given type parameters or with type parameters implied by the types of the arguments given to the
-constructor. Here are some examples:
+Los tipos paramétricos añaden algunas complicaciones al tema de los constructores. Recuérdese la sección [Tipos Paramétricos](@ref) que por defecto pueden construirse instancias de estos tipos dando  explícitamente los parámetros de tipo o con parámetros de tipo implicados por los tipos de los argumentos dados al constructor. He aquí algunos ejemplos:
 
 ```jldoctest parametric
 julia> struct Point{T<:Real}
@@ -248,20 +245,9 @@ julia> Point{Float64}(1,2) ## explicit T ##
 Point{Float64}(1.0, 2.0)
 ```
 
-As you can see, for constructor calls with explicit type parameters, the arguments are converted
-to the implied field types: `Point{Int64}(1,2)` works, but `Point{Int64}(1.0,2.5)` raises an
-[`InexactError`](@ref) when converting `2.5` to [`Int64`](@ref). When the type is implied
-by the arguments to the constructor call, as in `Point(1,2)`, then the types of the
-arguments must agree -- otherwise the `T` cannot be determined -- but any pair of real
-arguments with matching type may be given to the generic `Point` constructor.
+Como podemos ver, para las llamadas a constructor con parámetros de tipo explícito, los argumentos se convierten a los tipos implícitos de los campos: `Point{Int64}(1,2)` funciona, pero `Point{Int64}(1.0,2.5)` lanza un [`InexactError`](@ref) cuando `2.5` se convierte a [`Int64`](@ref). Cuando el tipo es implicado por los argumentos de la llamada al constructor, como en `Point(1,2)`, entonces los tipos de los argumentos deben concordar para que se pueda determinar `T`, pero da igual cuáles sean los tipos mientras ambos sean iguales y, además, subclases de `Real`.
 
-What's really going on here is that `Point`, `Point{Float64}` and `Point{Int64}` are all different
-constructor functions. In fact, `Point{T}` is a distinct constructor function for each type `T`.
-Without any explicitly provided inner constructors, the declaration of the composite type `Point{T<:Real}`
-automatically provides an inner constructor, `Point{T}`, for each possible type `T<:Real`, that
-behaves just like non-parametric default inner constructors do. It also provides a single general
-outer `Point` constructor that takes pairs of real arguments, which must be of the same type.
-This automatic provision of constructors is equivalent to the following explicit declaration:
+Lo que está pasando aquí realmente es que `Point`, `Point{Float64}` y `Point{Int64}` son funcioens constructores diferentes. De hecho, `Point{T}` es una función constructor distinto para cada tipo `T`. Sin ningún constructor interno propocionado explícitamente, la declaración del tipo compuesto `Point{T<:Real}` proporciona automáticamente un constructor interno `Point{T}` para cada posible ipo `T<:Real` que se comporta justo como lo hacen los constructores internos no paramétricos por defecto. Ella también proporciona un solo constructor general externo que toma pares de argumentos reales, que deben ser del mismo tipo. Esta provisión automática de constructores es equivalente a la siguiente declaración explícita:
 
 ```jldoctest parametric2
 julia> struct Point{T<:Real}
@@ -273,28 +259,18 @@ julia> struct Point{T<:Real}
 julia> Point(x::T, y::T) where {T<:Real} = Point{T}(x,y);
 ```
 
-Notice that each definition looks like the form of constructor call that it handles.
-The call `Point{Int64}(1,2)` will invoke the definition `Point{T}(x,y)` inside the
-`type` block.
-The outer constructor declaration, on the other hand, defines a
-method for the general `Point` constructor which only applies to pairs of values of the same real
-type. This declaration makes constructor calls without explicit type parameters, like `Point(1,2)`
-and `Point(1.0,2.5)`, work. Since the method declaration restricts the arguments to being of the
-same type, calls like `Point(1,2.5)`, with arguments of different types, result in "no method"
-errors.
+Observe que cada definición se parece a la forma de llamada de constructor que maneja. La llamada `Point{Int64}(1,2)` invocará la definición `Point{T}(x, y)` dentro del
+bloque `type`.
 
-Suppose we wanted to make the constructor call `Point(1,2.5)` work by "promoting" the integer
-value `1` to the floating-point value `1.0`. The simplest way to achieve this is to define the
-following additional outer constructor method:
+La declaración de constructor externo, por otro lado, define un método para el constructor general de `Point` que sólo se aplica a pares de valores del mismo tipo real. Esta declaración hace que las llamadas al constructor sin parámetros de tipo explícitos, como `Punto(1,2)` y `Punto(1.0,2.5)`, funcionen. Dado que la declaración del método restringe los argumentos para que sean del mismo tipo, las llamadas como `Point(1,2.5)`, con argumentos de diferentes tipos, dan como resultado errores "no method".
+
+Supongamos que queremos hacer la llamada a constructor `Point(1, 2.5)` funcione promocionando el valor entero `1` a punto flotante `1.0`. La forma más sencilla de conseguir eso es definir el siguiente método constructor adicional:
 
 ```jldoctest parametric2
 julia> Point(x::Int64, y::Float64) = Point(convert(Float64,x),y);
 ```
 
-This method uses the [`convert()`](@ref) function to explicitly convert `x` to [`Float64`](@ref)
-and then delegates construction to the general constructor for the case where both arguments are
-[`Float64`](@ref). With this method definition what was previously a [`MethodError`](@ref) now
-successfully creates a point of type `Point{Float64}`:
+Este método usa la función [`convert()`](@ref) para convertir explícitamente `x` a [`Float64`](@ref) y entonces delegar la construcción al constructor general para el caso de que ambos argumentos sean [`Float64`](@ref). Con esta definición de método, lo  que previamente producía un  [`MethodError`](@ref) ahora crea con éxito un punto de tipo `Point{Float64}`:
 
 ```jldoctest parametric2
 julia> Point(1,2.5)
@@ -304,7 +280,7 @@ julia> typeof(ans)
 Point{Float64}
 ```
 
-However, other similar calls still don't work:
+Sin embargo, otras llamadas similares siguen sin funcionar:
 
 ```jldoctest parametric2
 julia> Point(1.5,2)
@@ -313,17 +289,13 @@ Closest candidates are:
   Point(::T<:Real, !Matched::T<:Real) where T<:Real at none:1
 ```
 
-For a more general way to make all such calls work sensibly, see [Conversion and Promotion](@ref conversion-and-promotion).
-At the risk of spoiling the suspense, we can reveal here that all it takes is the following outer
-method definition to make all calls to the general `Point` constructor work as one would expect:
+Para una forma mucho más general de hacer que todas estas llamadas funcionen sensiblemente, ver [Conversión y promoción](@ref conversion-and-promotion). A riesgo de estropear el suspense, podemos revelar aquí que todo lo toma el siguiente método externo para hacer que todas las llamadas al constructor general `Point` trabajen como uno debería esperar:
 
 ```jldoctest parametric2
 julia> Point(x::Real, y::Real) = Point(promote(x,y)...);
 ```
 
-The `promote` function converts all its arguments to a common type -- in this case [`Float64`](@ref).
-With this method definition, the `Point` constructor promotes its arguments the same way that
-numeric operators like [`+`](@ref) do, and works for all kinds of real numbers:
+La función `promote` convierte todos sus argumentos a un tipo común (en este caso, `Float64`). Con esta definición de método el constructor `Point` promociona sus argumentos de la misma forma que lo hacen los operadores aritméticos como [`+`](@ref) y funciona para todos los tipos de números reales:
 
 ```jldoctest parametric2
 julia> Point(1.5,2)
@@ -336,16 +308,11 @@ julia> Point(1.0,1//2)
 Point{Float64}(1.0, 0.5)
 ```
 
-Thus, while the implicit type parameter constructors provided by default in Julia are fairly strict,
-it is possible to make them behave in a more relaxed but sensible manner quite easily. Moreover,
-since constructors can leverage all of the power of the type system, methods, and multiple dispatch,
-defining sophisticated behavior is typically quite simple.
+Por tanto, mientras los constructores con parámetros de tipo implícitos proporcionados por defecto en Julia son muy estrictos, es posible hacer que se comporten de una forma más relajada pero sensible con bastante facilidad. Además, como los constructores pueden sacar ventaja de toda la potencia del sistema de tipos, métodos y despacho múltiple, definir comportamientos sofisticados suele ser bastante simple.
 
 ## Case Study: Rational
 
-Perhaps the best way to tie all these pieces together is to present a real world example of a
-parametric composite type and its constructor methods. To that end, here is the (slightly modified) beginning of [`rational.jl`](https://github.com/JuliaLang/julia/blob/master/base/rational.jl),
-which implements Julia's [Rational Numbers](@ref):
+Quizás la mejor forma de unir todas las piezas es presentar un ejemplo del mundo real de un tipo compuesto paramétrico y sus métodos constructores. Para este fin, he aquí una parte de  [`rational.jl`](https://github.com/JuliaLang/julia/blob/master/base/rational.jl), que implementa los [Números Racionales](@ref) en Julia:
 
 ```jldoctest rational
 julia> struct OurRational{T<:Integer} <: Real
@@ -394,38 +361,14 @@ julia> function //(x::Complex, y::Complex)
 // (generic function with 6 methods)
 ```
 
-The first line -- `struct OurRational{T<:Integer} <: Real` -- declares that `OurRational` takes one
-type parameter of an integer type, and is itself a real type. The field declarations `num::T`
-and `den::T` indicate that the data held in a `OurRational{T}` object are a pair of integers of type
-`T`, one representing the rational value's numerator and the other representing its denominator.
+La primera línea -- `struct OurRational{T<:Integer} <: Real` -- declara que `OurRational` toma un parámetro de un subtipo de `Integer`, aunque él en si mismo es un tipo `Real`. Las declaraciones de campo `num::T` y `den::T` indican que los datos almacenados en un objeto `OurRational{T}` será un par de enteros de tipo `T`, uno que representará el numerador y otro el denominador. 
 
-Now things get interesting. `OurRational` has a single inner constructor method which checks that
-both of `num` and `den` aren't zero and ensures that every rational is constructed in "lowest
-terms" with a non-negative denominator. This is accomplished by dividing the given numerator and
-denominator values by their greatest common divisor, computed using the `gcd` function. Since
-`gcd` returns the greatest common divisor of its arguments with sign matching the first argument
-(`den` here), after this division the new value of `den` is guaranteed to be non-negative. Because
-this is the only inner constructor for `OurRational`, we can be certain that `OurRational` objects are
-always constructed in this normalized form.
+Ahora las cosas se ponen interesantes. `OurRational` tiene un solo constructor interno que comprueba que tanto `num` como `den` no son cero, y aegura que cada número racional se construye en sus términos mínimos con un denominador no negativo. Esto se consigue dividiendo los valores de numerador y denominador por su máximo común divisor, el cuál se calcula a través de la función `gcd`. Por último, y como `gcd` asigna el signo del primer argumento (en este caso `den`) se garantiza que el denominador ya no sea negativo. Como este es el único constructor interno de `Rational`, podemos estar seguros de que los objetos de este tipo siempre se construyen en forma normalizada.
 
-`OurRational` also provides several outer constructor methods for convenience. The first is the "standard"
-general constructor that infers the type parameter `T` from the type of the numerator and denominator
-when they have the same type. The second applies when the given numerator and denominator values
-have different types: it promotes them to a common type and then delegates construction to the
-outer constructor for arguments of matching type. The third outer constructor turns integer values
-into rationals by supplying a value of `1` as the denominator.
+`Rational` también proporciona varios métodos constructores externos por conveniencia. El primero es el constructor general "esándar", que infiere el tupo del parámetro `T` a partir del tipo del numerado y denominador que tienen que ser del mismo tipo. El segundo se aplica cuando numerador y denominador tiene tipos distintos: los promociona a un tipo común y entonces delega la construcción al otro constructor externo con argumentos del mismo tipo. En tercer constructor externo convierte valores enteros en racionales proporcionando un denominador de valor 1.
 
-Following the outer constructor definitions, we have a number of methods for the [`//`](@ref)
-operator, which provides a syntax for writing rationals. Before these definitions, [`//`](@ref)
-is a completely undefined operator with only syntax and no meaning. Afterwards, it behaves just
-as described in [Rational Numbers](@ref) -- its entire behavior is defined in these few lines.
-The first and most basic definition just makes `a//b` construct a `OurRational` by applying the
-`OurRational` constructor to `a` and `b` when they are integers. When one of the operands of [`//`](@ref)
-is already a rational number, we construct a new rational for the resulting ratio slightly differently;
-this behavior is actually identical to division of a rational with an integer.
-Finally, applying
-[`//`](@ref) to complex integral values creates an instance of `Complex{OurRational}` -- a complex
-number whose real and imaginary parts are rationals:
+Siguiendo las definiciones de constructores externos, tenemos una serie de métodos para el operador [`//`](@ref) que proporcionan una sintaxis para escribir racionales. Antes de estas definiciones,  [`//`](@ref)es un operador completamente indefinido con sólo sintaxis y sin significado. Después, se comporta tal y com se describe en [Números Racionales](@ref) -- 
+(su comportamiento completo está descrito en estas pocas líneas). La primera y más básica definición hace `a//b` construya un  `OurRational` aplicando el constructor de este tipo sobre `a` y `b` cuando ambos son enteros. Cuando uno de los operandos de  [`//`](@ref) ya es un número racional se construye un nuevo número racional para la razón resultante con una leve diferencia: este comportamiento es igual a la división de un racional entre un entero. Por último, aplicar [`//`](@ref) a valores complejos enteros crea una instancia de `Complex{Rational}`, que es un complejo cuyas partes real el imaginaria son racionales:
 
 ```jldoctest rational
 julia> ans = (1 + 2im)//(1 - 2im);
@@ -437,45 +380,23 @@ julia> ans <: Complex{OurRational}
 false
 ```
 
-Thus, although the [`//`](@ref) operator usually returns an instance of `OurRational`, if either
-of its arguments are complex integers, it will return an instance of `Complex{OurRational}` instead.
-The interested reader should consider perusing the rest of [`rational.jl`](https://github.com/JuliaLang/julia/blob/master/base/rational.jl):
-it is short, self-contained, and implements an entire basic Julia type.
+Por tanto, aunque el operador [`//`](@ref) suela devolver una instancia de `OurRational`, si uno de sus rgumentos es un complejo entero, devolverá una instancia de `Complex{OurRational}`. El lector interesado debería considerar la lectura del resto de [`rational.jl`](https://github.com/JuliaLang/julia/blob/master/base/rational.jl): es corto, autocontenido e implmeenta un tipo básico de Julia al completo.
 
-## [Constructors and Conversion](@id constructors-and-conversion)
+## [Constructores and Conversión](@id constructors-and-conversion)
 
-Constructors `T(args...)` in Julia are implemented like other callable objects: methods are added
-to their types. The type of a type is `Type`, so all constructor methods are stored in the method
-table for the `Type` type. This means that you can declare more flexible constructors, e.g. constructors
-for abstract types, by explicitly defining methods for the appropriate types.
+Los constructores `T(args)` se implementan como otros objetos invocables: los métodos se añaden a sus tipos. El tipo de un tipo es `Type` por lo que los métodos constructores se almacenan en la tabla de métodos para el tipo `Type`. Esto significa que se pueden declarar constructores más flexibles, es decir, constructores para tipos abstractos, mediante la definición explícita de métodos para los tipos apropiados.
 
-However, in some cases you could consider adding methods to `Base.convert` *instead* of defining
-a constructor, because Julia falls back to calling [`convert()`](@ref) if no matching constructor
-is found. For example, if no constructor `T(args...) = ...` exists `Base.convert(::Type{T}, args...) = ...`
-is called.
+Sin embargo, en algunos casos, uno debería considerar añadir métodos a `Base.convert` en ougar de definir un constructor, dado que Julia retrocede para llamar a [`convert()`](@ref) si no se encuentra un constructor que coincida. Por ejemplo, si no existe para constructor para `T(args...) =` se llamará a `Base.convert(::Type{T}, args...)=...`
 
-`convert` is used extensively throughout Julia whenever one type needs to be converted to another
-(e.g. in assignment, [`ccall`](@ref), etcetera), and should generally only be defined (or successful)
-if the conversion is lossless.  For example, `convert(Int, 3.0)` produces `3`, but `convert(Int, 3.2)`
-throws an `InexactError`.  If you want to define a constructor for a lossless conversion from
-one type to another, you should probably define a `convert` method instead.
+`convert` se usa extensivamente a través de Julia cuando un tipo tenga que ser convertido en otro (por ejemplo, en asignación, [`ccall`](@ref), etcetera), y sólo debería ser definido (o exitoso) si la conversión se realiza sin pérdidas. Por ejemplo, `convert(Int, 3.0)` produce `3`, pero `convert(Int,3.2)` lanza un `InexactError`. Si desea construirse un constructor para una conversión sin pérdidas de un tipo a otro, probablemente sería mejor definir un método `convert`.
 
-On the other hand, if your constructor does not represent a lossless conversion, or doesn't represent
-"conversion" at all, it is better to leave it as a constructor rather than a `convert` method.
-For example, the `Array{Int}()` constructor creates a zero-dimensional `Array` of the type `Int`,
-but is not really a "conversion" from `Int` to an `Array`.
+Por otra parte, si el constructro no representa una conversión sin pérdida, o no represnta ningua conversion es mejor dejarlo como constructor en lugar de como un método `convert`. Por ejemplo, el constructor `Array{Int}` crea un array cero-dimensional del tipo `Int` pero no es realmente una conversión de `Int` a `Array`.
 
-## Outer-only constructors
+## Constructores sólo exteriores
 
-As we have seen, a typical parametric type has inner constructors that are called when type parameters
-are known; e.g. they apply to `Point{Int}` but not to `Point`. Optionally, outer constructors
-that determine type parameters automatically can be added, for example constructing a `Point{Int}`
-from the call `Point(1,2)`. Outer constructors call inner constructors to do the core work of
-making an instance. However, in some cases one would rather not provide inner constructors, so
-that specific type parameters cannot be requested manually.
+Como se ha visto, un tipo paramétrico típico tiene constructroes internos que son invocados cuano se conocen los tupos de los parámetros, por ejemplo, se aplican a `Point{Int}`paro no a `Point`. Opcionalmente, los constructores externos que determinan los parámetros de tipo  pueden ser añadidos automáticamente, por ejemplo, construir un `Point{Int}` a partir de la llamada `Point(1,2)`. Los constructores externos llaman a los constructores internos para que hagan el trabajo básico de hacer una instancia.  Sin embargo, en algunos caos, uno podría en lugar de eso no proporcionar contructores internos para que los parámetros específicos no puedan ser solicitados manualmente. 
 
-For example, say we define a type that stores a vector along with an accurate representation of
-its sum:
+Por ejemplo, suponga que se define un tipo que almacena un vector con una representaciócn exacta de su suma:
 
 ```jldoctest
 julia> struct SummedArray{T<:Number,S<:Number}
@@ -487,12 +408,7 @@ julia> SummedArray(Int32[1; 2; 3], Int32(6))
 SummedArray{Int32,Int32}(Int32[1, 2, 3], 6)
 ```
 
-The problem is that we want `S` to be a larger type than `T`, so that we can sum many elements
-with less information loss. For example, when `T` is [`Int32`](@ref), we would like `S` to
-be [`Int64`](@ref). Therefore we want to avoid an interface that allows the user to construct
-instances of the type `SummedArray{Int32,Int32}`. One way to do this is to provide a
-constructor only for `SummedArray`, but inside the `type` definition block to suppress
-generation of default constructors:
+El problema es que nosotros queremos que `S` sea un tipo más grande que `T`, por lo que podemos sumar muchos elementos con menos pérdida de información. Por ejemplo, cuando `T` es [`Int32`](@ref), querríamos que `S` fiuera [`Int64`](@ref). Por tano queremos evitar un interfaz que permita al usuario construir instanca del tipo `SummedArray{Int32,Int32}`. Una forma de hacer esto es proporcionar sólo un constructor más exterior para `SummedArray`.  Esto puede hacerse usando a definicíon de métdo por tipo pero dentro del bloque de definición `type` para suprimir la generación de bucles por defecto:
 
 ```jldoctest
 julia> struct SummedArray{T<:Number,S<:Number}
@@ -510,7 +426,5 @@ Closest candidates are:
   SummedArray(::Array{T,1}) where T at none:5
 ```
 
-This constructor will be invoked by the syntax `SummedArray(a)`. The syntax `new{T,S}` allows
-specifying parameters for the type to be constructed, i.e. this call will return a `SummedArray{T,S}`.
-`new{T,S}` can be used in any constructor definition, but for convenience the parameters
-to `new{}` are automatically derived from the type being constructed when possible.
+El construcror será invocado por la sintaxis `SummedArray(a)`. La sintaxis `new{T,S}` permite especificar parámetrospara el tipo que se va a construir, es decir, esta llamada devolvera un `SummedArray{T, s]`.
+`new{T,S}` puede usarse en cualquier definicin de constructor, pero por conveniencia los parámtros a `new{}` se derivan automáticamente del tipo que se está construyendo cuando sea posible.
