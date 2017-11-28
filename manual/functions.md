@@ -160,7 +160,7 @@ julia> f(1,2,3)
 
 Sin embargo, cuando se usa el formato de función, como `f`, no se puede usar notación infija.
 
-## Operators With Special Names
+## Operadores con Nombres Especiales
 
 A few special expressions correspond to calls to functions with non-obvious names. These are:
 
@@ -228,7 +228,7 @@ idea de una funci´n sin argumentos puede parecer extraña, pero es útil para d
 En este uso, un bloque de código es envuelto en una función con cero argumentos, el cual es 
 después invocado mediante una llamada como `f()`.
 
-## Multiple Return Values
+## Retorno de Múltiples Valores
 
 En Julia, uno devuelve una tupla para simular el retorno de múltiples valores. Sin embargo, como
 las tuplas puede salteadas y destruidas sin necesitar paréntesis, podemos proporcionar una ilusión 
