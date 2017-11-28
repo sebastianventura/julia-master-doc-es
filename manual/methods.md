@@ -1,4 +1,4 @@
-# Methods
+# Métodos
 
 Recordemos de la sección [Funciones](@ref man-functions) que una función es un objeto que establece 
 una correspondencia entre una tupla de argumentos y un valor de retorno o lanza una excepción si 
