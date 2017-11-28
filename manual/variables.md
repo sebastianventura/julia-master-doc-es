@@ -80,7 +80,7 @@ WARNING: imported binding for sqrt overwritten in module Main
 
 Sin embargo, esto no se recomienta para evitar una potencial confusión.
 
-## Allowed Variable Names
+## Nombres de Variables Permitidos
 
 Los nombres de variable deben comenzar con una letra (`A`-`Z` o `a`-`z`), símblo de subrayado, o 
 un subconjunto de puntos Unicode mayores que `00A0`. En particular, se permiten las 
