@@ -10,14 +10,14 @@ están soportados sobre todos los tipos primitivos:
 | Expression | Name             | Description                            |
 |:---------- |:---------------- |:-------------------------------------- |
 | `+x`       | más unario       | Operación identidad                    |
-| `-x`       | menos unario     | maps values to their additive inverses |
-| `x + y`    | suma binaria     | performs addition                      |
-| `x - y`    | menos binario    | performs subtraction                   |
-| `x * y`    | producto         | performs multiplication                |
-| `x / y`    | división         | performs division                      |
-| `x \ y`    | división inversa | equivalent to `y / x`                  |
-| `x ^ y`    | potencia         | raises `x` to the `y`th power          |
-| `x % y`    | resto            | equivalent to `rem(x,y)`               |
+| `-x`       | menos unario     | Inverso matemático de un número        |
+| `x + y`    | suma binaria     | suma                                   |
+| `x - y`    | menos binario    | resta                                  |
+| `x * y`    | producto         | multiplicación                         |
+| `x / y`    | división         | división                               |
+| `x \ y`    | división inversa | Equivalente a `y / x`                  |
+| `x ^ y`    | potencia         | eleva `x` a la `y`-ésima potencia      |
+| `x % y`    | resto            | Equivalente a `rem(x,y)`               |
 
 así como la negación sobre tipos [`Bool`](@ref):
 
