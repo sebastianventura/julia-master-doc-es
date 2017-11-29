@@ -808,26 +808,17 @@ julia> foo(4)
 
 Tenga en cuenta que no hay ninguna impresión de [`Int64`](@ref). El cuerpo de la función generada sólo se ejecuta una vez (no es enteramente cierto, véase la nota a continuación) cuando se compila el método para ese conjunto específico de tipos de argumentos. Después de eso, la expresión devuelta de la función generada en la primera invocación se vuelve a utilizar como el cuerpo del método.
 
-The number of times a generated function is generated *might* be only once, but it *might* also
-be more often, or appear to not happen at all. As a consequence, you should *never* write a generated
-function with side effects - when, and how often, the side effects occur is undefined. (This is
-true for macros too - and just like for macros, the use of [`eval()`](@ref) in a generated function
-is a sign that you're doing something the wrong way.) However, unlike macros, the runtime system
-cannot correctly handle a call to [`eval()`](@ref), so it is disallowed.
+La cantidad de veces que se genera una función generada *podría* ser solo una vez, pero *podría* también ser más frecuente o no aparecer en absoluto. Como consecuencia, *nunca* debe escribir una función generada con efectos secundarios: cuándo y con qué frecuencia ocurren los efectos secundarios no está definida. (Esto también es válido para las macros, y al igual que para las macros, el uso de [`eval()`](@ref) en una función generada es una señal de que estás haciendo algo incorrecto.) Sin embargo, a diferencia de las macros , el sistema de tiempo de ejecución no puede manejar correctamente una llamada a [`eval()`](@ref), por lo que no se permite.
 
-It is also important to see how `@generated` functions interact with method redefinition.
-Following the principle that a correct `@generated` function must not observe any
-mutable state or cause any mutation of global state, we see the following behavior.
-Observe that the generated function *cannot* call any method that was not defined
-prior to the *definition* of the generated function itself.
+También es importante ver cómo las funciones `@generated` interactúan con la redefinición del método. Siguiendo el principio de que una función correcta `@ generated` no debe observar ningún estado mutable ni causar ninguna mutación del estado global, vemos el siguiente comportamiento. Observe que la función generada *no puede* llamar a ningún método que no se haya definido antes de la * definición * de la función generada en sí.
 
-Initially `f(x)` has one definition
+Inicialmente `f (x)` tiene una definición:
 
 ```jldoctest redefinition
 julia> f(x) = "original definition";
 ```
 
-Define other operations that use `f(x)`:
+Define otras operaciones que usan `f(x)`:
 
 ```jldoctest redefinition
 julia> g(x) = f(x);
@@ -837,7 +828,7 @@ julia> @generated gen1(x) = f(x);
 julia> @generated gen2(x) = :(f(x));
 ```
 
-We now add some new definitions for `f(x)`:
+Ahora añadimos algunas definiciones nuevas para `f(x)`:
 
 ```jldoctest redefinition
 julia> f(x::Int) = "definition for Int";
@@ -845,7 +836,7 @@ julia> f(x::Int) = "definition for Int";
 julia> f(x::Type{Int}) = "definition for Type{Int}";
 ```
 
-and compare how these results differ:
+y comparamos cómo difieren estos resultados:
 
 ```jldoctest redefinition
 julia> f(1)
@@ -861,7 +852,7 @@ julia> gen2(1)
 "definition for Int"
 ```
 
-Each method of a generated function has its own view of defined functions:
+Cada método de una función generada tiene su propia visión de funciones definidas:
 
 ```jldoctest redefinition
 julia> @generated gen1(x::Real) = f(x);
@@ -869,11 +860,7 @@ julia> @generated gen1(x::Real) = f(x);
 julia> gen1(1)
 "definition for Type{Int}"
 ```
-
-The example generated function `foo` above did not do anything a normal function `foo(x) = x * x`
-could not do (except printing the type on the first invocation, and incurring higher overhead).
-However, the power of a generated function lies in its ability to compute different quoted expressions
-depending on the types passed to it:
+La función de ejemplo `foo` anterior no hizo nada de lo que una función normal` foo(x) = x*x` no pudo hacer (excepto imprimir el tipo en la primera invocación y incurrir en una sobrecarga más alta). Sin embargo, el poder de una función generada radica en su capacidad para calcular diferentes expresiones entrecomilladas según los tipos que se le pasen:
 
 ```jldoctest
 julia> @generated function bar(x)
@@ -892,9 +879,10 @@ julia> bar("baz")
 "baz"
 ```
 
-(although of course this contrived example would be more easily implemented using multiple dispatch...)
+(although por supuesto este ejemplo artificial se implementa facilmente usando despacho múltiple...
 
-Abusing this will corrupt the runtime system and cause undefined behavior:
+Podemos, por supuesto, abusar de esto para producir algún comportamiento interesante:
+
 
 ```jldoctest
 julia> @generated function baz(x)
@@ -907,49 +895,40 @@ julia> @generated function baz(x)
 baz (generic function with 1 method)
 ```
 
-Since the body of the generated function is non-deterministic, its behavior, *and the behavior of all subsequent code*
-is undefined.
+ado que el cuerpo de la función generada es no determinista, su comportamiento es indefinido.
 
-*Don't copy these examples!*
+*¡No copie estos ejemplos!*
 
-These examples are hopefully helpful to illustrate how generated functions work, both in the definition
-end and at the call site; however, *don't copy them*, for the following reasons:
+Estos ejemplos sirven para ilustrar cómo funcionan las funciones generadas, tanto en el extremo de la definición como en el sitio de llamada; Sin embargo, no los copie, por las siguientes razones:
 
-  * the `foo` function has side-effects (the call to `Core.println`), and it is undefined exactly
-    when, how often or how many times these side-effects will occur
-  * the `bar` function solves a problem that is better solved with multiple dispatch - defining `bar(x) = x`
-    and `bar(x::Integer) = x ^ 2` will do the same thing, but it is both simpler and faster.
-  * the `baz` function is pathologically insane
+  * La función `foo` tiene efectos secundarios (la llamada a `Core.println`) y no está definida exactamente cuándo, 
+    con qué frecuencia o cuántas veces se producirán estos efectos secundarios
+  * La función `bar` resuelve un problema que se resuelve mejor con el despacho múltiple - definiendo `bar(x) = x` 
+    y `bar(x :: Integer) = x ^ 2` hará la misma cosa, pero es más simple y más rápido.
+  * La función `baz` es patológicamente insana
 
-Note that the set of operations that should not be attempted in a generated function is unbounded,
-and the runtime system can currently only detect a subset of the invalid operations. There are
-many other operations that will simply corrupt the runtime system without notification, usually
-in subtle ways not obviously connected to the bad definition. Because the function generator is
-run during inference, it must respect all of the limitations of that code.
+Tenga en cuenta que el conjunto de operaciones que no se deben intentar en una función generada no tiene límites, y el sistema de tiempo de ejecución solo puede detectar actualmente un subconjunto de las operaciones no válidas. Hay muchas otras operaciones que simplemente corromperán el sistema de tiempo de ejecución sin notificación, por lo general de maneras sutiles que obviamente no están conectadas a la mala definición. Debido a que el generador de funciones se ejecuta durante la inferencia, debe respetar todas las limitaciones de ese código.
 
-Some operations that should not be attempted include:
+Algunas operaciones que no deberían intentarse incluyen:
 
-1. Caching of native pointers.
-2. Interacting with the contents or methods of Core.Inference in any way.
-3. Observing any mutable state.
+1. Almacenamiento en caché de punteros nativos.
+2. Interactuar de cualquier manera con los contenidos o métodos de Core.Inference.
+3. Observar cualquier estado mutable.
 
-     * Inference on the generated function may be run at *any* time, including while your code is attempting
-       to observe or mutate this state.
-4. Taking any locks: C code you call out to may use locks internally, (for example, it is not problematic
-   to call `malloc`, even though most implementations require locks internally) but don't attempt
-   to hold or acquire any while executing Julia code.
-5. Calling any function that is defined after the body of the generated function. This condition
-   is relaxed for incrementally-loaded precompiled modules to allow calling any function in the module.
+     * La inferencia sobre la función generada se puede ejecutar en *cualquier* momento, incluso cuando el código intenta
+       observar o modificar este estado.
 
-Alright, now that we have a better understanding of how generated functions work, let's use them
-to build some more advanced (and valid) functionality...
+4. Tomar cualquier bloqueo: código C que llame a puede utilizar bloqueos internos, (por ejemplo, no es problemático 
+   para llamar `malloc`, a pesar de que la mayoría de las implementaciones requieren bloqueos internos), pero no 
+   pretenden mantener o adquirir cualquier tiempo ejecutando el código de Julia.
+5. Llamar a cualquier función que esté definida después del cuerpo de la función generada. Esta condición se relaja 
+   para los módulos precompilados de carga incremental para permitir llamar a cualquier función en el módulo.
+
+De acuerdo, ahora que tenemos una mejor comprensión de cómo funcionan las funciones generadas, utilicémoslas para construir algunas funcionalidades más avanzadas (y válidas) ...
 
 ### An advanced example
 
-Julia's base library has a [`sub2ind()`](@ref) function to calculate a linear index into an n-dimensional
-array, based on a set of n multilinear indices - in other words, to calculate the index `i` that
-can be used to index into an array `A` using `A[i]`, instead of `A[x,y,z,...]`. One possible implementation
-is the following:
+La biblioteca base de Julia tiene una función  [`sub2ind()`](@ref) para calcular un índice lineal en una matriz n-dimensional, basada en un conjunto de n índices multilineales - en otras palabras, para calcular el índice `i` que se puede usar para indexar en una matriz `A` usando `A[i]`, en lugar de `A[x, y, z, ...]`. Una posible implementación es la siguiente:
 
 ```jldoctest sub2ind
 julia> function sub2ind_loop(dims::NTuple{N}, I::Integer...) where N
@@ -965,7 +944,7 @@ julia> sub2ind_loop((3, 5), 1, 2)
 4
 ```
 
-The same thing can be done using recursion:
+Lo mismo puede hacerse usando recursión:
 
 ```jldoctest
 julia> sub2ind_rec(dims::Tuple{}) = 1;
@@ -982,13 +961,9 @@ julia> sub2ind_rec((3, 5), 1, 2)
 4
 ```
 
-Both these implementations, although different, do essentially the same thing: a runtime loop
-over the dimensions of the array, collecting the offset in each dimension into the final index.
+Ambas implementaciones, aunque diferentes, hacen esencialmente lo mismo: un bucle de tiempo de ejecución sobre las dimensiones de la matriz, recogiendo el desplazamiento en cada dimensión en el índice final.
 
-However, all the information we need for the loop is embedded in the type information of the arguments.
-Thus, we can utilize generated functions to move the iteration to compile-time; in compiler parlance,
-we use generated functions to manually unroll the loop. The body becomes almost identical, but
-instead of calculating the linear index, we build up an *expression* that calculates the index:
+Sin embargo, toda la información que necesitamos para el bucle está incrustada en la información de tipo de los argumentos. Por lo tanto, podemos utilizar las funciones generadas para mover la iteración a tiempo de compilación; en la jerga del compilador, usamos las funciones generadas para desenrollar manualmente el bucle. El cuerpo se vuelve casi idéntico, pero en vez de calcular el índice lineal, construimos una *expresión* que calcula el índice:
 
 ```jldoctest sub2ind_gen
 julia> @generated function sub2ind_gen(dims::NTuple{N}, I::Integer...) where N
@@ -1004,9 +979,9 @@ julia> sub2ind_gen((3, 5), 1, 2)
 4
 ```
 
-**What code will this generate?**
+**¿Qué código generará esto?**
 
-An easy way to find out is to extract the body into another (regular) function:
+Una forma sencilla de averiguarlo es extraer el cuerpo en otra función (regular):
 
 ```jldoctest sub2ind_gen2
 julia> @generated function sub2ind_gen(dims::NTuple{N}, I::Integer...) where N
@@ -1025,15 +1000,11 @@ julia> function sub2ind_gen_impl(dims::Type{T}, I...) where T <: NTuple{N,Any} w
 sub2ind_gen_impl (generic function with 1 method)
 ```
 
-We can now execute `sub2ind_gen_impl` and examine the expression it returns:
+Ahora podemos ejecutar `sub2ind_gen_impl` y examinar la expresión que devuelve
 
 ```jldoctest sub2ind_gen2
 julia> sub2ind_gen_impl(Tuple{Int,Int}, Int, Int)
 :(((I[1] - 1) + dims[1] * (I[2] - 1)) + 1)
 ```
 
-So, the method body that will be used here doesn't include a loop at all - just indexing into
-the two tuples, multiplication and addition/subtraction. All the looping is performed compile-time,
-and we avoid looping during execution entirely. Thus, we only loop *once per type*, in this case
-once per `N` (except in edge cases where the function is generated more than once - see disclaimer
-above).
+Por lo tanto, el cuerpo de método que se utilizará aquí no incluye un bucle en absoluto - sólo indexación en las dos tuplas, multiplicación y suma/resta. Todo el bucle se realiza en tiempo de compilación, y evitamos el bucle durante la ejecución por completo. Por lo tanto, sólo se realiza el bucle una vez por tipo, en este caso una vez por `N` (excepto en casos de borde donde la función se genera más de una vez - véase la exención de responsabilidad anterior).
