@@ -100,7 +100,7 @@ convert(::Type{T}, z::Complex) where {T<:Real} =
     (imag(z) == 0 ? convert(T, real(z)) : throw(InexactError()))
 ```
 
-### [Cas o de estudio: Conversiones de `Rational`](@id man-rational-conversion)
+### [Caso de estudio: Conversiones de `Rational`](@id man-rational-conversion)
 
 Para continuar con nuestro caso de estudio sobre el tipo [`Rational`](@ref) de Julia, he aquí las conversiones declaradas en [`rational.jl`](https://github.com/JuliaLang/julia/blob/master/base/rational.jl), después de la declaración del tipo y sus constructores:
 
@@ -133,22 +133,11 @@ Los cuatro primeros métodos `convert` proporcionan conversión a tipos racional
 
 Los dos últimos métodos conversores proporcionan conversiones de tipos racionales a punto flotante y entero. Para convertir a punto flotante, uno simplemente convierte tanto numerador como denominador a punto flotante y luego divide. Para convertir a entero, uno usa el operador `div` para división entera truncada (redondeo hacia cero).
 
-## Promotion
+## Promoción
 
-Promotion refers to converting values of mixed types to a single common type. Although it is not
-strictly necessary, it is generally implied that the common type to which the values are converted
-can faithfully represent all of the original values. In this sense, the term "promotion" is appropriate
-since the values are converted to a "greater" type -- i.e. one which can represent all of the
-input values in a single common type. It is important, however, not to confuse this with object-oriented
-(structural) super-typing, or Julia's notion of abstract super-types: promotion has nothing to
-do with the type hierarchy, and everything to do with converting between alternate representations.
-For instance, although every [`Int32`](@ref) value can also be represented as a [`Float64`](@ref) value,
-`Int32` is not a subtype of `Float64`.
+La promoción se refiere a convetir valores de tipos mezclados a un solo tipo común. Aunque esto no es estrictamente necesario, se supone generalmente que el tipo común al cuál los valores son convertidos puede representar de forma fidedigna todos los valores. En este sentido, el término "promoción" es apropiado ya que los valores son convertidos a un tipo "mayor" (es decir, uno que pueda reprsentar todos los valores de entrada en un solo tipo común). Es importante, sin embargo, no confundir esto con los super-tipos orientados a objetos (estructurales), o l nocíon de super-tipos abstractos de Julia: la promoción no tiene nada que ver con la jerarquía de tipos, y todo que ver con convertir entre representaciones alternas. Por ejemplo, aunque cad valor [`Int32`](@ref) puede también ser representado como un valor [`Float64`](@ref), `Int32` no es un subtipo de `Float64`.
 
-Promotion to a common "greater" type is performed in Julia by the `promote` function, which takes
-any number of arguments, and returns a tuple of the same number of values, converted to a common
-type, or throws an exception if promotion is not possible. The most common use case for promotion
-is to convert numeric arguments to a common type:
+La promoción a un tipo mayor común es realizada por Julia mediante la función `promote`, que toma cualquier número de argumentos, y devuelve un atupla con el mismo número de valores, convertidos a un tipo común, o lanza una excepción si no es posible la promoción. El caso de uso más común para la promoción es convertir argumentos numéricos a un tipo común:
 
 ```jldoctest
 julia> promote(1, 2.5)
@@ -170,17 +159,9 @@ julia> promote(1 + 2im, 3//4)
 (1//1 + 2//1*im, 3//4 + 0//1*im)
 ```
 
-Floating-point values are promoted to the largest of the floating-point argument types. Integer
-values are promoted to the larger of either the native machine word size or the largest integer
-argument type. Mixtures of integers and floating-point values are promoted to a floating-point
-type big enough to hold all the values. Integers mixed with rationals are promoted to rationals.
-Rationals mixed with floats are promoted to floats. Complex values mixed with real values are
-promoted to the appropriate kind of complex value.
+Los valores en punto flotante son promocionados al mayor de los tipos de los argumento en punto flotante. Los valores enteros son promocionados al mayor de el tamaño de palabra de máquina nativo o dl mayor tipo dde argumento entero. Las mezclas de valores enteros y en punto flotante son promocionados a tipos en punto flotante bastent grandes como para almacenar todos los valores. Los enteros mezclados con racionales promocionan a racionales. Los racionales mezclados con valores en punto flotante son promocionados a valores en punto flotante. Los valores complejos mezclados con valores relaes se promocionan al tipo apropiado de valor complejo.
 
-That is really all there is to using promotions. The rest is just a matter of clever application,
-the most typical "clever" application being the definition of catch-all methods for numeric operations
-like the arithmetic operators `+`, `-`, `*` and `/`. Here are some of the catch-all method definitions
-given in [`promotion.jl`](https://github.com/JuliaLang/julia/blob/master/base/promotion.jl):
+Esto es realmente todo lo que es usar promociones. El resto es sólo cuestión de una aplicación inteligente, siendo la definición de métodos "atrapa-todo" para operaciones numéricas tales como las aritméticas `+`, `-`, `*` y `/` las más típicas aplicaciones inteligentes. He aquí algunas de las definiciones de métodos "atrapa-todo" dados en [`promotion.jl`](https://github.com/JuliaLang/julia/blob/master/base/promotion.jl):
 
 ```julia
 +(x::Number, y::Number) = +(promote(x,y)...)
@@ -189,23 +170,13 @@ given in [`promotion.jl`](https://github.com/JuliaLang/julia/blob/master/base/pr
 /(x::Number, y::Number) = /(promote(x,y)...)
 ```
 
-These method definitions say that in the absence of more specific rules for adding, subtracting,
-multiplying and dividing pairs of numeric values, promote the values to a common type and then
-try again. That's all there is to it: nowhere else does one ever need to worry about promotion
-to a common numeric type for arithmetic operations -- it just happens automatically. There are
-definitions of catch-all promotion methods for a number of other arithmetic and mathematical functions
-in [`promotion.jl`](https://github.com/JuliaLang/julia/blob/master/base/promotion.jl), but beyond
-that, there are hardly any calls to `promote` required in the Julia standard library. The most
-common usages of `promote` occur in outer constructors methods, provided for convenience, to allow
-constructor calls with mixed types to delegate to an inner type with fields promoted to an appropriate
-common type. For example, recall that [`rational.jl`](https://github.com/JuliaLang/julia/blob/master/base/rational.jl)
-provides the following outer constructor method:
+Estas definiciones de métodos dicen que en la ausencia de reglas más específicas para sumar, restar, multiplicar y dividir pares de valores numéricos, promocionemos los valores a un tipo común y entonces intentemos de nuevo. Este es todo aquí: en ninguna otra parte hay que preocuparse por la promoción a un tipo numérico común para las operaciones aritméticas (ello sucede automáticamente). Hay definiciones de métodos de promoción "atrapa-todo" para un número de otras funciones arimtéticas y matemáticas en [`promotion.jl`](https://github.com/JuliaLang/julia/blob/master/base/promotion.jl), pero más allá de eso, difícilmente encontremos ninguna llamada a `promote` necesaria en la librería estándar de Julia. Los usos más comunes de `promote` ocurren en los métodos de construcción externos, proporcionados por conveniencia, para permitir llamadas a constructor con tipos mezclados para delegar a un tipo interno con campos promocionados a un  tipo común aproximado. Por ejemplo, recordemos que [`rational.jl`](https://github.com/JuliaLang/julia/blob/master/base/rational.jl) proporciona el siguiente método constructor externo:
 
 ```julia
 Rational(n::Integer, d::Integer) = Rational(promote(n,d)...)
 ```
 
-This allows calls like the following to work:
+Esto permite que llamadas como la siguiente funcionen:
 
 ```jldoctest
 julia> Rational(Int8(15),Int32(-5))
@@ -215,57 +186,38 @@ julia> typeof(ans)
 Rational{Int32}
 ```
 
-For most user-defined types, it is better practice to require programmers to supply the expected
-types to constructor functions explicitly, but sometimes, especially for numeric problems, it
-can be convenient to do promotion automatically.
+Para la mayoría de los tipos definidos por usuario, es mejor práctica requerir que los programadores proporcionen los tipos esperados para las funciones constructor explícitamente, pero algunas veces, especialmente para problemas numéricos, puede ser conveniente realizar la conversión de forma automática.
 
-### Defining Promotion Rules
+### Definiendo reglas de promoción
 
-Although one could, in principle, define methods for the `promote` function directly, this would
-require many redundant definitions for all possible permutations of argument types. Instead, the
-behavior of `promote` is defined in terms of an auxiliary function called `promote_rule`, which
-one can provide methods for. The `promote_rule` function takes a pair of type objects and returns
-another type object, such that instances of the argument types will be promoted to the returned
-type. Thus, by defining the rule:
+
+Aunque uno podría, en principio, definir métodos para la función `promote` directamente, esto requeriría muchas defniciones redundantes para todas las posibles permutaciones de tipos de argumentos. En lugar de ello, el comportamiento de `promote` es definido en términos de una función auxiliar denominada `promote_rule`, para la que uno puede proporcionar métodos. La funci´no `promote_rule` toma un par de objetos tipo y devuelve otro objeto tipo, tal que instancias de los tipos de argumentos sean promocionadas al tipo retornado. De este modo, definiendo la regla:
 
 ```julia
 promote_rule(::Type{Float64}, ::Type{Float32}) = Float64
 ```
 
-one declares that when 64-bit and 32-bit floating-point values are promoted together, they should
-be promoted to 64-bit floating-point. The promotion type does not need to be one of the argument
-types, however; the following promotion rules both occur in Julia's standard library:
+uno declara que cuando se promocionan juntos valores en punto flotante de 32 y de 64 bits, ellos deberían ser promocionados a punto flotante de 64 bits. El tipo de promoción no tiene que ser uno de los tipos de los argumentos. He aquí un par de ejemplos de reglas de promoción que aparecen en la librería estándar de Julia: 
 
 ```julia
 promote_rule(::Type{UInt8}, ::Type{Int8}) = Int
 promote_rule(::Type{BigInt}, ::Type{Int8}) = BigInt
 ```
 
-In the latter case, the result type is [`BigInt`](@ref) since `BigInt` is the only type
-large enough to hold integers for arbitrary-precision integer arithmetic. Also note that
-one does not need to define both `promote_rule(::Type{A}, ::Type{B})` and
-`promote_rule(::Type{B}, ::Type{A})` -- the symmetry is implied by the way `promote_rule`
-is used in the promotion process.
+En el último caso, el tipo de resultado es  [`BigInt`](@ref) since `BigInt` ya que éste es el único tipo lo bastante grande como para alojar enteros para aritmética entera de precisión arbitraria. Nótese también que uno no necesita definir dos reglas simétricas `promote_rule(::Type{A}, ::Type{B})` y `promote_rule(::Type{B}, ::Type{A})` (esta simetría es supuesta por la forma en que `promote_rule` es utilizada en el proceso de promoción.
 
-The `promote_rule` function is used as a building block to define a second function called `promote_type`,
-which, given any number of type objects, returns the common type to which those values, as arguments
-to `promote` should be promoted. Thus, if one wants to know, in absence of actual values, what
-type a collection of values of certain types would promote to, one can use `promote_type`:
+La función `promote_rule` se usa com un bloque constructivo para definir una segunda función llamada `promote_type` la cuál, dado cualquier número de objetos tupo, devuelve el tipo común al cuál esos valores, como argumentos a `promote` deberían ser promocionados. Por tanto, si uno quiere saber, en ausencia de valores actuales, a qué tipo promocionaría una colección de valores de cierto tipo, uno podría usar `promote_type`:
 
 ```jldoctest
 julia> promote_type(Int8, UInt16)
 Int64
 ```
 
-Internally, `promote_type` is used inside of `promote` to determine what type argument values
-should be converted to for promotion. It can, however, be useful in its own right. The curious
-reader can read the code in [`promotion.jl`](https://github.com/JuliaLang/julia/blob/master/base/promotion.jl),
-which defines the complete promotion mechanism in about 35 lines.
+Internamente, `promote_type` se usa dentro de `promote` para determinar a qué valores argumento tipo deberían ser convertidos tras una promoción. Ell puede, sin embargo, ser útil en sí misma. el lector curioso puede leer el código en [`promotion.jl`](https://github.com/JuliaLang/julia/blob/master/base/promotion.jl), , que define el mecanismo de promoción completo en aproximadamente 35 líneas.
 
-### Case Study: Rational Promotions
+### Caso de estudio: promociones Rational
 
-Finally, we finish off our ongoing case study of Julia's rational number type, which makes relatively
-sophisticated use of the promotion mechanism with the following promotion rules:
+Finalmente, finalizaremos nuestro caso de estudio el tipo de los números racionales en Julia, que hace un uso relativamente sofistidcado del mecanismo de promoción con las siguientes reglas de promoción:
 
 ```julia
 promote_rule(::Type{Rational{T}}, ::Type{S}) where {T<:Integer,S<:Integer} = Rational{promote_type(T,S)}
@@ -273,15 +225,6 @@ promote_rule(::Type{Rational{T}}, ::Type{Rational{S}}) where {T<:Integer,S<:Inte
 promote_rule(::Type{Rational{T}}, ::Type{S}) where {T<:Integer,S<:AbstractFloat} = promote_type(T,S)
 ```
 
-The first rule says that promoting a rational number with any other integer type promotes to a
-rational type whose numerator/denominator type is the result of promotion of its numerator/denominator
-type with the other integer type. The second rule applies the same logic to two different types
-of rational numbers, resulting in a rational of the promotion of their respective numerator/denominator
-types. The third and final rule dictates that promoting a rational with a float results in the
-same type as promoting the numerator/denominator type with the float.
+La primera regla dice que promocionar un número racional con algún otro entero promociona a un tipo racional cuyo tipo numerados/denominador es el resultado de la promoción de sus tipos numerador/denoinador con el otro tipo entero. La segunda regla aplica la misma lógic a dos tipos diferentes de números racionales, dando como resultado un racional de la promoción de sus respectivos tipos numerador/denominador. Las reglas tercera y última dictan que promocionar un racional con un punto flotante da como resultado el mismo tipo que promocionar el tipo de numerador/denominador con el float.
 
-This small handful of promotion rules, together with the [conversion methods discussed above](@ref man-rational-conversion),
-are sufficient to make rational numbers interoperate completely naturally with all of Julia's
-other numeric types -- integers, floating-point numbers, and complex numbers. By providing appropriate
-conversion methods and promotion rules in the same manner, any user-defined numeric type can interoperate
-just as naturally with Julia's predefined numerics.
+Este pequeño puñado de reglas de promoción, junto con los [métodos de conversión discutidos antes](@ref man-rational-conversion), son suficiente para hacer que los números racionales interoperen completamente y de forma natural con todos los demás tipos numéricos de Julia (enteros, números en punto flotante y números complehjos). Proporcionando métodos de converión apropiadosy reglas de promoción en la misma manera, cualquier tipo numérico definido por el usuario puede interoperar así de naturalmente con los numéricos predefinidos en Julia.
