@@ -1,29 +1,19 @@
-# Metaprogramming
+# Metaprogramación
 
-The strongest legacy of Lisp in the Julia language is its metaprogramming support. Like Lisp,
-Julia represents its own code as a data structure of the language itself. Since code is represented
-by objects that can be created and manipulated from within the language, it is possible for a
-program to transform and generate its own code. This allows sophisticated code generation without
-extra build steps, and also allows true Lisp-style macros operating at the level of [abstract syntax trees](https://en.wikipedia.org/wiki/Abstract_syntax_tree).
-In contrast, preprocessor "macro" systems, like that of C and C++, perform textual manipulation
-and substitution before any actual parsing or interpretation occurs. Because all data types and
-code in Julia are represented by Julia data structures, powerful [reflection](https://en.wikipedia.org/wiki/Reflection_%28computer_programming%29)
-capabilities are available to explore the internals of a program and its types just like any other
-data.
+El legado más fuerte de Lisp en el lenguaje Julia es su soporte a la metaprogramación. Al igual que Lisp, Julia representa su propio código como una estructura de datos del propio lenguaje. Dado que el código está representado por objetos que pueden ser creados y manipulados desde dentro del lenguaje, es posible que un programa pueda transformar y generar su propio código. Esto permite una sofisticada generación de código sin pasos de construcción adicionales, y también permite las verdaderas macros de estilo Lisp que operan a nivel de los [árboles sintácticos abstractos](https://en.wikipedia.org/wiki/Abstract_syntax_tree). En contraste, los sistemas de preprocesador "macro" como el de C y C++, realizan la manipulación y sustitución textual antes de que se realice cualquier análisis o interpretación real. Debido a que todos los tipos de datos y código en Julia están representados por las estructuras de datos Julia, hay disponibles poderosas capacidades de [reflexión](https://en.wikipedia.org/wiki/Reflection_%28computer_programming%29) están disponibles para explorar las características internas de un programa y sus tipos al igual que cualquier otro dato.
 
-## Program representation
+## Representación de programas
 
-Every Julia program starts life as a string:
+Cada programa en Julia comienza su vida como una cadena:
 
 ```jldoctest prog
 julia> prog = "1 + 1"
 "1 + 1"
 ```
 
-**What happens next?**
+**¿Qué sucede después?**
 
-The next step is to [parse](https://en.wikipedia.org/wiki/Parsing#Computer_languages) each string
-into an object called an expression, represented by the Julia type `Expr`:
+El siguiente paso es [analizar sintácticamente](https://en.wikipedia.org/wiki/Parsing#Computer_languages) cada cadena en un objeto denominado una expresión, representado por el tipo `Expr` de Julia:
 
 ```jldoctest prog
 julia> ex1 = parse(prog)
@@ -33,17 +23,16 @@ julia> typeof(ex1)
 Expr
 ```
 
-`Expr` objects contain three parts:
+Los objetos `Expr` contienen tres partes:
 
-  * a `Symbol` identifying the kind of expression. A symbol is an [interned string](https://en.wikipedia.org/wiki/String_interning)
-    identifier (more discussion below).
+* Un `Symbol` identificando la clase de expresión. Un símbolo es un [identificador de cadena internado](https://en.wikipedia.org/wiki/String_interning) (más información a continuación).
 
 ```jldoctest prog
 julia> ex1.head
 :call
 ```
 
-  * the expression arguments, which may be symbols, other expressions, or literal values:
+  * Los argumentos de expresión, que pueden ser símbolos, otras expresiones o valores literales:
 
 ```jldoctest prog
 julia> ex1.args
@@ -53,32 +42,31 @@ julia> ex1.args
  1
 ```
 
-  * finally, the expression result type, which may be annotated by the user or inferred by the compiler
-    (and may be ignored completely for the purposes of this chapter):
+  * Finalmente, el tipo de resultado de la expresión, que puede ser anotado por el usuario o inferido por el 
+    compilador (y puede ser ignorado completamente para los propósitos de este capítulo):
 
 ```jldoctest prog
 julia> ex1.typ
 Any
 ```
 
-Expressions may also be constructed directly in [prefix notation](https://en.wikipedia.org/wiki/Polish_notation):
+Las expresiones pueden también ser construidas directamente en [notación prefija](https://en.wikipedia.org/wiki/Polish_notation):
 
 ```jldoctest prog
 julia> ex2 = Expr(:call, :+, 1, 1)
 :(1 + 1)
 ```
 
-The two expressions constructed above – by parsing and by direct construction – are equivalent:
+Las dos expresiones construidas antes (mediante análisis sintáctico y mediante construcción directa) son equivalentes:
 
 ```jldoctest prog
 julia> ex1 == ex2
 true
 ```
 
-**The key point here is that Julia code is internally represented as a data structure that is accessible
-from the language itself.**
+**El punto clave aquí es que el código Julia se representa internamente como una estructura de datos que es accesible desde el propio lenguaje.**
 
-The [`dump()`](@ref) function provides indented and annotated display of `Expr` objects:
+La función [`dump()`](@ref) proporciona una visualización indentada y anotada de objetos `Expr`:
 
 ```jldoctest prog
 julia> dump(ex2)
@@ -91,27 +79,23 @@ Expr
   typ: Any
 ```
 
-`Expr` objects may also be nested:
+Los objetos `Expr` puede ser también anidados:
 
 ```jldoctest ex3
 julia> ex3 = parse("(4 + 4) / 2")
 :((4 + 4) / 2)
 ```
 
-Another way to view expressions is with Meta.show_sexpr, which displays the [S-expression](https://en.wikipedia.org/wiki/S-expression)
-form of a given `Expr`, which may look very familiar to users of Lisp. Here's an example illustrating
-the display on a nested `Expr`:
+Otra forma de ver expresiones es con Meta.show_sexpr, que muestra la [expresión-S](https://en.wikipedia.org/wiki/S-expression) de una `Expr` dada, que puede resultar muy familiar a los usuarios de Lisp. He aquí un ejemplo que visualiza una expresión (`Expr`) anidada:
 
 ```jldoctest ex3
 julia> Meta.show_sexpr(ex3)
 (:call, :/, (:call, :+, 4, 4), 2)
 ```
 
-### Symbols
+### Simbolos
 
-The `:` character has two syntactic purposes in Julia. The first form creates a [`Symbol`](@ref),
-an [interned string](https://en.wikipedia.org/wiki/String_interning) used as one building-block
-of expressions:
+El carácter `:` tiene dos propósitos sintácticos en Julia. La primera forma crea un símbolo (`Symbol`), una [cadena internada](https://en.wikipedia.org/wiki/String_interning) usada como un bloque constructivo de expresiones:
 
 ```jldoctest
 julia> :foo
@@ -121,8 +105,7 @@ julia> typeof(ans)
 Symbol
 ```
 
-The [`Symbol`](@ref) constructor takes any number of arguments and creates a new symbol by concatenating
-their string representations together:
+El constructor [`Symbol`](@ref) toma cualquier número de argumentos y crea un símbolo concatenando sus representaciones de cadena juntas:
 
 ```jldoctest
 julia> :foo == Symbol("foo")
@@ -135,10 +118,9 @@ julia> Symbol(:var,'_',"sym")
 :var_sym
 ```
 
-In the context of an expression, symbols are used to indicate access to variables; when an expression
-is evaluated, a symbol is replaced with the value bound to that symbol in the appropriate [scope](@ref scope-of-variables).
+En el contexto de una expresión, los símbolos se utilizan para indicar el acceso a variables; Cuando se evalúa una expresión, se sustituye un símbolo por el valor asociado a ese símbolo en el [ámbito](@ref scope-of-variables) apropiado.
 
-Sometimes extra parentheses around the argument to `:` are needed to avoid ambiguity in parsing.:
+A veces son necesarios paréntesis adicionales alrededor del argumento a: para evitar la ambigüedad en el análisis:
 
 ```jldoctest
 julia> :(:)
@@ -148,14 +130,11 @@ julia> :(::)
 :(::)
 ```
 
-## Expressions and evaluation
+## Expresiones y evaluación
 
-### Quoting
+###  Citación
 
-The second syntactic purpose of the `:` character is to create expression objects without using
-the explicit `Expr` constructor. This is referred to as *quoting*. The `:` character, followed
-by paired parentheses around a single statement of Julia code, produces an `Expr` object based
-on the enclosed code. Here is example of the short form used to quote an arithmetic expression:
+El segundo propósito sintáctico del carácter `:` es crear objetos expresión sin utilizar el constructor `Expr` explícito. Esto se conoce como *citación*. El carácter `:`, seguido de pares de paréntesis alrededor de una sola declaración de código Julia, produce un objeto `Expr` basado en el código incluido. He aquí un ejemplo de la forma corta utilizada para citar una expresión aritmética:
 
 ```jldoctest
 julia> ex = :(a+b*c+1)
@@ -165,11 +144,9 @@ julia> typeof(ex)
 Expr
 ```
 
-(to view the structure of this expression, try `ex.head` and `ex.args`, or use [`dump()`](@ref)
-as above)
+(para ver la estructura de esta expresión, podemos usar `ex.head` y `ex.args` o `dump()`como antes)
 
-Note that equivalent expressions may be constructed using [`parse()`](@ref) or the direct `Expr`
-form:
+Nótese que pueden construirse expresiones equivalentes usando [`parse()`](@ref) o la forma directa `Expr`:
 
 ```jldoctest
 julia>      :(a + b*c + 1)  ==
@@ -178,15 +155,9 @@ julia>      :(a + b*c + 1)  ==
 true
 ```
 
-Expressions provided by the parser generally only have symbols, other expressions, and literal
-values as their args, whereas expressions constructed by Julia code can have arbitrary run-time
-values without literal forms as args. In this specific example, `+` and `a` are symbols, `*(b,c)`
-is a subexpression, and `1` is a literal 64-bit signed integer.
+Las expresiones proporcionadas por el analizador sólo suelen tener símbolos, otras expresiones y valores literales como sus args, mientras que las expresiones construidas por el código Julia pueden tener valores de ejecución arbitrarios sin formas literales como args. En este ejemplo específico, `+` y `a` son símbolos, `*(b,c)` es una subexpresión, y `1` un entero literal de 64 bits.
 
-There is a second syntactic form of quoting for multiple expressions: blocks of code enclosed
-in `quote ... end`. Note that this form introduces `QuoteNode` elements to the expression tree,
-which must be considered when directly manipulating an expression tree generated from `quote`
-blocks. For other purposes, `:( ... )` and `quote .. end` blocks are treated identically.
+Hay una segunda forma sintáctica de citar para expresiones múltiples: bloques de código encerrados en `quote ... end`. Note que esta forma introduce elementos `QuoteNode` al árbol de expresión que deben considerarse cuando se manipule directamente un árbol de expresiones generado a partir de bloques `quote`. Para otros propósitos, los bloques `:(...)` y `quote...end` se tratan de forma idéntica.
 
 ```jldoctest
 julia> ex = quote
@@ -207,14 +178,11 @@ julia> typeof(ex)
 Expr
 ```
 
-### Interpolation
+### Interpolación
 
-Direct construction of `Expr` objects with value arguments is powerful, but `Expr` constructors
-can be tedious compared to "normal" Julia syntax. As an alternative, Julia allows "splicing" or
-interpolation of literals or expressions into quoted expressions. Interpolation is indicated by
-the `$` prefix.
+La construcción directa de objetos `Expr` con valores como argumentos es potente, pero los constructores objetos `Expr` pueden ser tediosos comparados con la sintaxis "normal" de Julia. Como alternativa, Julia permite "empalme" o interpolación de literales o expresiones en expresiones citadas. La interpolación se indica con el prefijo `$`.
 
-In this example, the literal value of `a` is interpolated:
+En este ejemplo el valor literal de `a` es interpolado:
 
 ```jldoctest interp1
 julia> a = 1;
@@ -223,7 +191,7 @@ julia> ex = :($a + b)
 :(1 + b)
 ```
 
-Interpolating into an unquoted expression is not supported and will cause a compile-time error:
+Interpolar en una expresión no citada (*quoted*) no se admite y causará un error en tiempo de compilación: 
 
 ```jlcodtest interp1
 julia> $a + b
@@ -231,15 +199,14 @@ ERROR: unsupported or misplaced expression $
  ...
 ```
 
-In this example, the tuple `(1,2,3)` is interpolated as an expression into a conditional test:
+En este ejemplo, la tupla `(1,2,3)` es interpolada como una expresión en un test condicional:
 
 ```jldoctest interp1
 julia> ex = :(a in $:((1,2,3)) )
 :(a in (1, 2, 3))
 ```
 
-Interpolating symbols into a nested expression requires enclosing each symbol in an enclosing
-quote block:
+Interpolar símbolos en una expresión anidada requiere encerrar cada símbolo en un bloque de cita que lo encierre:
 
 ```julia-repl
 julia> :( :a in $( :(:a + :b) ) )
@@ -247,14 +214,11 @@ julia> :( :a in $( :(:a + :b) ) )
                    quoted inner expression
 ```
 
-The use of `$` for expression interpolation is intentionally reminiscent of [string interpolation](@ref string-interpolation)
-and [command interpolation](@ref command-interpolation). Expression interpolation allows convenient, readable programmatic
-construction of complex Julia expressions.
+El uso de `$` para la interpolación de la expresión recuerda intencionalmente a la [interpolación de cadenas](@ref string-interpolation) y a la [interpolación de mandatos](@ref command-interpolation). La interpolación de expresiones permite la construcción programática conveniente y legible de expresiones Julia complejas.
 
-### [`eval()`](@ref) and effects
+### [`eval()`](@ref) and efectos
 
-Given an expression object, one can cause Julia to evaluate (execute) it at global scope using
-[`eval()`](@ref):
+Dado un objeto expresión, uno puede causar que Julia lo evalúe (ejecute) en un ámbito global usando [`eval()`](@ref):
 
 ```jldoctest interp1
 julia> :(1 + 2)
@@ -276,9 +240,7 @@ julia> eval(ex)
 3
 ```
 
-Every [module](@ref modules) has its own [`eval()`](@ref) function that evaluates expressions in its global
-scope. Expressions passed to [`eval()`](@ref) are not limited to returning values -- they can
-also have side-effects that alter the state of the enclosing module's environment:
+Cada [módulo](@ref modules) tiene su propia función [`eval()`](@ref) que evalúa expresiones en su ámbito global. Las expresiones pasadas a [`eval()`](@ref) no están limitadas a valores de retorno (ellas también pueden tener efetos colaterales que alteren el estado del entorno del módulo que las encierra:
 
 ```jldoctest
 julia> ex = :(x = 1)
@@ -294,12 +256,10 @@ julia> x
 1
 ```
 
-Here, the evaluation of an expression object causes a value to be assigned to the global variable
-`x`.
+Aquí, la evaluación de un objeto expresión causa que se asigne un valor a la variable global `x`.
 
-Since expressions are just `Expr` objects which can be constructed programmatically and then evaluated,
-it is possible to dynamically generate arbitrary code which can then be run using [`eval()`](@ref).
-Here is a simple example:
+Como las expresiones no son más que objetos `Expr` que pueden ser construidos programáticamente y después evaluados, es posible generar dinámicamente código arbitrario que pueda ser ejecutado luego mediante [`eval()`](@ref). He aquí
+Since expressions are just `Expr` objects which can be constructed programmatically and then evaluated, un ejemplo sencillo:
 
 ```julia-repl
 julia> a = 1;
@@ -313,24 +273,19 @@ julia> eval(ex)
 3
 ```
 
-The value of `a` is used to construct the expression `ex` which applies the `+` function to the
-value 1 and the variable `b`. Note the important distinction between the way `a` and `b` are used:
+El valor de `a` se ha usado para construir la expresión `ex` que aplica la función `+` al valor `1` y a la variable `b`. Note la distinción importante entre la forma en que se usan las variables `a` y `b`:
 
-  * The value of the *variable*`a` at expression construction time is used as an immediate value in
-    the expression. Thus, the value of `a` when the expression is evaluated no longer matters: the
-    value in the expression is already `1`, independent of whatever the value of `a` might be.
-  * On the other hand, the *symbol*`:b` is used in the expression construction, so the value of the
-    variable `b` at that time is irrelevant -- `:b` is just a symbol and the variable `b` need not
-    even be defined. At expression evaluation time, however, the value of the symbol `:b` is resolved
-    by looking up the value of the variable `b`.
+* El valor de la *variable* `a` se utiliza como valor inmediato en la expresión en el tiempo de construcción de la 
+  expresión. Por lo tanto, una vez que la expresión es evaluada, el valor de a ya no importa: el valor en la expresión 
+  ya es 1, independientemente de lo que pueda ser ahora  el valor de `a`.
+* Por otro lado, el símbolo `:b` se utiliza en la construcción de la expresión, por lo que el valor de la variable `b` 
+  en ese momento es irrelevante - :b es sólo un símbolo y la variable b ni siquiera necesita ser definida. En el 
+  momento de la evaluación de la expresión, sin embargo, el valor del símbolo `:b` se resuelve buscando el valor de 
+  la variable `b`.
 
-### Functions on `Expr`essions
+### Funcciones sobre `Expr`esiones
 
-As hinted above, one extremely useful feature of Julia is the capability to generate and manipulate
-Julia code within Julia itself. We have already seen one example of a function returning `Expr`
-objects: the [`parse()`](@ref) function, which takes a string of Julia code and returns the corresponding
-`Expr`. A function can also take one or more `Expr` objects as arguments, and return another
-`Expr`. Here is a simple, motivating example:
+Como se ha sugerido anteriormente, una característica muy útil de Julia es la capacidad de generar y manipular código Julia dentro del propio Julia. Ya hemos visto un ejemplo de una función que devuelve objetos `Expr`: la función [`parse()`](@ref), que toma una cadena de código Julia y devuelve la `Expr` correspondiente. Una función también puede tomar uno o más objetos `Expr` como argumentos, y devolver otro `Expr`. Aquí hay un ejemplo simple y motivador:
 
 ```jldoctest
 julia> function math_expr(op, op1, op2)
@@ -346,8 +301,7 @@ julia> eval(ex)
 21
 ```
 
-As another example, here is a function that doubles any numeric argument, but leaves expressions
-alone:
+Otro ejemplo puede ser esta función que dobla cualquier argumento numérico, pero deja las expresiones solas:
 
 ```jldoctest
 julia> function make_expr2(op, opr1, opr2)
@@ -369,14 +323,11 @@ julia> eval(ex)
 
 ## [Macros](@id man-macros)
 
-Macros provide a method to include generated code in the final body of a program. A macro maps
-a tuple of arguments to a returned *expression*, and the resulting expression is compiled directly
-rather than requiring a runtime [`eval()`](@ref) call. Macro arguments may include expressions,
-literal values, and symbols.
+Las macros proporcionan un método para incluir el código generado en el cuerpo final de un programa. Una macro asigna una tupla de argumentos a una expresión devuelta, y la expresión resultante se compila directamente en lugar de requerir una llamada [`eval()`](@ref) de ejecución. Los argumentos de macro pueden incluir expresiones, valores literales y símbolos.
 
-### Basics
+### Básico
 
-Here is an extraordinarily simple macro:
+He aquí una macro extraordinariamente simple:
 
 ```jldoctest sayhello
 julia> macro sayhello()
@@ -385,23 +336,20 @@ julia> macro sayhello()
 @sayhello (macro with 1 method)
 ```
 
-Macros have a dedicated character in Julia's syntax: the `@` (at-sign), followed by the unique
-name declared in a `macro NAME ... end` block. In this example, the compiler will replace all
-instances of `@sayhello` with:
+Las macros tienen un carácter dedicado en la sintaxis de Julia: el `@` (at-sign), seguido por el nombre único declarado en un bloque `macro NAME ... end`. En este ejemplo, el compilador reemplazará todas las instancias de `@sayhello` con:
 
 ```julia
 :( println("Hello, world!") )
 ```
 
-When `@sayhello` is entered in the REPL, the expression executes immediately, thus we only see the
-evaluation result:
+Cuando `@sayhello` se llama en el REPL, la expresión se ejecuta inmediatamente, por lo tanto solo vemos el resultado de la evaluación:   
 
 ```jldoctest sayhello
 julia> @sayhello()
 Hello, world!
 ```
 
-Now, consider a slightly more complex macro:
+Ahora, considere una macro un poco más compleja:
 
 ```jldoctest sayhello2
 julia> macro sayhello(name)
@@ -410,16 +358,14 @@ julia> macro sayhello(name)
 @sayhello (macro with 1 method)
 ```
 
-This macro takes one argument: `name`. When `@sayhello` is encountered, the quoted expression
-is *expanded* to interpolate the value of the argument into the final expression:
+Esta macro toma un argumento: `name`. Cuando se encuentra `@sayhello`, la expresión citada se *expande* para interpolar el valor del argumento en la expresión final:
 
 ```jldoctest sayhello2
 julia> @sayhello("human")
 Hello, human
 ```
 
-We can view the quoted return expression using the function [`macroexpand()`](@ref) (**important note:**
-this is an extremely useful tool for debugging macros):
+Podemos ver la expresión de retorno entre comillas usando la función [`macroexpand()`](@ref) (**nota importante:** esta es una herramienta extremadamente útil para depurar macros):
 
 ```jldoctest sayhello2
 julia> ex = macroexpand( :(@sayhello("human")) )
@@ -431,22 +377,18 @@ Expr
 
 We can see that the `"human"` literal has been interpolated into the expression.
 
-There also exists a macro [`@macroexpand`](@ref) that is perhaps a bit more convenient than the `macroexpand` function:
-
+También existe una macro [`@macroexpand`](@ref) que quizás sea un poco más conveniente que la función `macroexpand`:
 
 ```jldoctest sayhello2
 julia> @macroexpand @sayhello "human"
 :((println)("Hello, ", "human"))
 ```
 
-### Hold up: why macros?
+### Un momento. ¿Por qué las macros?
 
-We have already seen a function `f(::Expr...) -> Expr` in a previous section. In fact, [`macroexpand()`](@ref)
-is also such a function. So, why do macros exist?
+Ya hemos visto una función `f(:: Expr ...) -> Expr` en una sección anterior. De hecho, [`macroexpand()`](@ref) es también una función. Entonces, ¿por qué existen macros?
 
-Macros are necessary because they execute when code is parsed, therefore, macros allow the programmer
-to generate and include fragments of customized code *before* the full program is run. To illustrate
-the difference, consider the following example:
+Las macros son necesarias porque se ejecutan cuando se analiza el código, por lo tanto, las macros permiten al programador generar e incluir fragmentos de código personalizado antes de ejecutar el programa completo. Para ilustrar la diferencia, considere el siguiente ejemplo:
 
 ```jldoctest whymacros
 julia> macro twostep(arg)
@@ -459,8 +401,7 @@ julia> ex = macroexpand( :(@twostep :(1, 2, 3)) );
 I execute at parse time. The argument is: $(Expr(:quote, :((1, 2, 3))))
 ```
 
-The first call to [`println()`](@ref) is executed when [`macroexpand()`](@ref) is called. The
-resulting expression contains *only* the second `println`:
+La primera llamada a [`println()`](@ref) se ejecuta cuando se invoca [`macroexpand()`](@ref). La expresión resultante contiene *sólo* el segundo `println`:
 
 ```jldoctest whymacros
 julia> typeof(ex)
@@ -473,27 +414,24 @@ julia> eval(ex)
 I execute at runtime. The argument is: (1, 2, 3)
 ```
 
-### Macro invocation
+### Invocación de macros
 
-Macros are invoked with the following general syntax:
+Las macros son invocadas con la siguiente sintaxis general:
+
+
 
 ```julia
 @name expr1 expr2 ...
 @name(expr1, expr2, ...)
 ```
 
-Note the distinguishing `@` before the macro name and the lack of commas between the argument
-expressions in the first form, and the lack of whitespace after `@name` in the second form. The
-two styles should not be mixed. For example, the following syntax is different from the examples
-above; it passes the tuple `(expr1, expr2, ...)` as one argument to the macro:
+Note la `@` antes del nombre de macro y la falta de domas entre las expresiones de los argumentos en la primera forma, y la falta de espacios en balnco después de `@name` en la segunda forma. Los dos estilos no deberían mezclarse. Por ejemplo, la siguiente sintaxis es diferente que la de los ejemplos anteriores; ella pasa la tupla `(expr1, expr2, ...)` como argumento a la macro:
 
 ```julia
 @name (expr1, expr2, ...)
 ```
 
-It is important to emphasize that macros receive their arguments as expressions, literals, or
-symbols. One way to explore macro arguments is to call the [`show()`](@ref) function within the
-macro body:
+Es importante enfatizar que las macros reciben sus argumentos como expresiones, literales o símbolos. Una forma de explorar los argumentos de las macros es llamar a la función `show()` dentro del cuerpo de la macro:
 
 ```jldoctest
 julia> macro showarg(x)
