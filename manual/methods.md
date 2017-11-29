@@ -348,16 +348,10 @@ Si hay un único parámetro, las llaves que lo encierran (en `where {T}`) pueden
 
 Los parámetros múltiples pueden ser separados con comas, por ejemplo `where {T, S<:Real}`, o escritos usando `where` anidados, por ejemplo, `where S<:Real where T`.
 
-Redefining Methods
-------------------
+Redefiniendo Métodos
+--------------------
 
-When redefining a method or adding new methods,
-it is important to realize that these changes don't take effect immediately.
-This is key to Julia's ability to statically infer and compile code to run fast,
-without the usual JIT tricks and overhead.
-Indeed, any new method definition won't be visible to the current runtime environment,
-including Tasks and Threads (and any previously defined `@generated` functions).
-Let's start with an example to see what this means:
+Cuando se redefine un método o se añaden nuevos métodos, es importante comprender que estos cambios no tienen efecto inmediatamente. Esto es clave para la capacidad de Julia para inferir estáticamente y compilar código para ejecutar rápido, sin los trucos de JIT y sobrecargas usuales. De hecho, cualquier nueva definición de método no será visible al entorno de ejecución actual, incluyendo tareas e hilos (y cualquier otra función definida con `@generated`). Comencemos con un ejemplo para ver qué significa esto:
 
 ```julia-repl
 julia> function tryeval()
