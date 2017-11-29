@@ -472,45 +472,35 @@ Cuando sólo el tipo de los argumentos propoprcionados tenga que ser restrincido
 
 ## Note on Optional and keyword Arguments
 
-As mentioned briefly in [Functions](@ref man-functions), optional arguments are implemented as syntax for multiple
-method definitions. For example, this definition:
+Como se menciona brevemente en [Funciones](@ref man-functions), los argumentos opcionales se implementan como sintaxis para múltiples definiciones de métodos. Por ejemplo, esta definición:
 
 ```julia
-f(a=1,b=2) = a+2b
+f (a = 1, b = 2) = a + 2b
 ```
 
-translates to the following three methods:
+se traduce a los siguientes tres métodos:
 
 ```julia
-f(a,b) = a+2b
-f(a) = f(a,2)
-f() = f(1,2)
+f (a, b) = a + 2b
+f (a) = f (a, 2)
+f () = f (1,2)
 ```
 
-This means that calling `f()` is equivalent to calling `f(1,2)`. In this case the result is `5`,
-because `f(1,2)` invokes the first method of `f` above. However, this need not always be the case.
-If you define a fourth method that is more specialized for integers:
+Esto significa que llamar a `f()` es equivalente a llamar a `f(1,2)`. En este caso, el resultado es `5`, porque` f (1,2) `invoca el primer método de `f` anterior. Sin embargo, este no siempre es el caso. Si define un cuarto método que es más especializado para enteros:
 
 ```julia
-f(a::Int,b::Int) = a-2b
+f (a :: Int, b :: Int) = a-2b
 ```
 
-then the result of both `f()` and `f(1,2)` is `-3`. In other words, optional arguments are tied
-to a function, not to any specific method of that function. It depends on the types of the optional
-arguments which method is invoked. When optional arguments are defined in terms of a global variable,
-the type of the optional argument may even change at run-time.
+entonces el resultado de ambos `f()` y `f(1,2)` es `-3`. En otras palabras, los argumentos opcionales están vinculados a una función, no a ningún método específico de esa función. Depende de los tipos de argumentos opcionales qué método se invoca. Cuando los argumentos opcionales se definen en términos de una variable global, el tipo de argumento opcional puede incluso cambiar en tiempo de ejecución.
 
-Keyword arguments behave quite differently from ordinary positional arguments. In particular,
-they do not participate in method dispatch. Methods are dispatched based only on positional arguments,
-with keyword arguments processed after the matching method is identified.
+Los argumentos de palabra clave se comportan de manera bastante diferente de los argumentos posicionales ordinarios. En particular, no participan en el envío del método. Los métodos se envían basados *únicamente en argumentos posicionales, con argumentos de palabra clave procesados* después de que se identifica el método de coincidencia.
 
-## Function-like objects
+## Funciones como objetos
 
-Methods are associated with types, so it is possible to make any arbitrary Julia object "callable"
-by adding methods to its type. (Such "callable" objects are sometimes called "functors.")
+Los métodos están asociados con tipos, por lo que es posible hacer algún objeto Julia arbitrario "invocable" añadiendo métoos a este tipo (tales objetos "invocables" son denominados en ocasiones "functores"). 
 
-For example, you can define a type that stores the coefficients of a polynomial, but behaves like
-a function evaluating the polynomial:
+Por ejemplo, podemos definir un tipo que almacena los coeficientes de un polinomio, pero que se comporta como una función que evalúa el polinomio:
 
 ```jldoctest polynomial
 julia> struct Polynomial{R}
@@ -526,8 +516,7 @@ julia> function (p::Polynomial)(x)
        end
 ```
 
-Notice that the function is specified by type instead of by name. In the function body, `p` will
-refer to the object that was called. A `Polynomial` can be used as follows:
+Note que la función es especificada por el tipo en lugar de por el nombre. En el cuerpo de la función, `p ` se referira´al objeto que fue llamado. Un `Polynomial` puede ser usado como sigue:
 
 ```jldoctest polynomial
 julia> p = Polynomial([1,10,100])
@@ -537,224 +526,169 @@ julia> p(3)
 931
 ```
 
-This mechanism is also the key to how type constructors and closures (inner functions that refer
-to their surrounding environment) work in Julia, discussed [later in the manual](@ref constructors-and-conversion).
+Este mecanismo es también la clave de cómo los constructores de tipo y cierres (funciones internas que se refieren al entorno que las rodea) funcionan en Julia, lo cuñal se discute [después en el manual](@ref constructors-and-conversion).
 
 ## Empty generic functions
 
-Occasionally it is useful to introduce a generic function without yet adding methods. This can
-be used to separate interface definitions from implementations. It might also be done for the
-purpose of documentation or code readability. The syntax for this is an empty `function` block
-without a tuple of arguments:
+Ocasionalmente, es útil introducir una función genérica sin agregar métodos. Esto se puede usar para separar las definiciones de interfaz de las implementaciones. También se puede hacer con el fin de la documentación o la legibilidad del código. La sintaxis para esto es un bloque de `function` vacío sin una tupla de argumentos:
 
 ```julia
 function emptyfunc
 end
 ```
 
-## [Method design and the avoidance of ambiguities](@id man-method-design-ambiguities)
+## [Diseño de métodos y evitación de ambigüedades](@id man-method-design-ambiguities)
 
-Julia's method polymorphism is one of its most powerful features, yet
-exploiting this power can pose design challenges.  In particular, in
-more complex method hierarchies it is not uncommon for
-[ambiguities](@ref man-ambiguities) to arise.
+El polimorfismo de los métodos de Julia es una de sus características más poderosas, pero explotar este poder puede plantear desafíos de diseño. En particular, en jerarquías de métodos más complejos no es raro que surjan [ambigüedades](@ref man-ambiguities).
 
-Above, it was pointed out that one can resolve ambiguities like
+Arriba se indicó que uno puede resolver ambigüedades como
 
 ```julia
 f(x, y::Int) = 1
 f(x::Int, y) = 2
 ```
 
-by defining a method
+definiendo un método
 
 ```julia
 f(x::Int, y::Int) = 3
 ```
 
-This is often the right strategy; however, there are circumstances
-where following this advice blindly can be counterproductive. In
-particular, the more methods a generic function has, the more
-possibilities there are for ambiguities. When your method hierarchies
-get more complicated than this simple example, it can be worth your
-while to think carefully about alternative strategies.
+Esta es a menudo la estrategia correcta; sin embargo, hay circunstancias en las que seguir este consejo a ciegas puede ser contraproducente. En particular, cuantos más métodos tenga una función genérica, más posibilidades habrá de ambigüedades. Cuando sus jerarquías de métodos se vuelven más complicadas que este simple ejemplo, puede valer la pena pensar cuidadosamente sobre estrategias alternativas.
 
-Below we discuss particular challenges and some alternative ways to resolve such issues.
+A continuación, discutimos los desafíos particulares y algunas formas alternativas de resolver dichos problemas.
 
 ### Tuple and NTuple arguments
 
-`Tuple` (and `NTuple`) arguments present special challenges. For example,
+Los argumentos `Tuple` (y `NTuple`) presentan retos especiales. Por ejemplo,
 
 ```julia
 f(x::NTuple{N,Int}) where {N} = 1
 f(x::NTuple{N,Float64}) where {N} = 2
 ```
 
-are ambiguous because of the possibility that `N == 0`: there are no
-elements to determine whether the `Int` or `Float64` variant should be
-called. To resolve the ambiguity, one approach is define a method for
-the empty tuple:
+son ambiguos debido a la posibilidad de que `N == 0`: no hay elementos para determinar si se debe invocar a la variante` Int` o `Float64`. Para resolver la ambigüedad, un enfoque es definir un método para la tupla vacía:
 
 ```julia
 f(x::Tuple{}) = 3
 ```
 
-Alternatively, for all methods but one you can insist that there is at
-least one element in the tuple:
+Alternativamente, para todos los métodos excepto uno podemos insistir en que hay al menos un elemento en la tupla:
 
 ```julia
 f(x::NTuple{N,Int}) where {N} = 1           # this is the fallback
 f(x::Tuple{Float64, Vararg{Float64}}) = 2   # this requires at least one Float64
 ```
 
-### [Orthogonalize your design](@id man-methods-orthogonalize)
+### [Orthogonalice su diseño](@id man-methods-orthogonalize)
 
-When you might be tempted to dispatch on two or more arguments,
-consider whether a "wrapper" function might make for a simpler
-design. For example, instead of writing multiple variants:
+Cuando tenga la tentación de despachar en dos o más argumentos, considere si una función de "envoltura" podría hacer un diseño más simple. Por ejemplo, en lugar de escribir múltiples variantes:
 
 ```julia
-f(x::A, y::A) = ...
-f(x::A, y::B) = ...
-f(x::B, y::A) = ...
-f(x::B, y::B) = ...
+f (x :: A, y :: A) = ...
+f (x :: A, y :: B) = ...
+f (x :: B, y :: A) = ...
+f (x :: B, y :: B) = ...
 ```
 
-you might consider defining
+podría considerar definir
 
 ```julia
-f(x::A, y::A) = ...
-f(x, y) = f(g(x), g(y))
+f (x :: A, y :: A) = ...
+f (x, y) = f (g (x), g (y))
 ```
 
-where `g` converts the argument to type `A`. This is a very specific
-example of the more general principle of
-[orthogonal design](https://en.wikipedia.org/wiki/Orthogonality_(programming)),
-in which separate concepts are assigned to separate methods. Here, `g`
-will most likely need a fallback definition
+donde `g` convierte el argumento para escribir `A`. Esto es un ejemplo muy específico del principio más general de [diseño ortogonal](https://en.wikipedia.org/wiki/Orthogonality_ (programación)), en el que los conceptos separados se alinean a métodos separados. Aquí, `g` muy probablemente necesitará una definición de repliegue
 
 ```julia
-g(x::A) = x
+g (x :: A) = x
 ```
 
-A related strategy exploits `promote` to bring `x` and `y` to a common
-type:
+Una estrategia relacionada explota `promote` para llevar` x` y `y` a un tipo común:
 
 ```julia
-f(x::T, y::T) where {T} = ...
-f(x, y) = f(promote(x, y)...)
+f (x :: T, y :: T) donde {T} = ...
+f (x, y) = f (promover (x, y) ...)
 ```
 
-One risk with this design is the possibility that if there is no
-suitable promotion method converting `x` and `y` to the same type, the
-second method will recurse on itself infinitely and trigger a stack
-overflow. The non-exported function `Base.promote_noncircular` can be
-used as an alternative; when promotion fails it will still throw an
-error, but one that fails faster with a more specific error message.
+Un riesgo de este diseño es la posibilidad de que si no hay un método de promoción adecuado para convertir `x` y` y` al mismo tipo, el segundo método se repetirá en sí mismo infinitamente y desencadenará un desbordamiento de la pila. La función no exportada `Base.promote_noncircular` se puede usar como alternativa; cuando la promoción falla, aún arrojará un error, pero uno que falla más rápido con un mensaje de error más específico.
 
-### Dispatch on one argument at a time
+### Despacho en un argumento a la vez
 
-If you need to dispatch on multiple arguments, and there are many
-fallbacks with too many combinations to make it practical to define
-all possible variants, then consider introducing a "name cascade"
-where (for example) you dispatch on the first argument and then call
-an internal method:
+Si necesita despachar en múltiples argumentos, y hay muchos retrocesos con demasiadas combinaciones para que sea práctico definir todas las variantes posibles, entonces considere introducir una "cascada de nombres" donde (por ejemplo) despache en el primer argumento y luego llame un método interno:
 
 ```julia
-f(x::A, y) = _fA(x, y)
-f(x::B, y) = _fB(x, y)
+f (x :: A, y) = _fA (x, y)
+f (x :: B, y) = _fB (x, y)
 ```
 
-Then the internal methods `_fA` and `_fB` can dispatch on `y` without
-concern about ambiguities with each other with respect to `x`.
+Entonces los métodos internos `_fA` y` _fB` pueden enviarse en `y` sin preocuparse por las ambigüedades entre sí con respecto a `x`.
 
-Be aware that this strategy has at least one major disadvantage: in
-many cases, it is not possible for users to further customize the
-behavior of `f` by defining further specializations of your exported
-function `f`. Instead, they have to define specializations for your
-internal methods `_fA` and `_fB`, and this blurs the lines between
-exported and internal methods.
+Tenga en cuenta que esta estrategia tiene al menos una desventaja importante: en muchos casos, no es posible para los usuarios personalizar aún más el comportamiento de `f` definiendo más especializaciones de su función` f` exportada. En su lugar, tienen que definir especializaciones para sus métodos internos `_fA` y` _fB`, y esto borra las líneas entre los métodos exportados e internos.
 
-### Abstract containers and element types
+### Contenedores abstractos y tipos de elementos
 
-Where possible, try to avoid defining methods that dispatch on
-specific element types of abstract containers. For example,
+Donde sea posible, trate de evitar definir los métodos que se despachan en tipos de elementos específicos de contenedores abstractos. Por ejemplo,
 
 ```julia
--(A::AbstractArray{T}, b::Date) where {T<:Date}
+- (A :: AbstractArray {T}, b :: Date) donde {T <: Date}
 ```
 
-generates ambiguities for anyone who defines a method
+genera ambigüedades para cualquiera que defina un método
 
 ```julia
--(A::MyArrayType{T}, b::T) where {T}
+- (A :: MyArrayType {T}, b :: T) donde {T}
 ```
 
-The best approach is to avoid defining *either* of these methods:
-instead, rely on a generic method `-(A::AbstractArray, b)` and make
-sure this method is implemented with generic calls (like `similar` and
-`-`) that do the right thing for each container type and element type
-*separately*. This is just a more complex variant of the advice to
-[orthogonalize](@ref man-methods-orthogonalize) your methods.
+El mejor enfoque es evitar definir *cualquiera* de estos métodos: en su lugar, confíe en un método genérico `-(A::AbstractArray, b)` y haga Asegúrese de que este método se implemente con llamadas genéricas (como `similar` y
+`-`) que hacen lo correcto para cada tipo de contenedor y tipo de elemento *por separado*. Esta es solo una variante más compleja de los consejos para [ortogonalize](@ ref man-methods-ortogonalize) sus métodos.
 
-When this approach is not possible, it may be worth starting a
-discussion with other developers about resolving the ambiguity; just
-because one method was defined first does not necessarily mean that it
-can't be modified or eliminated.  As a last resort, one developer can
-define the "band-aid" method
+Cuando este enfoque no es posible, puede valer la pena comenzar un discusión con otros desarrolladores sobre la resolución de la ambigüedad; sólo porque un método se definió primero no necesariamente significa que no puede ser modificado o eliminado Como último recurso, un desarrollador puede definir el método de "curita"
 
 ```julia
--(A::MyArrayType{T}, b::Date) where {T<:Date} = ...
+- (A :: MyArrayType {T}, b :: Date) donde {T <: Date} = ...
 ```
 
-that resolves the ambiguity by brute force.
+eso resuelve la ambigüedad por la fuerza bruta.
 
-### Complex method "cascades" with default arguments
+### Método complejo "cascadas" con argumentos predeterminados
 
-If you are defining a method "cascade" that supplies defaults, be
-careful about dropping any arguments that correspond to potential
-defaults. For example, suppose you're writing a digital filtering
-algorithm and you have a method that handles the edges of the signal
-by applying padding:
+Si está definiendo un método "cascada" que suministra valores predeterminados, sea cuidado al eliminar cualquier argumento que corresponda al potencial por defecto. Por ejemplo, supongamos que estás escribiendo un filtro digital algoritmo y usted tiene un método que maneja los bordes de la señal mediante la aplicación de relleno:
 
 ```julia
-function myfilter(A, kernel, ::Replicate)
-    Apadded = replicate_edges(A, size(kernel))
-    myfilter(Apadded, kernel)  # now perform the "real" computation
-end
+function myfilter (A, kernel, :: Replicate)
+    Apadded = replicate_edges (A, tamaño (kernel))
+    myfilter (Apadded, kernel) # ahora realiza el cálculo "real"
+fin
 ```
 
-This will run afoul of a method that supplies default padding:
+Esto entrará en conflicto con un método que proporciona relleno predeterminado:
 
 ```julia
-myfilter(A, kernel) = myfilter(A, kernel, Replicate()) # replicate the edge by default
+myfilter (A, kernel) = myfilter (A, kernel, Replicate ()) # replica el borde por defecto
 ```
 
-Together, these two methods generate an infinite recursion with `A` constantly growing bigger.
+Juntos, estos dos métodos generan una recursión infinita con 'A' creciendo cada vez más.
 
-The better design would be to define your call hierarchy like this:
+El mejor diseño sería definir su jerarquía de llamadas de esta manera:
 
 ```julia
-struct NoPad end  # indicate that no padding is desired, or that it's already applied
+struct NoPad end # indica que no se desea relleno, o que ya está aplicado
 
-myfilter(A, kernel) = myfilter(A, kernel, Replicate())  # default boundary conditions
+myfilter (A, kernel) = myfilter (A, kernel, Replicate ()) # condiciones de contorno predeterminadas
 
-function myfilter(A, kernel, ::Replicate)
-    Apadded = replicate_edges(A, size(kernel))
-    myfilter(Apadded, kernel, NoPad())  # indicate the new boundary conditions
-end
+function myfilter (A, kernel, :: Replicate)
+    Apadded = replicate_edges (A, tamaño (kernel))
+    myfilter (Apadded, kernel, NoPad ()) # indican las nuevas condiciones de contorno
+fin
 
-# other padding methods go here
+# otros métodos de relleno van aquí
 
-function myfilter(A, kernel, ::NoPad)
-    # Here's the "real" implementation of the core computation
-end
+function myfilter (A, kernel, :: NoPad)
+    # Aquí está la implementación "real" de la computación central
+fin
 ```
 
-`NoPad` is supplied in the same argument position as any other kind of
-padding, so it keeps the dispatch hierarchy well organized and with
-reduced likelihood of ambiguities. Moreover, it extends the "public"
-`myfilter` interface: a user who wants to control the padding
-explicitly can call the `NoPad` variant directly.
+`NoPad` se proporciona en la misma posición de argumento que cualquier otro tipo de relleno, por lo que mantiene la jerarquía de despacho bien organizada y con menor probabilidad de ambigüedades. Además, amplía lo "público"interfaz `myfilter`: un usuario que quiere controlar el relleno explícitamente puede llamar a la variante `NoPad` directamente.
 
 [^Clarke61]: Arthur C. Clarke, *Profiles of the Future* (1961): Clarke's Third Law.
