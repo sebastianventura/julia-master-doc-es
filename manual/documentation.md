@@ -1,23 +1,17 @@
-# Documentation
+# Documentación
 
-Julia enables package developers and users to document functions, types and other objects easily
-via a built-in documentation system since Julia 0.4.
+Julia permite a los desarrolladores y usuarios de paquetes documentar funciones, tipos y otros objetos fácilmente a través de un sistema de documentación incorporado desde Julia 0.4.
 
-The basic syntax is very simple: any string appearing at the top-level right before an object
-(function, macro, type or instance) will be interpreted as documenting it (these are called *docstrings*).
-Here is a very simple example:
+La sintaxis básica es muy simple: cualquier cadena que aparezca en el nivel superior justo antes de que un objeto (función, macro, tipo o instancia) se interpretará como documentación (se llaman *docstrings*). He aquí un ejemplo muy simple:
 
 ```julia
 "Tell whether there are too foo items in the array."
 foo(xs::Array) = ...
 ```
 
-Documentation is interpreted as [Markdown](https://en.wikipedia.org/wiki/Markdown), so you can
-use indentation and code fences to delimit code examples from text. Technically, any object can
-be associated with any other as metadata; Markdown happens to be the default, but one can construct
-other string macros and pass them to the `@doc` macro just as well.
+La documentación se interpreta como [Markdown](https://en.wikipedia.org/wiki/Markdown), por lo que puede usar indentación y vallas de código para delimitar ejemplos de código del texto. Técnicamente, cualquier objeto puede asociarse con cualquier otro como metadatos; Markdown es el formato predeterminado, pero uno puede construir otras macros de cadena y pasarlas a la macro `@doc` también.
 
-Here is a more complex example, still using Markdown:
+Aquí hay un ejemplo más complejo, aún usando Markdown:
 
 ````julia
 """
@@ -35,42 +29,44 @@ julia> bar([1, 2], [1, 2])
 function bar(x, y) ...
 ````
 
-As in the example above, we recommend following some simple conventions when writing documentation:
+Como en el ejemplo anterior, recomendamos seguir algunas convenciones simples al escribir documentación:
 
-1. Always show the signature of a function at the top of the documentation, with a four-space indent
-   so that it is printed as Julia code.
+1. Siempre muestre la firma de una función en la parte superior de la documentación, con una sangría de cuatro espacios
+   para que se imprima como código Julia.
+   
+   Esto puede ser idéntico a la firma presente en el código Julia (como `mean (x :: AbstractArray)`),
+   o una forma simplificada. Los argumentos opcionales deben representarse con sus valores predeterminados (es decir
+   `f(x,y = 1)`) cuando sea posible, siguiendo la sintaxis real de Julia. Los argumentos opcionales que no tengan 
+   un valor predeterminado deben ponerse entre corchetes (es decir, `f(x[,y])` y `f (x [,y[,z]])`). Una solución
+   alternativa es usar varias líneas: una sin argumentos opcionales y la otra(s) con ellos. Esta
+   solución también se puede usar para documentar varios métodos relacionados de una función dada. Cuando una función
+   acepta muchos argumentos de palabras clave, solo incluye un marcador de posición `<keyword arguments>` en la firma
+   (es decir, `f (x; <keyword arguments>)`), y proporcione la lista completa bajo una sección `#Argumentos`
+   (ver el punto 4 a continuación).
 
-   This can be identical to the signature present in the Julia code (like `mean(x::AbstractArray)`),
-   or a simplified form. Optional arguments should be represented with their default values (i.e.
-   `f(x, y=1)`) when possible, following the actual Julia syntax. Optional arguments which do not
-   have a default value should be put in brackets (i.e. `f(x[, y])` and `f(x[, y[, z]])`). An alternative
-   solution is to use several lines: one without optional arguments, the other(s) with them. This
-   solution can also be used to document several related methods of a given function. When a function
-   accepts many keyword arguments, only include a `<keyword arguments>` placeholder in the signature
-   (i.e. `f(x; <keyword arguments>)`), and give the complete list under an `# Arguments` section
-   (see point 4 below).
-2. Include a single one-line sentence describing what the function does or what the object represents
-   after the simplified signature block. If needed, provide more details in a second paragraph, after
-   a blank line.
+2. Incluya una oración de una sola línea que describa qué hace la función o qué representa el objeto después del 
+   bloque de firma simplificado. Si es necesario, brinde más detalles en un segundo párrafo, después de una línea 
+   en blanco.
+   
+   La frase de una línea debe usar la forma imperativa ("Hacer esto", "Devolver eso") en lugar de la tercera 
+   persona (no escribir "Devuelve la longitud ...") al documentar funciones. Debería terminar con un punto. Si el 
+   significado de una función no se puede resumir fácilmente, dividirla en partes compostables separadas podría 
+   ser beneficioso (sin embargo, esto no debería tomarse como un requisito absoluto para cada caso).
+   
+3. No te repitas.
 
-   The one-line sentence should use the imperative form ("Do this", "Return that") instead of the
-   third person (do not write "Returns the length...") when documenting functions. It should end
-   with a period. If the meaning of a function cannot be summarized easily, splitting it into separate
-   composable parts could be beneficial (this should not be taken as an absolute requirement for
-   every single case though).
-3. Do not repeat yourself.
+   Como el nombre de la función viene dado por la firma, no es necesario iniciar la documentación con 
+   "La función` bar` ... ": vaya directamente al punto. De forma similar, si la firma especifica los tipos de 
+   argumentos, mencionarlos en la descripción es redundante.
 
-   Since the function name is given by the signature, there is no need to start the documentation
-   with "The function `bar`...": go straight to the point. Similarly, if the signature specifies
-   the types of the arguments, mentioning them in the description is redundant.
-4. Only provide an argument list when really necessary.
+4. Solo proporcione una lista de argumentos cuando sea realmente necesario.
 
-   For simple functions, it is often clearer to mention the role of the arguments directly in the
-   description of the function's purpose. An argument list would only repeat information already
-   provided elsewhere. However, providing an argument list can be a good idea for complex functions
-   with many arguments (in particular keyword arguments). In that case, insert it after the general
-   description of the function, under an `# Arguments` header, with one `-` bullet for each argument.
-   The list should mention the types and default values (if any) of the arguments:
+   Para funciones simples, a menudo es más claro mencionar el papel de los argumentos directamente en la 
+   descripción del propósito de la función. Una lista de argumentos solo repetiría la información ya provista en otro 
+   lugar. Sin embargo, proporcionar una lista de argumentos puede ser una buena idea para funciones complejas con muchos
+   argumentos (en particular argumentos de palabras clave). En ese caso, insértelo después de la descripción general de la 
+   función, bajo un encabezado `# Arguments`, con una viñeta` -` para cada argumento. La lista debe mencionar los tipos y
+   valores predeterminados (si los hay) de los argumentos:
 
    ```julia
    """
@@ -81,7 +77,11 @@ As in the example above, we recommend following some simple conventions when wri
    ...
    """
    ```
-5. Include any code examples in an `# Examples` section.
+5. Incluya cualquier ejemplo de código en la sección `# Examples`.
+
+   Los ejemplos deben, siempre que sea posible, escribirse como *doctests*. A *doctest* es un bloque de código vallado (ver [Bloques de código](@ref)) que comienza con `` `` `` `` jldoctest````` y contiene cualquier cantidad de instrucciones `julia>` junto con las entradas y resultados esperados que imitan a Julia REPL.
+
+    Por ejemplo, en la siguiente docstring se define una variable `a` y el resultado esperado, como se imprime en un Julia REPL, aparece después:
 
    Examples should, whenever possible, be written as *doctests*. A *doctest* is a fenced code block
    (see [Code blocks](@ref)) starting with ````` ```jldoctest````` and contains any number of `julia>`
@@ -825,9 +825,9 @@ aside from the `:` character that is appended to the footnote label.
 !!! note
     No checks are done during parsing to make sure that all footnote references have matching footnotes.
 
-#### Horizontal rules
+#### Reglas horizontales
 
-The equivalent of an `<hr>` HTML tag can be written using the following syntax:
+El equivalente de un tag HTML  `<hr>` puede escribirse usando la siguiente sintaxis:
 
 ```
 Text above the line.
@@ -837,12 +837,9 @@ Text above the line.
 And text below the line.
 ```
 
-#### Tables
+#### Tablas
 
-Basic tables can be written using the syntax described below. Note that markdown tables have limited
-features and cannot contain nested toplevel elements unlike other elements discussed above –
-only inline elements are allowed. Tables must always contain a header row with column names. Cells
-cannot span multiple rows or columns of the table.
+Pueden escribirse tablas básicas usando la sintaxis descrita debajo. Nótese que las tablas markdown tienen características limitadas y no pueden contener elementosde nivel superior anidados a diferencia de otros elementos discutidos antes – sólo se permiten elementos en línea. Las tablas deber siempre contener una fila cabecera con nombres de columnas. Las celdas no se pueden extender múltiples filas o columnas de la tabla.
 
 ```
 | Column One | Column Two | Column Three |
@@ -858,11 +855,9 @@ cannot span multiple rows or columns of the table.
     specifies whether the row is left-aligned, right-aligned, or (when `:` appears on both ends) center-aligned.
     Providing no `:` characters will default to right-aligning the column.
 
-#### Admonitions
+#### Admoniciones
 
-Specially formatted blocks with titles such as "Notes", "Warning", or "Tips" are known as admonitions
-and are used when some part of a document needs special attention. They can be defined using the
-following `!!!` syntax:
+Los bloques especialmente formateados con títulos como "Notas", "Advertencia" o "Consejos" se conocen como advertencias y se utilizan cuando alguna parte de un documento necesita atención especial. Se pueden definir con la siguiente sintaxis `!!!`:
 
 ```
 !!! note
@@ -876,17 +871,10 @@ following `!!!` syntax:
     This warning admonition has a custom title: `"Beware!"`.
 ```
 
-Admonitions, like most other toplevel elements, can contain other toplevel elements. When no title
-text, specified after the admonition type in double quotes, is included then the title used will
-be the type of the block, i.e. `"Note"` in the case of the `note` admonition.
+Las advertencias, como la mayoría de los otros elementos de nivel, pueden contener otros elementos de alto nivel. Cuando no se incluye texto de título, especificado después del tipo de advertencia entre comillas dobles, el título utilizado será el tipo del bloque, es decir, `" Nota "` en el caso de la advertencia de "nota".
 
-## Markdown Syntax Extensions
+## Extensiones de sintaxis Markdown
 
-Julia's markdown supports interpolation in a very similar way to basic string literals, with the
-difference that it will store the object itself in the Markdown tree (as opposed to converting
-it to a string). When the Markdown content is rendered the usual `show` methods will be called,
-and these can be overridden as usual. This design allows the Markdown to be extended with arbitrarily
-complex features (such as references) without cluttering the basic syntax.
+El Markdown de Julia admite la interpolación de una manera muy similar a los literales de cadena básicos, con la diferencia de que almacenará el objeto en el árbol Markdown (en lugar de convertirlo en una cadena). Cuando se procesa el contenido de Markdown, se invocarán los métodos `show` habituales, que pueden anularse como siempre. Este diseño permite que Markdown pueda ser extendido con características arbitrariamente complejas (como referencias) sin saturar la sintaxis básica.
 
-In principle, the Markdown parser itself can also be arbitrarily extended by packages, or an entirely
-custom flavour of Markdown can be used, but this should generally be unnecessary.
+En principio, el analizador de Markdown también se puede extender arbitrariamente por paquetes, o se puede usar un estilo de Markdown totalmente personalizado, pero esto generalmente no debería ser necesario.
