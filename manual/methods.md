@@ -372,31 +372,17 @@ julia> newfun()
 1
 ```
 
-In this example, observe that the new definition for `newfun` has been created,
-but can't be immediately called.
-The new global is immediately visible to the `tryeval` function,
-so you could write `return newfun` (without parentheses).
-But neither you, nor any of your callers, nor the functions they call, or etc.
-can call this new method definition!
+En este ejemplo, observe que la nueva definición para `newfun` ha sido creada, pero no puede ser llamada inmediatamente.
+El nuevo global es inmediatamente visible para la función `tryeval`, para que pueda escribir `return newfun` (sin paréntesis).
+¡Pero ni usted ni ninguna de las personas que llama, ni las funciones a las que llama, etc. puede llamar a esta nueva definición de método!
 
-But there's an exception: future calls to `newfun` *from the REPL* work as expected,
-being able to both see and call the new definition of `newfun`.
+Pero hay una excepción: las llamadas futuras a `newfun` *del REPL* funcionan como se esperaba, pudiendo tanto ver como invocar la nueva definición de` newfun`. Sin embargo, las futuras llamadas a `tryeval` continuarán viendo la definición de` newfun` tal como era *en la instrucción anterior en REPL*, y por lo tanto antes de esa llamada a `tryeval`.
 
-However, future calls to `tryeval` will continue to see the definition of `newfun` as it was
-*at the previous statement at the REPL*, and thus before that call to `tryeval`.
+Es posible que desee probar esto para ver cómo funciona.
 
-You may want to try this for yourself to see how it works.
+La implementación de este comportamiento es un "contador de edad mundial". Este valor monótonamente creciente rastrea cada operación de definición de método. Esto permite describir "el conjunto de definiciones de métodos visibles para un entorno de tiempo de ejecución dado" como un solo número, o "edad mundial". También permite comparar los métodos disponibles en dos mundos simplemente comparando su valor ordinal. En el ejemplo anterior, vemos que el "mundo actual" (en el que existe el método `newfun ()`) es uno mayor que el "mundo de tiempo de ejecución" local de la tarea que se corrigió cuando se inició la ejecución de `tryeval`.
 
-The implementation of this behavior is a "world age counter".
-This monotonically increasing value tracks each method definition operation.
-This allows describing "the set of method definitions visible to a given runtime environment"
-as a single number, or "world age".
-It also allows comparing the methods available in two worlds just by comparing their ordinal value.
-In the example above, we see that the "current world" (in which the method `newfun()` exists),
-is one greater than the task-local "runtime world" that was fixed when the execution of `tryeval` started.
-
-Sometimes it is necessary to get around this (for example, if you are implementing the above REPL).
-Fortunately, there is an easy solution: call the function using [`Base.invokelatest`](@ref):
+A veces es necesario evitar esto (por ejemplo, si está implementando el REPL anterior). Afortunadamente, hay una solución fácil: llamar a la función usando [`Base.invokelatest`] (@ ref):
 
 ```jldoctest
 julia> function tryeval2()
@@ -408,16 +394,14 @@ tryeval2 (generic function with 1 method)
 julia> tryeval2()
 2
 ```
-
-Finally, let's take a look at some more complex examples where this rule comes into play.
-Define a function `f(x)`, which initially has one method:
+Por último, echemos un vistazo a algunos ejemplos más complejos donde esta regñla se pone en funcionamiento. Definamos una función `f(x)`, que inicialmente tiene un método:
 
 ```jldoctest redefinemethod
 julia> f(x) = "original definition"
 f (generic function with 1 method)
 ```
 
-Start some other operations that use `f(x)`:
+Iniciamos algunas operaciones que usan `f(x)`:
 
 ```jldoctest redefinemethod
 julia> g(x) = f(x)
@@ -426,7 +410,7 @@ g (generic function with 1 method)
 julia> t = @async f(wait()); yield();
 ```
 
-Now we add some new methods to `f(x)`:
+Ahora añadimos algunos métodos nuevos a `f(x)`:
 
 ```jldoctest redefinemethod
 julia> f(x::Int) = "definition for Int"
@@ -436,7 +420,7 @@ julia> f(x::Type{Int}) = "definition for Type{Int}"
 f (generic function with 3 methods)
 ```
 
-Compare how these results differ:
+Compare cómo difieren estos resultados:
 
 ```jldoctest redefinemethod
 julia> f(1)
@@ -456,9 +440,7 @@ julia> wait(schedule(t, 1))
 
 ## Parametrically-constrained Varargs methods
 
-Function parameters can also be used to constrain the number of arguments that may be supplied
-to a "varargs" function ([Varargs Functions](@ref)).  The notation `Vararg{T,N}` is used to indicate
-such a constraint.  For example:
+Los parámetros de función pueden también ser usados para restringir el número de argumentos que pueden ser proporcionados a una función "varags" (ver [Funciones Vararg](@ref)).  La notación `Vararg{T,N}` se usa para indicar tal restricción. Por ejemplo:
 
 ```jldoctest
 julia> bar(a,b,x::Vararg{Any,2}) = (a,b,x)
@@ -478,16 +460,15 @@ Closest candidates are:
   bar(::Any, ::Any, ::Any, ::Any) at none:1
 ```
 
-More usefully, it is possible to constrain varargs methods by a parameter. For example:
+Más útil aún, es posible restringir métodos varargs mediante un parámetro. Por ejemplo:
 
 ```julia
 function getindex(A::AbstractArray{T,N}, indexes::Vararg{Number,N}) where {T,N}
 ```
 
-would be called only when the number of `indexes` matches the dimensionality of the array.
+sería llamado sólo cuando el número de `indexes` se correspondiera con la dimensionalidad del array.
 
-When only the type of supplied arguments needs to be constrained `Vararg{T}` can be equivalently
-written as `T...`. For instance `f(x::Int...) = x` is a shorthand for `f(x::Vararg{Int}) = x`.
+Cuando sólo el tipo de los argumentos propoprcionados tenga que ser restrincido , `Vararg{T}` puede escribirse de forma equivalente como `T...`. Por ejemplo `f(x::Int...) = x` es una abreviación de `f(x::Vararg{Int}) = x`.
 
 ## Note on Optional and keyword Arguments
 
