@@ -450,15 +450,11 @@ julia> @showarg(println("Yo!"))
 :(println("Yo!"))
 ```
 
-In addition to the given argument list, every macro is passed extra arguments named `__source__` and `__module__`.
+Además de la lista de argumentos dada, a cada macro se le pasan dos argumentos adicionales llamados `__source__` and `__module__`.
 
-The argument `__source__` provides information (in the form of a `LineNumberNode` object) about the parser location
-of the `@` sign from the macro invocation.
-This allows macros to include better error diagnostic information,
-and is commonly used by logging, string-parser macros, and docs, for example,
-as well as to implement the `@__LINE__`, `@__FILE__`, and `@__DIR__` macros.
+El argumento `__source__` proporciona información (en forma de un objeto `LineNumberNode`) sobre la ubicación del analizador del signo `@` de invocación de la macro . Esto permite que las macros incluyan una mejor información de diagnóstico de errores, y es comúnmente utilizada por el registro, las macros del analizador de cadenas y los documentos, por ejemplo, así como para implementar las macros `@__ LINE__`,`@__ FILE__` y `@__ DIR__` .
 
-The location information can be accessed by referencing `__source__.line` and `__source__.file`:
+Se puede acceder a la información de ubicación haciendo referencia a `__source __. Line` y` __source __. File`:
 
 ```jldoctest
 julia> macro __LOCATION__(); return QuoteNode(__source__); end
@@ -472,16 +468,11 @@ LineNumberNode
   file: Symbol none
 ```
 
-The argument `__module__` provides information (in the form of a `Module` object)
-about the expansion context of the macro invocation.
-This allows macros to look up contextual information, such as existing bindings,
-or to insert the value as an extra argument to a runtime function call doing self-reflection
-in the current module.
+El argumento `__module__` proporciona información (en forma de un objeto` Module`) sobre el contexto de expansión de invocacin de la macro. Esto permite que las macros busquen información contextual, como enlaces existentes, o que inserten el valor como un argumento adicional a una llamada de función en tiempo de ejecución que realiza la autorreflexión en el módulo actual.
 
+### Construir una macro avanzada
 
-### Building an advanced macro
-
-Here is a simplified definition of Julia's `@assert` macro:
+He aquí una versión simplificada de la macro `@assert` de Julia:
 
 ```jldoctest building
 julia> macro assert(ex)
@@ -490,7 +481,7 @@ julia> macro assert(ex)
 @assert (macro with 1 method)
 ```
 
-This macro can be used like this:
+La macro puede ser usada de esta forma:
 
 ```jldoctest building
 julia> @assert 1 == 1.0
@@ -499,27 +490,17 @@ julia> @assert 1 == 0
 ERROR: AssertionError: 1 == 0
 ```
 
-In place of the written syntax, the macro call is expanded at parse time to its returned result.
-This is equivalent to writing:
+En lugar de la sintaxis escrita, la llamada a macro es expandida en tiempo de análisis para que devuelva un resutlado. Esto es equivalente a escribir:
+
 
 ```julia
 1 == 1.0 ? nothing : throw(AssertionError("1 == 1.0"))
 1 == 0 ? nothing : throw(AssertionError("1 == 0"))
 ```
 
-That is, in the first call, the expression `:(1 == 1.0)` is spliced into the test condition slot,
-while the value of `string(:(1 == 1.0))` is spliced into the assertion message slot. The entire
-expression, thus constructed, is placed into the syntax tree where the `@assert` macro call occurs.
-Then at execution time, if the test expression evaluates to true, then `nothing` is returned,
-whereas if the test is false, an error is raised indicating the asserted expression that was false.
-Notice that it would not be possible to write this as a function, since only the *value* of the
-condition is available and it would be impossible to display the expression that computed it in
-the error message.
+Es decir, en la primera llamada, la expresión `:(1 == 1.0)` se empalma en la ranura de condición de prueba, mientras que el valor de `string(:( 1 == 1.0))` se empalma en la ranura de mensaje de aserción. Toda la expresión, así construida, se coloca en el árbol de sintaxis donde se produce la llamada de macro `@assert`. Entonces, en el tiempo de ejecución, si la expresión de prueba se evalúa como verdadera, entonces se devuelve `nothing`, mientras que si la prueba es falsa, se genera un error indicando la expresión afirmada que es falsa. Observe que no sería posible escribir esto como una función, ya que sólo está disponible el valor de la condición y sería imposible mostrar la expresión que lo calculó en el mensaje de error.
 
-The actual definition of `@assert` in the standard library is more complicated. It allows the
-user to optionally specify their own error message, instead of just printing the failed expression.
-Just like in functions with a variable number of arguments, this is specified with an ellipses
-following the last argument:
+La definición real de `@assert` en la biblioteca estándar es más complicada. Permite al usuario especificar opcionalmente su propio mensaje de error, en lugar de simplemente imprimir la expresión fallida. Al igual que en las funciones con un número variable de argumentos, esto se especifica con elipses después del último argumento:
 
 ```jldoctest assert2
 julia> macro assert(ex, msgs...)
@@ -530,11 +511,7 @@ julia> macro assert(ex, msgs...)
 @assert (macro with 1 method)
 ```
 
-Now `@assert` has two modes of operation, depending upon the number of arguments it receives!
-If there's only one argument, the tuple of expressions captured by `msgs` will be empty and it
-will behave the same as the simpler definition above. But now if the user specifies a second argument,
-it is printed in the message body instead of the failing expression. You can inspect the result
-of a macro expansion with the aptly named [`macroexpand()`](@ref) function:
+Ahora `@assert` tiene dos modos de operación, dependiendo del número de argumentos que recibe! Si sólo hay un argumento, la tupla de expresiones capturadas por `msgs` estará vacía y se comportará igual que la definición más simple anterior. Ahora bien, si el usuario especifica un segundo argumento, se imprime en el cuerpo del mensaje en lugar de la expresión que falla. Puede examinar el resultado de una expansión de macro con la función [`macroexpand()`](@ref) correctamente denominada:
 
 ```jldoctest assert2
 julia> macroexpand(:(@assert a == b))
@@ -552,11 +529,7 @@ julia> macroexpand(:(@assert a==b "a should equal b!"))
     end)
 ```
 
-There is yet another case that the actual `@assert` macro handles: what if, in addition to printing
-"a should equal b," we wanted to print their values? One might naively try to use string interpolation
-in the custom message, e.g., `@assert a==b "a ($a) should equal b ($b)!"`, but this won't work
-as expected with the above macro. Can you see why? Recall from [string interpolation](@ref string-interpolation) that
-an interpolated string is rewritten to a call to [`string()`](@ref). Compare:
+Hay otro caso que la versión real de `@assert` maneja: ¿qué pasa si, además de imprimir "a should be equal b", queremos imprimir sus valores? Uno podría ingenuamente intentar usar interpolación de cadena en el mensaje personalizado, por ejemplo, ` @assert a==b "a ($a) should equal b ($b)!"`, pero esto no funcionará como se esperaba con la macro anterior. ¿Puedes ver por qué? Recuerda de [string interpolation](@ref string-interpolation) que una cadena interpolada se reescribe a una llamada a [`string()`](@ref). Compare:
 
 ```jldoctest
 julia> typeof(:("a should equal b"))
@@ -577,31 +550,15 @@ Expr
   typ: Any
 ```
 
-So now instead of getting a plain string in `msg_body`, the macro is receiving a full expression
-that will need to be evaluated in order to display as expected. This can be spliced directly into
-the returned expression as an argument to the [`string()`](@ref) call; see [`error.jl`](https://github.com/JuliaLang/julia/blob/master/base/error.jl)
-for the complete implementation.
+Así que ahora en lugar de obtener una cadena sencilla en `msg_body`, la macro está recibiendo una expresión completa que necesitará ser evaluada para mostrarse como se esperaba. Esto puede ser empalmado directamente en la expresión devuelta como un argumento a la llamada [`string()`](@ref); Vea [`error.jl`](https://github.com/JuliaLang/julia/blob/master/base/error.jl) para la implementación completa.
 
-The `@assert` macro makes great use of splicing into quoted expressions to simplify the manipulation
-of expressions inside the macro body.
+La macro `@assert` hace un gran uso del empalme en expresiones entre comillas para simplificar la manipulación de expresiones dentro del cuerpo de la macro.
 
-### Hygiene
+### Higiene
 
-An issue that arises in more complex macros is that of [hygiene](https://en.wikipedia.org/wiki/Hygienic_macro).
-In short, macros must ensure that the variables they introduce in their returned expressions do
-not accidentally clash with existing variables in the surrounding code they expand into. Conversely,
-the expressions that are passed into a macro as arguments are often *expected* to evaluate in
-the context of the surrounding code, interacting with and modifying the existing variables. Another
-concern arises from the fact that a macro may be called in a different module from where it was
-defined. In this case we need to ensure that all global variables are resolved to the correct
-module. Julia already has a major advantage over languages with textual macro expansion (like
-C) in that it only needs to consider the returned expression. All the other variables (such as
-`msg` in `@assert` above) follow the [normal scoping block behavior](@ref scope-of-variables).
+Un problema que surge en las macros más complejas es el de la [higiene](https://en.wikipedia.org/wiki/Hygienic_macro).En resumen, las macros deben asegurarse de que las variables que introducen en sus expresiones devueltas no chocan accidentalmente con las variables existentes en el código circundante en el que se expanden. A la inversa, a menudo se espera que las expresiones que se pasan a una macro como argumentos evalúen en el contexto del código circundante, interactuando con y modificando las variables existentes. Otra preocupación surge del hecho de que una macro puede ser llamada en un módulo diferente desde donde se definió. En este caso, debemos asegurarnos de que todas las variables globales se resuelvan en el módulo correcto. Julia ya tiene una gran ventaja sobre los lenguajes con expansión de macro textual (como C) en que sólo necesita considerar la expresión devuelta. Todas las demás variables (como `msg` en `@assert` arriba) siguen el [comportamiento normal del bloque de ámbito](@ref scope-of-variables).
 
-To demonstrate these issues, let us consider writing a `@time` macro that takes an expression
-as its argument, records the time, evaluates the expression, records the time again, prints the
-difference between the before and after times, and then has the value of the expression as its
-final value. The macro might look like this:
+Para demostrar estos problemas, consideremos la posibilidad de escribir una macro `@time` que toma una expresión como su argumento, registra el tiempo, evalúa la expresión, registra el tiempo de nuevo, imprime la diferencia entre los tiempos antes y después y luego tiene el valor de La expresión como su valor final. La macro podría tener este aspecto:
 
 ```julia
 macro time(ex)
@@ -615,21 +572,12 @@ macro time(ex)
 end
 ```
 
-Here, we want `t0`, `t1`, and `val` to be private temporary variables, and we want `time` to refer
-to the [`time()`](@ref) function in the standard library, not to any `time` variable the user
-might have (the same applies to `println`). Imagine the problems that could occur if the user
-expression `ex` also contained assignments to a variable called `t0`, or defined its own `time`
-variable. We might get errors, or mysteriously incorrect behavior.
+Aquí, queremos que `t0`, `t1` y `val` sean variables temporales privadas, y queremos que `time` se refiera a la función [`time()`](@ref) de la biblioteca estándar, no a cualquier variable de tiempo que el usuario pueda tener (lo mismo se aplica a `println`). Imagine los problemas que podrían ocurrir si la expresión de usuario `ex` también contuviera asignaciones a una variable denominada `t0`, o definiese su propia variable `time`. Podríamos obtener errores o comportamiento misteriosamente incorrecto.
 
-Julia's macro expander solves these problems in the following way. First, variables within a macro
-result are classified as either local or global. A variable is considered local if it is assigned
-to (and not declared global), declared local, or used as a function argument name. Otherwise,
-it is considered global. Local variables are then renamed to be unique (using the [`gensym()`](@ref)
-function, which generates new symbols), and global variables are resolved within the macro definition
-environment. Therefore both of the above concerns are handled; the macro's locals will not conflict
-with any user variables, and `time` and `println` will refer to the standard library definitions.
 
-One problem remains however. Consider the following use of this macro:
+El expansor de macro de Julia resuelve estos problemas de la siguiente manera. En primer lugar, las variables dentro de un resultado de macro se clasifican como locales o globales. Una variable se considera local si es asignada (y no se declara global), se declara local o se utiliza como un nombre de argumento de función. De lo contrario, se considera global. Las variables locales son renombradas como únicas (utilizando la función [`gensym()`](@ref), que genera nuevos símbolos), y las variables globales se resuelven dentro del entorno de definición de macro. Por lo tanto, ambas preocupaciones se manejan; Los locales de la macro no entrarán en conflicto con ninguna variable de usuario, y `time` y `println` se referirán a las definiciones de la biblioteca estándar.
+
+Sin embargo, queda un problema. Considere el siguiente uso de esta macro:
 
 ```julia
 module MyModule
@@ -641,9 +589,7 @@ time() = ... # compute something
 end
 ```
 
-Here the user expression `ex` is a call to `time`, but not the same `time` function that the macro
-uses. It clearly refers to `MyModule.time`. Therefore we must arrange for the code in `ex` to
-be resolved in the macro call environment. This is done by "escaping" the expression with [`esc()`](@ref):
+Aquí la expresión de usuario `ex` es una llamada a `time`, pero no a la misma función `time` que usa la macro, sino que se refiere claramente a `MyModule.time`. Por tanto, debemos arreglar pora que el código en `ex` sea resuelto en el entorno de llamada de la macro. Esto se hace usando [`esc()`](@ref) para "escapar" la expresión:
 
 ```julia
 macro time(ex)
@@ -653,11 +599,9 @@ macro time(ex)
 end
 ```
 
-An expression wrapped in this manner is left alone by the macro expander and simply pasted into
-the output verbatim. Therefore it will be resolved in the macro call environment.
+Una expresión envuelta de esta manera es dejada sola por el expansor de macros y simplemente pegada en la salida. Por tanto, será resuelta en el entorno de llamada de la macro.
 
-This escaping mechanism can be used to "violate" hygiene when necessary, in order to introduce
-or manipulate user variables. For example, the following macro sets `x` to zero in the call environment:
+El mecanismo de "escapar" puede ser usado para "violar" la higiene cuando sea necesario, para introducir o manipular variables de usuario. Por ejemplo, la siguiente macro fija `x` a cero en el entorno de llamada:
 
 ```jldoctest
 julia> macro zerox()
@@ -676,16 +620,13 @@ julia> foo()
 0
 ```
 
-This kind of manipulation of variables should be used judiciously, but is occasionally quite handy.
+Esta clase de manipulación de variables debería ser usada juiciosamente, pero es ocasionalmente bastante útil.
 
-Getting the hygiene rules correct can be a formidable challenge.
-Before using a macro, you might want to consider whether a function closure
-would be sufficient. Another useful strategy is to defer as much work as possible to runtime.
-For example, many macros simply wrap their arguments in a QuoteNode or other similar Expr.
-Some examples of this include `@task body` which simply returns `schedule(Task(() -> $body))`,
-and `@eval expr`, which simply returns `eval(QuoteNode(expr))`.
+Obtener las normas de higiene correctas puede ser un desafío formidable. Antes de usar una macro, es posible que desee considerar si un cierre de función sería suficiente. Otra estrategia útil es diferir tanto trabajo como sea posible para el tiempo de ejecución. Por ejemplo, muchas macros simplemente envuelven sus argumentos en un QuoteNode u otro Expr similar. Algunos ejemplos de esto incluyen `@task body` que simplemente devuelve `schedule (Task(() -> $ body))`, y `@eval expr`, que simplemente devuelve `eval (QuoteNode (expr))`.
 
-To demonstrate, we might rewrite the `@time` example above as:
+Obtener las normas de higiene correctas puede ser un desafío formidable. Antes de usar una macro, es posible que desee considerar si un cierre de función sería suficiente. Otra estrategia útil es diferir tanto trabajo como sea posible para el tiempo de ejecución. Por ejemplo, muchas macros simplemente envuelven sus argumentos en un QuoteNode u otro Expr similar. Algunos ejemplos de esto incluyen `@task body` que simplemente devuelve` schedule (Task (() -> $ body)) `, y` @eval expr`, que simplemente devuelve `eval (QuoteNode (expr))`.
+
+Para demostrarlo, podríamos reescribir el ejemplo `@time` anterior como:
 
 ```julia
 macro time(expr)
@@ -700,18 +641,11 @@ function timeit(f)
 end
 ```
 
-However, we don't do this for a good reason: wrapping the `expr` in a new scope block (the anonymous function)
-also slightly changes the meaning of the expression (the scope of any variables in it),
-while we want `@time` to be usable with minimum impact on the wrapped code.
+Sin embargo, no hacemos esto por una buena razón: al envolver el `expr` en un nuevo bloque de alcance (la función anónima) también cambia ligeramente el significado de la expresión (el alcance de cualquier variable en él), mientras que queremos` @ time` para ser utilizable con un impacto mínimo en el código ajustado.
 
-## Code Generation
+## Generación de Código
 
-When a significant amount of repetitive boilerplate code is required, it is common to generate
-it programmatically to avoid redundancy. In most languages, this requires an extra build step,
-and a separate program to generate the repetitive code. In Julia, expression interpolation and
-[`eval()`](@ref) allow such code generation to take place in the normal course of program execution.
-For example, the following code defines a series of operators on three arguments in terms of their
-2-argument forms:
+Cuando se requiere una cantidad significativa de código repetitivo, es común generarlo programáticamente para evitar la redundancia. En la mayoría de los lenguajes, esto requiere un paso de construcción adicional y un programa separado para generar el código repetitivo. En Julia, la interpolación de expresión y [`eval()`](@ref) permiten que dicha generación de código tenga lugar en el curso normal de la ejecución del programa. Por ejemplo, el siguiente código define una serie de operadores en tres argumentos en términos de sus formas de 2 argumentos:
 
 ```julia
 for op = (:+, :*, :&, :|, :$)
@@ -721,9 +655,7 @@ for op = (:+, :*, :&, :|, :$)
 end
 ```
 
-In this manner, Julia acts as its own [preprocessor](https://en.wikipedia.org/wiki/Preprocessor),
-and allows code generation from inside the language. The above code could be written slightly
-more tersely using the `:` prefix quoting form:
+De este modo, Julia actúa como su propio [preprocesador](https://en.wikipedia.org/wiki/Preprocessor), y permite la generación de código desde dentro del lenguaje. El código anterior debería ser escrito ligeramente más secamente usando la forma prefija de citación `:`
 
 ```julia
 for op = (:+, :*, :&, :|, :$)
@@ -731,8 +663,7 @@ for op = (:+, :*, :&, :|, :$)
 end
 ```
 
-This sort of in-language code generation, however, using the `eval(quote(...))` pattern, is common
-enough that Julia comes with a macro to abbreviate this pattern:
+En este tipo de generación de código dentro del lenguaje utilizando el patrón `eval(quote(...))` es bastante común, sin embargo, que Julia venga con una macro para abreviar este patrón:
 
 ```julia
 for op = (:+, :*, :&, :|, :$)
@@ -740,9 +671,7 @@ for op = (:+, :*, :&, :|, :$)
 end
 ```
 
-The [`@eval`](@ref) macro rewrites this call to be precisely equivalent to the above longer versions.
-For longer blocks of generated code, the expression argument given to [`@eval`](@ref) can be a
-block:
+La macro [`@eval`](@ref) reescribe esta llamada para ser precisamente equivalente a las versiones largas anteriores. Para bloques de código generado más grandes, el argumento expresión dado a [`@eval`](@ref) puede ser un bloque:
 
 ```julia
 @eval begin
@@ -750,18 +679,14 @@ block:
 end
 ```
 
-## Non-Standard String Literals
+## Literales de cadena no estándar
 
-Recall from [Strings](@ref non-standard-string-literals) that string literals prefixed by an identifier are called non-standard
-string literals, and can have different semantics than un-prefixed string literals. For example:
+Recuerde de [Strings](@ref non-standard-string-literals) que los literales de cadena prefijados por un identificador se llaman literales de cadena no estándar y pueden tener semántica distinta que los literales de cadena no prefijados. Por ejemplo:
 
-  * `r"^\s*(?:#|$)"` produces a regular expression object rather than a string
-  * `b"DATA\xff\u2200"` is a byte array literal for `[68,65,84,65,255,226,136,128]`.
+* `r"^\s*(?:#|$)"` produces un objeto expresión regular en lugar de una cadena.
+* `b"DATA\xff\u2200"` es un literal array bytepara `[68,65,84,65,255,226,136,128]`.
 
-Perhaps surprisingly, these behaviors are not hard-coded into the Julia parser or compiler. Instead,
-they are custom behaviors provided by a general mechanism that anyone can use: prefixed string
-literals are parsed as calls to specially-named macros. For example, the regular expression macro
-is just the following:
+Tal vez sorprendentemente, estos comportamientos no están codificados en el analizador de Julia o en el compilador. En su lugar, son comportamientos personalizados proporcionados por un mecanismo general que cualquiera puede utilizar: los literales de cadenas prefijados se analizan como llamadas a macros de nombre especial. Por ejemplo, la macro de expresiones regulares es sólo la siguiente:
 
 ```julia
 macro r_str(p)
@@ -769,19 +694,14 @@ macro r_str(p)
 end
 ```
 
-That's all. This macro says that the literal contents of the string literal `r"^\s*(?:#|$)"` should
-be passed to the `@r_str` macro and the result of that expansion should be placed in the syntax
-tree where the string literal occurs. In other words, the expression `r"^\s*(?:#|$)"` is equivalent
-to placing the following object directly into the syntax tree:
+Eso es todo. Esta macro dice que el contenido literal de la cadena literal `r"^\s*(?:#|$)"` debe ser pasado a la macro `@r_str` y que el resultado de esa expansión debe colocarse en el árbol de sintaxis donde tiene lugar la cadena literal. En otras palabras, la expresión `r"^\s*(?:#|$)"` equivale a colocar el siguiente objeto directamente en el árbol de sintaxis:
 
 ```julia
 Regex("^\\s*(?:#|\$)")
 ```
 
-Not only is the string literal form shorter and far more convenient, but it is also more efficient:
-since the regular expression is compiled and the `Regex` object is actually created *when the code is compiled*,
-the compilation occurs only once, rather than every time the code is executed. Consider if the
-regular expression occurs in a loop:
+No sólo la forma literal de la cadena es más corta y mucho más conveniente, sino que también es más eficiente: puesto que la expresión regular se compila y el objeto Regex se crea realmente *cuando el código es compilado*, la compilación se produce sólo una vez, Se ejecuta el código. Considere si la expresión regular se produce en un bucle:
+
 
 ```julia
 for line = lines
@@ -794,9 +714,7 @@ for line = lines
 end
 ```
 
-Since the regular expression `r"^\s*(?:#|$)"` is compiled and inserted into the syntax tree when
-this code is parsed, the expression is only compiled once instead of each time the loop is executed.
-In order to accomplish this without macros, one would have to write this loop like this:
+Como la expresión regular `r"^\s*(?:#|$)"` Se compila e inserta en el árbol de sintaxis cuando se analiza este código, la expresión sólo se compila una vez en lugar de cada vez que se ejecuta el bucle. Para lograr esto sin macros, uno tendría que escribir este bucle así:
 
 ```julia
 re = Regex("^\\s*(?:#|\$)")
@@ -810,30 +728,18 @@ for line = lines
 end
 ```
 
-Moreover, if the compiler could not determine that the regex object was constant over all loops,
-certain optimizations might not be possible, making this version still less efficient than the
-more convenient literal form above. Of course, there are still situations where the non-literal
-form is more convenient: if one needs to interpolate a variable into the regular expression, one
-must take this more verbose approach; in cases where the regular expression pattern itself is
-dynamic, potentially changing upon each loop iteration, a new regular expression object must be
-constructed on each iteration. In the vast majority of use cases, however, regular expressions
-are not constructed based on run-time data. In this majority of cases, the ability to write regular
-expressions as compile-time values is invaluable.
+Por otra parte, si el compilador no pudiera determinar que el objeto regex era constante en todos los bucles, ciertas optimizaciones podrían no ser posibles, haciendo esta versión aún menos eficiente que la forma literal más conveniente de arriba. Por supuesto, todavía hay situaciones en las que la forma no literal es más conveniente: si se necesita interpolar una variable en la expresión regular, se debe tomar este enfoque más detallado; En los casos en que el patrón de expresión regular mismo es dinámico, cambiando potencialmente en cada iteración del bucle, un nuevo objeto expresión regular debe ser construido en cada iteración. Sin embargo, en la gran mayoría de los casos de uso, las expresiones regulares no se construyen sobre la base de datos de tiempo de ejecución. En esta mayoría de casos, la capacidad de escribir expresiones regulares como valores en tiempo de compilación es valiosísima.
 
-Like non-standard string literals, non-standard command literals exist using a prefixed variant
-of the command literal syntax. The command literal ```custom`literal` ``` is parsed as `@custom_cmd "literal"`.
-Julia itself does not contain any non-standard command literals, but packages can make use of
-this syntax. Aside from the different syntax and the `_cmd` suffix instead of the `_str` suffix,
-non-standard command literals behave exactly like non-standard string literals.
+Al igual que los literales de cadena no estándar, existen literales de comandos no estándar que usan una variante prefijada de la sintaxis literal del comando. El comando literal ```custom `literal` ``` se analiza como `@custom_cmd "literal"`. Julia por sí misma no contiene ningún literal de comando no estándar, pero los paquetes pueden hacer uso de esta sintaxis. Aparte de la sintaxis diferente y el sufijo `_cmd` en lugar del sufijo` _str`, los literales de comandos no estándar se comportan exactamente como los literales de cadena no estándar.
 
-In the event that two modules provide non-standard string or command literals with the same name,
-it is possible to qualify the string or command literal with a module name. For instance, if both
-`Foo` and `Bar` provide non-standard string literal `@x_str`, then one can write `Foo.x"literal"`
-or `Bar.x"literal"` to disambiguate between the two.
+En el caso de que dos módulos proporcionen cadenas o literales de comando con el mismo nombre, es posible calificar la cadena o literal de comando con un nombre de módulo. Por ejemplo, si tanto `Foo` como` Bar` proporcionan literal de cadena no estándar `@x_str`, entonces uno puede escribir `Foo.x "literal"` o `Bar.x "literal" `para desambiguar entre los dos.
+
+El mecanismo para literales de cadena definidos por el usuario es profundo, profundamente poderoso. No sólo son literales no estándar de Julia implementados usándolos, sino que también se implementa la sintaxis literal de comandos (``` `echo "Hello, $person"` ```)
+
 
 The mechanism for user-defined string literals is deeply, profoundly powerful. Not only are Julia's
 non-standard literals implemented using it, but also the command literal syntax (``` `echo "Hello, $person"` ```)
-is implemented with the following innocuous-looking macro:
+se implementa con la siguiente macro de aspecto inofensivo:
 
 ```julia
 macro cmd(str)
@@ -841,45 +747,29 @@ macro cmd(str)
 end
 ```
 
-Of course, a large amount of complexity is hidden in the functions used in this macro definition,
-but they are just functions, written entirely in Julia. You can read their source and see precisely
-what they do -- and all they do is construct expression objects to be inserted into your program's
-syntax tree.
+Por supuesto, una gran cantidad de complejidad se oculta en las funciones utilizadas en esta definición de macro, pero son sólo funciones, escritas íntegramente en Julia. Usted puede leer su fuente y ver exactamente lo que hacen -y todo lo que hacen es construir objetos de expresión para ser insertados en el árbol de sintaxis de su programa.
 
-## Generated functions
+## Funciones Generadas
 
-A very special macro is `@generated`, which allows you to define so-called *generated functions*.
-These have the capability to generate specialized code depending on the types of their arguments
-with more flexibility and/or less code than what can be achieved with multiple dispatch. While
-macros work with expressions at parsing-time and cannot access the types of their inputs, a generated
-function gets expanded at a time when the types of the arguments are known, but the function is
-not yet compiled.
+Una macro muy especial es `@generated`, que permite definir las llamadas *funciones generadas*. Éstas tienen la capacidad de generar código especializado dependiendo de los tipos de sus argumentos con más flexibilidad y/o menos código que lo que se puede lograr con el despacho múltiple. Mientras las macros trabajan con expresiones al momento de analizar y no pueden acceder a los tipos de sus entradas, una función generada se amplía en un momento en que se conocen los tipos de los argumentos, pero la función aún no se ha compilado.
 
-Instead of performing some calculation or action, a generated function declaration returns a quoted
-expression which then forms the body for the method corresponding to the types of the arguments.
-When called, the body expression is first evaluated and compiled, then the returned expression
-is compiled and run. To make this efficient, the result is often cached. And to make this inferable,
-only a limited subset of the language is usable. Thus, generated functions provide a flexible
-framework to move work from run-time to compile-time, at the expense of greater restrictions on
-the allowable constructs.
+En lugar de realizar algún cálculo o acción, una declaración de función generada devuelve una expresión entre comillas que luego forma el cuerpo para el método correspondiente a los tipos de los argumentos. Cuando se llama, la expresión del cuerpo se compila (o se extrae de una caché, en las llamadas posteriores) y sólo se evalúa la expresión devuelta, y no el código que lo generó. Así, las funciones generadas proporcionan un marco flexible para mover el trabajo desde el tiempo de ejecución hasta el tiempo de compilación.
 
-When defining generated functions, there are four main differences to ordinary functions:
+Cuando se definen las funciones generadas, hay tres diferencias principales con las funciones ordinarias:
 
-1. You annotate the function declaration with the `@generated` macro. This adds some information
-   to the AST that lets the compiler know that this is a generated function.
-2. In the body of the generated function you only have access to the *types* of the arguments –
-   not their values – and any function that was defined *before* the definition of the generated
-   function.
-3. Instead of calculating something or performing some action, you return a *quoted expression* which,
-   when evaluated, does what you want.
-4. Generated functions must not *mutate* or *observe* any non-constant global state (including,
-   for example, IO, locks, non-local dictionaries, or using `method_exists`).
-   This means they can only read global constants, and cannot have any side effects.
-   In other words, they must be completely pure.
-   Due to an implementation limitation, this also means that they currently cannot define a closure
-   or untyped generator.
+1. Uno anota la declaración de función con la macro `@generated`. Esto agrega cierta información a la AST que permite al
+   compilador saber que se trata de una función generada.
+2. En el cuerpo de la función generada sólo tiene acceso a los *tipos* de los argumentos, no a sus valores – y cualquier
+   función que fuera definida *antes* de la definición de la función generada.
+3. En lugar de calcular algo o realizar alguna acción, devuelve una *expresión citada* que, cuando se evalúa, hace lo
+   que uno quiere.
+4. Las funciones generadas no deben *mutar* ni *observar* ningún estado global no constante (incluidos, por ejemplo, 
+   IO, bloqueos, diccionarios no locales o que usen `method_exists`). Esto significa que solo pueden leer constantes 
+   globales y no pueden tener ningún efecto secundario. En otras palabras, deben ser completamente puros. Debido a 
+   una limitación de implementación, esto también significa que actualmente no pueden definir un cierre o un generador 
+   sin tipo.
 
-It's easiest to illustrate this with an example. We can declare a generated function `foo` as
+Es más fácil ilustrar esto con un ejemplo. Podemos declarar una función generada `foo` como:
 
 ```jldoctest generated
 julia> @generated function foo(x)
@@ -889,12 +779,9 @@ julia> @generated function foo(x)
 foo (generic function with 1 method)
 ```
 
-Note that the body returns a quoted expression, namely `:(x * x)`, rather than just the value
-of `x * x`.
+Tenga en cuenta que el cuerpo devuelve una expresión entre comillas, a saber `:(x * x)`, en lugar de sólo el valor de `x * x`.
 
-From the caller's perspective, they are very similar to regular functions; in fact, you don't
-have to know if you're calling a regular or generated function - the syntax and result of the
-call is just the same. Let's see how `foo` behaves:
+Desde la perspectiva del llamador, son muy similares a las funciones regulares; de hecho, no tienes que saber si estás llamando a una función regular o generada  -la sintaxis y el resultado de la llamada son iguales. Veamos cómo se comporta `foo`:
 
 ```jldoctest generated
 julia> x = foo(2); # note: output is from println() statement in the body
@@ -910,22 +797,16 @@ julia> y
 "barbar"
 ```
 
-So, we see that in the body of the generated function, `x` is the *type* of the passed argument,
-and the value returned by the generated function, is the result of evaluating the quoted expression
-we returned from the definition, now with the *value* of `x`.
+Así, vemos que en el cuerpo de la función generada, `x` es el tipo del argumento pasado, y el valor devuelto por la función generada es el resultado de la evaluación de la expresión citada que devolvimos de la definición, ahora con el *valor* de `x`.
 
-What happens if we evaluate `foo` again with a type that we have already used?
+¿Qué pasa si evaluamos foo de nuevo con un tipo que ya hemos utilizado?
 
 ```jldoctest generated
 julia> foo(4)
 16
 ```
 
-Note that there is no printout of [`Int64`](@ref). We can see that the body of the generated function
-was only executed once here, for the specific set of argument types, and the result was cached.
-After that, for this example, the expression returned from the generated function on the first
-invocation was re-used as the method body. However, the actual caching behavior is an implementation-defined
-performance optimization, so it is invalid to depend too closely on this behavior.
+Tenga en cuenta que no hay ninguna impresión de [`Int64`](@ref). El cuerpo de la función generada sólo se ejecuta una vez (no es enteramente cierto, véase la nota a continuación) cuando se compila el método para ese conjunto específico de tipos de argumentos. Después de eso, la expresión devuelta de la función generada en la primera invocación se vuelve a utilizar como el cuerpo del método.
 
 The number of times a generated function is generated *might* be only once, but it *might* also
 be more often, or appear to not happen at all. As a consequence, you should *never* write a generated
