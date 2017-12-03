@@ -1,44 +1,23 @@
-# Parallel Computing
+# Computación Paralela
 
-Most modern computers possess more than one CPU, and several computers can be combined together
-in a cluster. Harnessing the power of these multiple CPUs allows many computations to be completed
-more quickly. There are two major factors that influence performance: the speed of the CPUs themselves,
-and the speed of their access to memory. In a cluster, it's fairly obvious that a given CPU will
-have fastest access to the RAM within the same computer (node). Perhaps more surprisingly, similar
-issues are relevant on a typical multicore laptop, due to differences in the speed of main memory
-and the [cache](https://www.akkadia.org/drepper/cpumemory.pdf). Consequently, a good multiprocessing
-environment should allow control over the "ownership" of a chunk of memory by a particular CPU.
-Julia provides a multiprocessing environment based on message passing to allow programs to run
-on multiple processes in separate memory domains at once.
+La mayoría de las computadoras modernas poseen más de una CPU, y varias computadoras pueden combinarse en un cluster. Aprovechar la potencia de estas múltiples CPU permite que muchos cálculos se completen más rápidamente. Hay dos factores principales que influyen en el rendimiento: la velocidad de las propias CPUs y la velocidad de su acceso a la memoria. En un clúster, es bastante obvio que una CPU dada tendrá acceso más rápido a la RAM dentro de la misma computadora (nodo). Quizás más sorprendentemente, problemas similares son relevantes en un portátil multicore típico, debido a las diferencias en la velocidad de la memoria principal y la [caché](https://www.akkadia.org/drepper/cpumemory.pdf). En consecuencia, un buen entorno de multiprocesamiento debe permitir el control sobre la "propiedad" de un trozo de memoria por una CPU particular. Julia proporciona un entorno de multiprocesamiento basado en el paso de mensajes para permitir que los programas se ejecuten en múltiples procesos en distintos dominios de memoria a la vez.
 
-Julia's implementation of message passing is different from other environments such as MPI [^1].
-Communication in Julia is generally "one-sided", meaning that the programmer needs to explicitly
-manage only one process in a two-process operation. Furthermore, these operations typically do
-not look like "message send" and "message receive" but rather resemble higher-level operations
-like calls to user functions.
+La implementación de Julia del paso del mensajes es diferente de otros entornos tales como MPI [^1]. Comunicación en Julia es generalmente "unilateral", lo que significa que el programador necesita explícitamente administrar sólo un proceso en una operación de dos procesos. Además, estas operaciones típicamente no se parecen a "envío de mensajes" y "recepción de mensajes", sino más bien se asemejan a operaciones de nivel superior como llamadas a funciones de usuario.
 
-Parallel programming in Julia is built on two primitives: *remote references* and *remote calls*.
-A remote reference is an object that can be used from any process to refer to an object stored
-on a particular process. A remote call is a request by one process to call a certain function
-on certain arguments on another (possibly the same) process.
+La programación paralela en Julia se basa en dos primitivas: *referencias remotas* y *llamadas remotas*. Una referencia remota es un objeto que puede utilizarse desde cualquier proceso para referirse a un objeto almacenado en un proceso determinado. Una llamada remota es una petición de un proceso para llamar a una determinada función en ciertos argumentos en otro proceso (posiblemente el mismo).
 
-Remote references come in two flavors: [`Future`](@ref) and [`RemoteChannel`](@ref).
+Las referencias remotas vienen en dos variedades: [`Future`](@ref) y [`RemoteChannel`](@ref).
 
-A remote call returns a [`Future`](@ref) to its result. Remote calls return immediately; the process
-that made the call proceeds to its next operation while the remote call happens somewhere else.
-You can wait for a remote call to finish by calling [`wait()`](@ref) on the returned [`Future`](@ref),
-and you can obtain the full value of the result using [`fetch()`](@ref).
+Una llamada remota devuelve un [`Future`](@ref) a su resultado. Las llamadas remotas retornan inmediatamente; el proceso que hizo que la llamada procede a su siguiente operación mientras la llamada remota sucede en otro lugar. Podemos esperar a que una llamada remota termine llamando a [`wait()`](@ref) en el [`Future`](@ref) devuelto, y puede obtener el valor completo del resultado usando [`fetch()`](@ref).
 
-On the other hand, [`RemoteChannel`](@ref) s are rewritable. For example, multiple processes can
-co-ordinate their processing by referencing the same remote `Channel`.
+Por otro lado, los objetos [`RemoteChannel`](@ref) son reescribibles. Por ejemplo, varios procesos pueden coordinar su procesamiento haciendo referencia al mismo canal (`Channel`) remoto.
 
 Each process has an associated identifier. The process providing the interactive Julia prompt
 always has an `id` equal to 1. The processes used by default for parallel operations are referred
 to as "workers". When there is only one process, process 1 is considered a worker. Otherwise,
 workers are considered to be all processes other than process 1.
 
-Let's try this out. Starting with `julia -p n` provides `n` worker processes on the local machine.
-Generally it makes sense for `n` to equal the number of CPU cores on the machine.
+Vamos a probar esto. Comenzar con `julia -p n` proporciona `n` procesos *workers* en la máquina local. Generalmente tiene sentido igualar `n` al número de núcleos de la CPU en la máquina.
 
 ```julia
 $ ./julia -p 2
