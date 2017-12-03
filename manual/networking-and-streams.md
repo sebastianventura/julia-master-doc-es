@@ -1,15 +1,10 @@
-# Networking and Streams
+# Redes y Flujos
 
-Julia provides a rich interface to deal with streaming I/O objects such as terminals, pipes and
-TCP sockets. This interface, though asynchronous at the system level, is presented in a synchronous
-manner to the programmer and it is usually unnecessary to think about the underlying asynchronous
-operation. This is achieved by making heavy use of Julia cooperative threading ([coroutine](@ref man-tasks))
-functionality.
+Julia proporciona una interfaz rica para tratar objetos que representen un flujo contínuo de E/S como terminales, tuberías y sockets TCP. Esta interfaz, aunque asíncrona a nivel del sistema, se presenta de forma síncrona al programador y normalmente no es necesario pensar en la operación asincrónica subyacente. Esto se logra haciendo un uso intensivo de la funcionalidad de los hilos cooperativos en Julia (o [corrutinas](@ref man-tasks)).
 
-## Basic Stream I/O
+## Flujos de E/S básico
 
-All Julia streams expose at least a [`read()`](@ref) and a [`write()`](@ref) method, taking the
-stream as their first argument, e.g.:
+Todos loos flujos en Julia exponen al menos un método [`read()`](@ref) y un [`write()`](@ref), tomando el flujo como su primer argumento, por ejemplo:
 
 ```julia-repl
 julia> write(STDOUT,"Hello World");  # suppress return value 11 with ;
