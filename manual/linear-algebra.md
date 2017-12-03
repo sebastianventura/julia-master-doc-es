@@ -1,8 +1,6 @@
 # Linear algebra
 
-In addition to (and as part of) its support for multi-dimensional arrays, Julia provides native implementations
-of many common and useful linear algebra operations. Basic operations, such as [`trace`](@ref), [`det`](@ref),
-and [`inv`](@ref) are all supported:
+Además de (y como parte de) su soporte a los arrays multidimensionales, Julia proporciona implementaciones nativas de muchas operaciones de álgebra lineal comunes y útiles. Las operaciones básicas tales como la traza ([`trace`](@ref)), el determinante ([`det`](@ref)) y la inversa ([`inv`](@ref)) están todas soportadas:
 
 ```jldoctest
 julia> A = [1 2 3; 4 1 6; 7 8 1]
@@ -24,7 +22,7 @@ julia> inv(A)
   0.240385   0.0576923  -0.0673077
 ```
 
-As well as other useful operations, such as finding eigenvalues or eigenvectors:
+Así como otras operaciones útiles, como buscar autovalores o autovectores:
 
 ```jldoctest
 julia> A = [1.5 2 -4; 3 -1 -6; -10 2.3 4]
@@ -64,8 +62,7 @@ Base.LinAlg.LU{Float64,Array{Float64,2}} with factors L and U:
 [-10.0 2.3 4.0; 0.0 2.345 -3.4; 0.0 0.0 -5.24947]
 ```
 
-Since `A` is not Hermitian, symmetric, triangular, tridiagonal, or bidiagonal, an LU factorization may be the
-best we can do. Compare with:
+Como `A` no es hermítica, simétrica, triangular o bidiagonal, una factorización LU puede ser lo mejor que podemos hacer. Compara con:
 
 ```jldoctest
 julia> B = [1.5 2 -4; 2 -1 -3; -4 -3 5]
@@ -94,10 +91,7 @@ permutation:
 successful: true
 ```
 
-Here, Julia was able to detect that `B` is in fact symmetric, and used a more appropriate factorization.
-Often it's possible to write more efficient code for a matrix that is known to have certain properties e.g.
-it is symmetric, or tridiagonal. Julia provides some special types so that you can "tag" matrices as having
-these properties. For instance:
+Aquí, Julia fue capaz de detectar que `B` es de hecho simetrica, y usa una factorizacíon más apropiada. Frecuentemente es posible escribir código ms eficiente para una matriz de la que se conocen ciertas propiedades como que sea simétrica o diagonal. Julia proporciona algunos tipos especiales para que uno pueda "etiquetar" las matrices que tengan estas propiedades. Por ejemplo:
 
 ```jldoctest
 julia> B = [1.5 2 -4; 2 -1 -3; -4 -3 5]
@@ -113,9 +107,7 @@ julia> sB = Symmetric(B)
  -4.0  -3.0   5.0
 ```
 
-`sB` has been tagged as a matrix that's (real) symmetric, so for later operations we might perform on it,
-such as eigenfactorization or computing matrix-vector products, efficiencies can be found by only referencing
-half of it. For example:
+`sB` ha sido etiquetada como una matriz que es simétrica (real) por lo que para algunas operacioneas que podríamos hacer sobre ella, tal como la autofactorización o calbular productos matriz-vector, pueden encontrarse eficiencias sólo referenciando la mitad de ella. Por ejemplo:
 
 ```jldoctest
 julia> B = [1.5 2 -4; 2 -1 -3; -4 -3 5]
@@ -142,15 +134,9 @@ julia> sB\x
  -1.1087
  -1.45652
 ```
-The `\` operation here performs the linear solution. Julia's parser provides convenient dispatch
-to specialized methods for the *transpose* of a matrix left-divided by a vector, or for the various combinations
-of transpose operations in matrix-matrix solutions. Many of these are further specialized for certain special
-matrix types. For example, `A\B` will end up calling [`Base.LinAlg.A_ldiv_B!`](@ref) while `A'\B` will end up calling
-[`Base.LinAlg.Ac_ldiv_B`](@ref), even though we used the same left-division operator. This works for matrices too: `A.'\B.'`
-would call [`Base.LinAlg.At_ldiv_Bt`](@ref). The left-division operator is pretty powerful and it's easy to write compact,
-readable code that is flexible enough to solve all sorts of systems of linear equations.
+La operación realiza aquí la resolución de la ecuación lineal. El analizador sintáctico de Julia proporciona un despacho conveniente para métodos especializados para la *transpuesta* de una matriz o una matriz dividida por la izquierda por un vector, o para las distintas combinaciones u operacioneas de transposición en soluciones matriz-matriz. Muchas de ellas son incluso más especializadas para ciertos tipos especiales de matrices. Por ejemplo, `A\B` acabará llamando a [`Base.LinAlg.A_ldiv_B!`](@ref) mientras que `A'\B` acabará llamando a [`Base.LinAlg.Ac_ldiv_B`](@ref), incluso aunque usáramos el mismo operador de división por la izquierda. Esto funcionea también para matrices: `A.'\B.'` invocará a [`Base.LinAlg.At_ldiv_Bt`](@ref). El operador de división por la izquierda es muy potente y es fácil escribir código compacto y bastante legible para resolver todo tipo de sistemas de ecuaciones lineales.
 
-## Special matrices
+## Matrices especiales
 
 [Matrices with special symmetries and structures](http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=3274)
 arise often in linear algebra and are frequently associated with various matrix factorizations.
