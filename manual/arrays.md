@@ -2,20 +2,11 @@
 
 Julia, como la mayoría de los lenguajes informáticos técnicos, proporciona una implementación de los arrays de primera clase. La mayoría de los lenguajes informáticos técnicos prestan mucha atención a su implementación de arrays a expensas de otros contenedores. Julia no trata los arrays de manera especial. La biblioteca de arrays se ha implementado casi completamente en el propio lenguaje Julia, y deriva su rendimiento del compilador, al igual que cualquier otro código escrito en Julia. Como tal, es también posible definir tipos de arrays personalizados heredando de AbstractArray. Consulte la [sección de manual en la interfaz AbstractArray](@ref man-interface-array) para ms detalles sobre implementar un tipo array personalizado.
 
-An array is a collection of objects stored in a multi-dimensional grid. In the most general case,
-an array may contain objects of type `Any`. For most computational purposes, arrays should contain
-objects of a more specific type, such as [`Float64`](@ref) or [`Int32`](@ref).
+Un array es una colección de objetos almacenados en una cuadrícula multidimensional. En el caso más general, un array puede contener objetos de tipo `Any`. Para la mayoría de los propósitos computacionales, los arrays deben contener objetos de un tipo más específico, como  [`Float64`](@ref) o [`Int32`](@ref).
 
-In general, unlike many other technical computing languages, Julia does not expect programs to
-be written in a vectorized style for performance. Julia's compiler uses type inference and generates
-optimized code for scalar array indexing, allowing programs to be written in a style that is convenient
-and readable, without sacrificing performance, and using less memory at times.
+En general, a diferencia de muchos otros lenguajes informáticos técnicos, Julia no espera que los programas se escriban en un estilo vectorizado para el rendimiento. El compilador de Julia utiliza la inferencia de tipos y genera código optimizado para la indexación escalar de arrays, permitiendo que los programas se escriban en un estilo que sea conveniente y legible, sin sacrificar el rendimiento y utilizando menos memoria a veces.
 
-In Julia, all arguments to functions are passed by reference. Some technical computing languages
-pass arrays by value, and this is convenient in many cases. In Julia, modifications made to input
-arrays within a function will be visible in the parent function. The entire Julia array library
-ensures that inputs are not modified by library functions. User code, if it needs to exhibit similar
-behavior, should take care to create a copy of inputs that it may modify.
+En Julia, todos los argumentos a las funciones se pasan por referencia. Algunos lenguajes informáticos técnicos pasan los arrays por valor, y esto es conveniente en muchos casos. En Julia, las modificaciones hechas a los arrays de entrada dentro de una función serán visibles en la función principal. Toda la biblioteca de arrays de Julia garantiza que las entradas no sean modificadas por las funciones de biblioteca. El código de usuario, si necesita mostrar un comportamiento similar, debe tener cuidado de crear una copia de las entradas que puede modificar.
 
 ## Arrays
 
@@ -36,13 +27,9 @@ behavior, should take care to create a copy of inputs that it may modify.
 
 ### Construcción e Inicialización
 
-Many functions for constructing and initializing arrays are provided. In the following list of
-such functions, calls with a `dims...` argument can either take a single tuple of dimension sizes
-or a series of dimension sizes passed as a variable number of arguments. Most of these functions
-also accept a first input `T`, which is the element type of the array. If the type `T` is
-omitted it will default to [`Float64`](@ref).
+Existen muchas funciones para construir e inicializar matrices. En la siguiente lista de tales funciones, las llamadas con un argumento `dims...` pueden tomar una sola tupla de tamaños de dimensión o una serie de tamaños de dimensión pasados como un número variable de argumentos. Muchas de estas funciones también aceptan un primea entrada `T`, que es el tipo de los elementos del array. Si este tipo es omitido se asumirá como tipo por defecto por defecto [`Float64`](@ref).
 
-| Function                           | Description                                                                                                                                                                                                                                  |
+| Función                           | Descripción                                                                                                                                                                                                                    |
 |:---------------------------------- |:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`Array{T}(dims...)`](@ref)        | an uninitialized dense [`Array`](@ref)                                                                                                                                                                                                       |
 | [`zeros(T, dims...)`](@ref)        | an `Array` of all zeros                                                                                                                                                                                                                      |
@@ -74,17 +61,17 @@ converted to that type using `convert()`.
 
 ### Concatenación
 
-Arrays can be constructed and also concatenated using the following functions:
+Los arrays pueden ser construídos y también concatenados usando las siguientes funciones:
 
 | Function               | Description                                          |
 |:---------------------- |:---------------------------------------------------- |
-| [`cat(k, A...)`](@ref) | concatenate input n-d arrays along the dimension `k` |
-| [`vcat(A...)`](@ref)   | shorthand for `cat(1, A...)`                         |
-| [`hcat(A...)`](@ref)   | shorthand for `cat(2, A...)`                         |
+| [`cat(k, A...)`](@ref) | concatena n-d arrays a lo largo de la dimensión `k`  |
+| [`vcat(A...)`](@ref)   | abreviatura para `cat(1, A...)`                      |
+| [`hcat(A...)`](@ref)   | abreviatura para `cat(2, A...)`                      |
 
-Scalar values passed to these functions are treated as 1-element arrays.
+Los valores escalares pasados a estas funciones son tratados como arrays de 1 elemento.
 
-The concatenation functions are used so often that they have special syntax:
+Las funciones de concatenación se usan tan frecuentemente que tiene una sintaxis especial:
 
 | Expression        | Calls             |
 |:----------------- |:----------------- |
@@ -92,16 +79,13 @@ The concatenation functions are used so often that they have special syntax:
 | `[A B C ...]`     | [`hcat()`](@ref)  |
 | `[A B; C D; ...]` | [`hvcat()`](@ref) |
 
-[`hvcat()`](@ref) concatenates in both dimension 1 (with semicolons) and dimension 2 (with spaces).
+`hvcat()` concatena tanto en la dimensión 1 (con puntos y coma) como en la dos (con espacios).
 
-### Inicializadores de array tipados
+### Inicializadores tipados de arrays
 
-An array with a specific element type can be constructed using the syntax `T[A, B, C, ...]`. This
-will construct a 1-d array with element type `T`, initialized to contain elements `A`, `B`, `C`,
-etc. For example `Any[x, y, z]` constructs a heterogeneous array that can contain any values.
+Se puede construir una matriz con un tipo de elemento específico utilizando la sintaxis `T[A, B, C, ...]`. Esto construirá un array 1-d con el tipo de elemento `T`, inicializado para contener los elementos `A`, `B`, `C`, etc. Por ejemplo `Any [x, y, z]` construye un array heterogéneo que puede contener cualquier valor.
 
-Concatenation syntax can similarly be prefixed with a type to specify the element type of the
-result.
+La sintaxis de concatenación puede ser prefijada de forma similar con un tipo para especificar el tipo de elemento del resultado.
 
 ```jldoctest
 julia> [[1 2] [3 4]]
@@ -113,23 +97,17 @@ julia> Int8[[1 2] [3 4]]
  1  2  3  4
 ```
 
-### Comprehensiones
+### Comprensiones
 
-Comprehensions provide a general and powerful way to construct arrays. Comprehension syntax is
-similar to set construction notation in mathematics:
+Las comprensiones proporcionan una forma general y potente de construir arrays. La sintaxis de comprensión es similar a la notación de construcción de conjuntos en matemáticas:
 
 ```
 A = [ F(x,y,...) for x=rx, y=ry, ... ]
 ```
 
-The meaning of this form is that `F(x,y,...)` is evaluated with the variables `x`, `y`, etc. taking
-on each value in their given list of values. Values can be specified as any iterable object, but
-will commonly be ranges like `1:n` or `2:(n-1)`, or explicit arrays of values like `[1.2, 3.4, 5.7]`.
-The result is an N-d dense array with dimensions that are the concatenation of the dimensions
-of the variable ranges `rx`, `ry`, etc. and each `F(x,y,...)` evaluation returns a scalar.
+El significado de esta forma es que `F(x, y, ...)` se evalúa para las variables x, y, etc. tomando cada valor en su lista de valores dada. Los valores se pueden especificar como cualquier objeto iterable, pero comúnmente serán rangos como `1:n` o `2:(n-1)`, o arrays de valores explícitos como `[1.2, 3.4, 5.7]`. El resultado es una matriz N-d densa con dimensiones que son la concatenación de las dimensiones de las variables rango `rx`, `ry`, etc. y cada evaluación `F (x, y, ...)` devuelve un escalar.
 
-The following example computes a weighted average of the current element and its left and right
-neighbor along a 1-d grid. :
+El siguiente ejemplo calcula un promedio ponderado del elemento actual y su vecino izquierdo y derecho a lo largo de una cuadrícula de 1-d. :
 
 ```julia-repl
 julia> x = rand(8)
@@ -153,9 +131,7 @@ julia> [ 0.25*x[i-1] + 0.5*x[i] + 0.25*x[i+1] for i=2:length(x)-1 ]
  0.656511
 ```
 
-The resulting array type depends on the types of the computed elements. In order to control the
-type explicitly, a type can be prepended to the comprehension. For example, we could have requested
-the result in single precision by writing:
+El tipo del array resultante depende de los tipos de los elementos calculados. Para controlar el tipo explícitamente, un tipo puede ser precedido a la comprensión. Por ejemplo, podríamos haber solicitado el resultado en precisión simple escribiendo:
 
 ```julia
 Float32[ 0.25*x[i-1] + 0.5*x[i] + 0.25*x[i+1] for i=2:length(x)-1 ]
@@ -163,26 +139,21 @@ Float32[ 0.25*x[i-1] + 0.5*x[i] + 0.25*x[i+1] for i=2:length(x)-1 ]
 
 ### Expresiones Generador
 
-Comprehensions can also be written without the enclosing square brackets, producing an object
-known as a generator. This object can be iterated to produce values on demand, instead of allocating
-an array and storing them in advance (see [Iteration](@ref)). For example, the following expression
-sums a series without allocating memory:
+Las comprensiones también se pueden escribir sin los corchetes adjuntos, produciendo un objeto conocido como generador. Este objeto puede iterarse para producir valores bajo demanda, en lugar de asignar una matriz y almacenarlos de antemano (véase [Iteración](@ref)). Por ejemplo, la siguiente expresión suma una serie sin asignar memoria:
 
 ```jldoctest
 julia> sum(1/n^2 for n=1:1000)
 1.6439345666815615
 ```
 
-When writing a generator expression with multiple dimensions inside an argument list, parentheses
-are needed to separate the generator from subsequent arguments:
+Cuando se escribe una expresión generador con múltiples dimensiones dentro de una lista de argumentos, se necesitan paréntesis para separar el generador de argumentos posteriores:
 
 ```julia-repl
 julia> map(tuple, 1/(i+j) for i=1:2, j=1:2, [1:4;])
 ERROR: syntax: invalid iteration specification
 ```
 
-All comma-separated expressions after `for` are interpreted as ranges. Adding parentheses lets
-us add a third argument to `map`:
+Todas las expresiones separadas por comas después de se interpretan como rangos. Añadir paréntesis nos permite añadir un tercer argumento a `map`:
 
 ```jldoctest
 julia> map(tuple, (1/(i+j) for i=1:2, j=1:2), [1 3; 2 4])
@@ -191,8 +162,7 @@ julia> map(tuple, (1/(i+j) for i=1:2, j=1:2), [1 3; 2 4])
  (0.333333, 2)  (0.25, 4)
 ```
 
-Ranges in generators and comprehensions can depend on previous ranges by writing multiple `for`
-keywords:
+Los rangos en generadores y comprensiones pueden depender de rangos anteriores escribiendo varias palabras clave `for`:
 
 ```jldoctest
 julia> [(i,j) for i=1:3 for j=1:i]
@@ -205,9 +175,9 @@ julia> [(i,j) for i=1:3 for j=1:i]
  (3, 3)
 ```
 
-In such cases, the result is always 1-d.
+En estos casos, el resultado es siempre 1-d.
 
-Generated values can be filtered using the `if` keyword:
+Los valores generados se pueden filtrar usando la palabra clave if:
 
 ```jldoctest
 julia> [(i,j) for i=1:3 for j=1:i if i+j == 4]
@@ -218,39 +188,25 @@ julia> [(i,j) for i=1:3 for j=1:i if i+j == 4]
 
 ### [Indexación](@id man-array-indexing)
 
-The general syntax for indexing into an n-dimensional array A is:
+La sintaxis general para indexar en un array n-dimensional `A` es:
 
 ```
 X = A[I_1, I_2, ..., I_n]
 ```
 
-where each `I_k` may be a scalar integer, an array of integers, or any other
-[supported index](@ref man-supported-index-types). This includes
-[`Colon`](@ref) (`:`) to select all indices within the entire dimension,
-ranges of the form `a:c` or `a:b:c` to select contiguous or strided
-subsections, and arrays of booleans to select elements at their `true` indices.
+donde cada `I_k` puede ser un entero escalar, un array de enteros o cualquier otro [índice soportado](@ref man-supported-index-types). Esto incluye [`Colon`](@ref) (`:`) para seleccionar todos los índices dentro de la dimensión completa, rangos de la forma `a:c` o `a:b:c` para seleccionar subsecciones contiguas o con salto, y arrays de booleans para seleccionar elementos en sus índices `true`.
 
-If all the indices are scalars, then the result `X` is a single element from the array `A`. Otherwise,
-`X` is an array with the same number of dimensions as the sum of the dimensionalities of all the
-indices.
+Si todos los índices fueran escalares, entonces el resultado `X` es un solo elemento del array `A`. De lo contrario, `X` es un array con el mismo número de dimensiones que la suma de las dimensionalidades de todos los índices.
 
-If all indices are vectors, for example, then the shape of `X` would be `(length(I_1), length(I_2), ..., length(I_n))`,
-with location `(i_1, i_2, ..., i_n)` of `X` containing the value `A[I_1[i_1], I_2[i_2], ..., I_n[i_n]]`.
-If `I_1` is changed to a two-dimensional matrix, then `X` becomes an `n+1`-dimensional array of
-shape `(size(I_1, 1), size(I_1, 2), length(I_2), ..., length(I_n))`. The matrix adds a dimension.
-The location `(i_1, i_2, i_3, ..., i_{n+1})` contains the value at `A[I_1[i_1, i_2], I_2[i_3], ..., I_n[i_{n+1}]]`.
-All dimensions indexed with scalars are dropped. For example, the result of `A[2, I, 3]` is an
-array with size `size(I)`. Its `i`th element is populated by `A[2, I[i], 3]`.
+Si todos los índices son vectores, por ejemplo, entonces la forma de `X` sería `(length(I_1), length(I_2), ..., length(I_n))`, donde las ubicaciones `(i_1, i_2, ..., i_n)` de `X` contienen el valor `A[I_1[i_1], I_2[i_2], ..., I_n[i_n]]`. Si `I_1` se cambia por un array bidimensional, entonces `X` se vuelve un `n+1`-dimensional array de forma `(size(I_1, 1), size(I_1, 2), length(I_2), ..., length(I_n))`. La matriz añade una dimensión. La ubicación `(i_1, i_2, i_3, ..., i_{n+1})` contiene el valor en `A[I_1[i_1, i_2], I_2[i_3], ..., I_n[i_{n+1}]]`. Todas las dimensiones indexadas con escalares se eliminan. Por ejemplo, el resultado de `A[2, I, 3]` es un array de tamaño `size(I)`. Su i-ésimo elemento es poblado por `A[2, I[i], 3]`.
 
-As a special part of this syntax, the `end` keyword may be used to represent the last index of
-each dimension within the indexing brackets, as determined by the size of the innermost array
-being indexed. Indexing syntax without the `end` keyword is equivalent to a call to `getindex`:
+Como parte especial de esta sintaxis, se puede usar la palabra clave `end` para representar el último índice de cada dimensión dentro de los corchetes de indexación, según lo determinado por el tamaño del array más interno indexado. La sintaxis de indexación sin la palabra `end` es equivalente a una llamada a `getindex`:
 
 ```
 X = getindex(A, I_1, I_2, ..., I_n)
 ```
 
-Example:
+Ejemplo:
 
 ```jldoctest
 julia> x = reshape(1:16, 4, 4)
@@ -271,9 +227,7 @@ julia> x[1, [2 3; 4 1]]
  13  1
 ```
 
-Empty ranges of the form `n:n-1` are sometimes used to indicate the inter-index location between
-`n-1` and `n`. For example, the [`searchsorted()`](@ref) function uses this convention to indicate
-the insertion point of a value not found in a sorted array:
+Los rangos vacío de la forma `n:n-1` se suelen usar para indicar la localización inter-index entre `n-1` y `n`. Por ejemplo, la función [`searchsorted()`](@ref) usa esta convención para indicar el punto de inserción de un valor no encontrados en un array ordenado:
 
 ```jldoctest
 julia> a = [1,2,5,6,7];
@@ -282,36 +236,24 @@ julia> searchsorted(a, 3)
 3:2
 ```
 
-### Assignment
+### Asignación
 
-The general syntax for assigning values in an n-dimensional array A is:
-
+La sintaxis general para asignar valores en un array `A` es:
 ```
 A[I_1, I_2, ..., I_n] = X
 ```
 
-where each `I_k` may be a scalar integer, an array of integers, or any other
-[supported index](@ref man-supported-index-types). This includes
-[`Colon`](@ref) (`:`) to select all indices within the entire dimension,
-ranges of the form `a:c` or `a:b:c` to select contiguous or strided
-subsections, and arrays of booleans to select elements at their `true` indices.
+donde cada `I_k` puede ser un índice escalar, un array de enteros o cualquier otro [índice soportado](@ref man-supported-index-types). Esto incluye [`Colon`](@ref) (`:`) para seleccionar todos los índices dentro de la dimensión completa, rangos de la forma `a:c` o `a:b:c` para seleccionar subsecciones contiguas o con salto, y arrays de booleans para seleccionar elementos en sus índices `true`.
 
-If `X` is an array, it must have the same number of elements as the product of the lengths of
-the indices: `prod(length(I_1), length(I_2), ..., length(I_n))`. The value in location `I_1[i_1], I_2[i_2], ..., I_n[i_n]`
-of `A` is overwritten with the value `X[i_1, i_2, ..., i_n]`. If `X` is not an array, its value
-is written to all referenced locations of `A`.
+Si `X` es un array, debe tener el mismo número de elementos que el producto de las longitudes de los índices `prod(length(I_1), length(I_2), ..., length(I_n))`. El valor en la localización `I_1[i_1], I_2[i_2], ..., I_n[i_n]`de `A` es sobreescrito con el valor `X[i_1, i_2, ..., i_n]`. Si `X` no es un array, su valor es escrito a todas las localizaciones referenciadas de `A`.
 
-Just as in [Indexing](@ref man-array-indexing), the `end` keyword may be used
-to represent the last index of each dimension within the indexing brackets, as
-determined by the size of the array being assigned into. Indexed assignment
-syntax without the `end` keyword is equivalent to a call to
-[`setindex!()`](@ref):
+Justo como en [Indexación](@ref man-array-indexing), la palabra clave `end` puede utilizarse para representar el último índice de cada dimensión dentro de los corchetes de los índices, como queda determinado por el tamaño del array en el que se está siendo asignado. La sintaxis de la asignacin indwexada sin la palabra clave `end` es equivalente a llamar a la función [`setindex!()`](@ref):
 
 ```
 setindex!(A, X, I_1, I_2, ..., I_n)
 ```
 
-Example:
+Ejemplo:
 
 ```jldoctest
 julia> x = collect(reshape(1:9, 3, 3))
