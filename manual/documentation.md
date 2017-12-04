@@ -106,6 +106,7 @@ Como en el ejemplo anterior, recomendamos seguir algunas convenciones simples al
    ````
 
    !!! warning
+   
        Invocar a `rand` y otras funciones relacionadas con RNG deben evitarse en doctests ya que no producirán 
        salidas consistentes durante diferentes sesiones de Julia. Si desea mostrar alguna funcionalidad relacionada 
        con la generación de números aleatorios, una opción es construir explícitamente y sembrar su propio 
@@ -122,9 +123,10 @@ A continuación, puede ejecutar `make -C doc doctest` para ejecutar todos los do
 
     Los ejemplos que no se pueden verificar deben escribirse dentro de bloques de código delimitados que comiencen con `` `` `` `` julia````` para que se destaquen correctamente en la documentación generada.   
     
-   !!! Consejo
+   !!! Tip
        Siempre que sea posible, los ejemplos deben ser ** autónomos ** y ** ejecutables ** para que los lectores 
        puedan probarlos sin tener que incluir ninguna dependencia.
+       
 6. Usa los backticks para identificar el código y las ecuaciones.
 
     Los identificadores de Julia y los extractos del código siempre deben aparecer entre los backticks
