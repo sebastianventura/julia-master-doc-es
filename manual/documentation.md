@@ -77,7 +77,7 @@ Como en el ejemplo anterior, recomendamos seguir algunas convenciones simples al
    ...
    """
    ```
-5. Incluya cualquier ejemplo de código en la sección `# Examples`.
+5. Incluya cualquier ejemplo de código en la sección `#Examples`.
 
    Los ejemplos deben, siempre que sea posible, escribirse como *doctests*. A *doctest* es un bloque de código vallado (ver [Bloques de código](@ref)) que comienza con `` `` `` `` jldoctest````` y contiene cualquier cantidad de instrucciones `julia>` junto con las entradas y resultados esperados que imitan a Julia REPL.
 
@@ -106,36 +106,35 @@ Como en el ejemplo anterior, recomendamos seguir algunas convenciones simples al
    ````
 
    !!! warning
-       Calling `rand` and other RNG-related functions should be avoided in doctests since they will not
-       produce consistent outputs during different Julia sessions. If you would like to show some random
-       number generation related functionality, one option is to explicitly construct and seed your own
-       [`MersenneTwister`](@ref) (or other pseudorandom number generator) and pass it to the functions you are
-       doctesting.
+       Invocar a `rand` y otras funciones relacionadas con RNG deben evitarse en doctests ya que no producirán 
+       salidas consistentes durante diferentes sesiones de Julia. Si desea mostrar alguna funcionalidad relacionada 
+       con la generación de números aleatorios, una opción es construir explícitamente y sembrar su propio 
+       [`MersenneTwister`](@ref) (u otro generador de números pseudoaleatorios) y pasarlo a las funciones que está 
+       confirmando.
 
-       Operating system word size ([`Int32`](@ref) or [`Int64`](@ref)) as well as path separator differences
-       (`/` or `\`) will also affect the reproducibility of some doctests.
+        El tamaño de palabra del sistema operativo ([`Int32`] (@ ref) o [` Int64`] (@ ref)) así como las diferencias 
+        del separador de ruta (`/` o `\`) también afectarán la reproducibilidad de algunos documentos.
 
-       Note that whitespace in your doctest is significant! The doctest will fail if you misalign the
-       output of pretty-printing an array, for example.
+        ¡Tenga en cuenta que el espacio en blanco en su doctest es significativo! El doctest fallará si desalinea 
+        la salida de impresión bonita de una matriz, por ejemplo.
+       
+A continuación, puede ejecutar `make -C doc doctest` para ejecutar todos los doctests en el Manual de Julia, lo que garantizará que su ejemplo funcione.
 
-   You can then run `make -C doc doctest` to run all the doctests in the Julia Manual, which will
-   ensure that your example works.
+    Los ejemplos que no se pueden verificar deben escribirse dentro de bloques de código delimitados que comiencen con `` `` `` `` julia````` para que se destaquen correctamente en la documentación generada.   
+    
+   !!! Consejo
+       Siempre que sea posible, los ejemplos deben ser ** autónomos ** y ** ejecutables ** para que los lectores 
+       puedan probarlos sin tener que incluir ninguna dependencia.
+6. Usa los backticks para identificar el código y las ecuaciones.
 
-   Examples that are untestable should be written within fenced code blocks starting with ````` ```julia`````
-   so that they are highlighted correctly in the generated documentation.
+    Los identificadores de Julia y los extractos del código siempre deben aparecer entre los backticks
+    `` `` `` `para habilitar el resaltado. Las ecuaciones en la sintaxis de LaTeX se pueden insertar entre los 
+    backticks dobles `` `` `` ``.
+    Use caracteres Unicode en lugar de su secuencia de escape LaTeX, es decir `` `` `α = 1``` `` en lugar de 
+    `` `` `\\ alpha = 1``` ``.
+7. Coloque los caracteres iniciales y finales `` `` `en líneas por sí mismos.
 
-   !!! tip
-       Wherever possible examples should be **self-contained** and **runnable** so that readers are able
-       to try them out without having to include any dependencies.
-6. Use backticks to identify code and equations.
-
-   Julia identifiers and code excerpts should always appear between backticks ``` ` ``` to enable
-   highlighting. Equations in the LaTeX syntax can be inserted between double backticks ``` `` ```.
-   Use Unicode characters rather than their LaTeX escape sequence, i.e. ``` ``α = 1`` ``` rather
-   than ``` ``\\alpha = 1`` ```.
-7. Place the starting and ending `"""` characters on lines by themselves.
-
-   That is, write:
+   Esto es, escriba:
 
    ```julia
    """
@@ -146,7 +145,7 @@ Como en el ejemplo anterior, recomendamos seguir algunas convenciones simples al
    f(x, y) = ...
    ```
 
-   rather than:
+   en lugar de:
 
    ```julia
    """...
@@ -155,13 +154,13 @@ Como en el ejemplo anterior, recomendamos seguir algunas convenciones simples al
    f(x, y) = ...
    ```
 
-   This makes it more clear where docstrings start and end.
-8. Respect the line length limit used in the surrounding code.
+Esto deja más claro dónde comienzan y finalizan las cadenas de documentos.
+8. Respete el límite de longitud de línea utilizado en el código circundante.
 
-   Docstrings are edited using the same tools as code. Therefore, the same conventions should apply.
-   It it advised to add line breaks after 92 characters.
+    Las *Docstrings* se editan usando las mismas herramientas que el código. Por lo tanto, las mismas convenciones deberían aplicarse.
+    Se aconseja agregar saltos de línea después de 92 caracteres.
 
-## Accessing Documentation
+## Acceder a documentación
 
 Documentation can be accessed at the REPL or in [IJulia](https://github.com/JuliaLang/IJulia.jl)
 by typing `?` followed by the name of a function or macro, and pressing `Enter`. For example,
