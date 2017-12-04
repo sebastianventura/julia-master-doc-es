@@ -346,7 +346,7 @@ julia> A[CartesianIndex.(indices(A, 1), indices(A, 2)), :]
     `end` para representar el último índice de una dimensión. No use la palabra `end` en expresiones de
     indexación que puedan contener `CartesianIndex` o *arrays* en ellos.
 
-#### Indexacin Lógica
+#### Indexación Lógica
 
 A menudo denomnada indexación lógica o indexación con una máscara lógica, la indexación mediante  una matriz booleana selecciona elementos en los índices cuyos valores son `verdaderos`. La indexación por un vector booleano `B` es efectivamente igual a la indexación por el vector de enteros que es devuelto por [`find (B)`](@ref). De forma similar, la indexación por una matriz booleana `N`-dimensional es efectivamente igual a la indexación por el vector de `CartesianIndex{N}`s donde sus valores son` true`. Un índice lógico debe ser un vector de la misma longitud que la dimensión en la que indexa, o debe ser el único índice proporcionado y debe coincidir con el tamaño y la dimensionalidad de la matriz en la que se indexa. En general, es más eficiente usar matrices booleanas como índices directamente en lugar de llamar primero a [`find()`](@ref).
 
@@ -509,55 +509,13 @@ aumente el índice `i` de [` getindex (A, i) `] (@ ref) por [` stride (A, k) `] 
 método [`Base.unsafe_convert (Ptr {T}, A)`] (@ ref), el diseño de la memoria debe corresponder
 de la misma manera a estos pasos.
 
+El tipo [`Array`](@ref) es una instancia específica de `DenseArray` donde los elementos se almacenan en orden de columnas principales (consulte notas adicionales en [Sugerencias de rendimiento](@ref man-performance-tips)). [`Vector`](@ref) y [`Matrix`](@ref) son alias para los casos 1-d y 2-d. Las operaciones específicas como la indexación escalar, la asignación y algunas otras operaciones básicas específicas del almacenamiento son todas las que deben implementarse para [`Array`](@ref), de modo que el resto de la biblioteca de matriz pueda implementarse de una forma genérica.
 
-The base array type in Julia is the abstract type [`AbstractArray{T,N}`](@ref). It is parametrized by
-the number of dimensions `N` and the element type `T`. [`AbstractVector`](@ref) and [`AbstractMatrix`](@ref) are
-aliases for the 1-d and 2-d cases. Operations on `AbstractArray` objects are defined using higher
-level operators and functions, in a way that is independent of the underlying storage. These operations
-generally work correctly as a fallback for any specific array implementation.
+`SubArray` es una especialización de `AbstractArray` que realiza indexación por referencia en lugar de copiar. Un `SubArray` se crea con la función [`view()`](@ref), que se llama de la misma manera que [`getindex()`](@ref) (con una matriz y una serie de argumentos de índice) . El resultado de [`view()`](@ref) se ve igual que el resultado de [`getindex()`] (@ref), excepto que los datos se dejan en su lugar. [`view()`](@ref) almacena los vectores de índice de entrada en un objeto `SubArray`, que luego puede usarse para indexar la matriz original de forma indirecta. Al colocar la macro [`@views`](@ref) delante de una expresión o bloque de código, cualquier segmento `array[...]` en esa expresión se convertirá para crear una vista `SubArray` en su lugar.
 
-The `AbstractArray` type includes anything vaguely array-like, and implementations of it might
-be quite different from conventional arrays. For example, elements might be computed on request
-rather than stored. However, any concrete `AbstractArray{T,N}` type should generally implement
-at least [`size(A)`](@ref) (returning an `Int` tuple), [`getindex(A,i)`](@ref) and [`getindex(A,i1,...,iN)`](@ref getindex);
-mutable arrays should also implement [`setindex!()`](@ref). It is recommended that these operations
-have nearly constant time complexity, or technically Õ(1) complexity, as otherwise some array
-functions may be unexpectedly slow. Concrete types should also typically provide a [`similar(A,T=eltype(A),dims=size(A))`](@ref)
-method, which is used to allocate a similar array for [`copy()`](@ref) and other out-of-place
-operations. No matter how an `AbstractArray{T,N}` is represented internally, `T` is the type of
-object returned by *integer* indexing (`A[1, ..., 1]`, when `A` is not empty) and `N` should be
-the length of the tuple returned by [`size()`](@ref).
+`StridedVector` y` StridedMatrix` son alias convenientes definidos para que Julia pueda llamar a un rango más amplio de funciones BLAS y LAPACK pasándoles objetos [`Array`](@ref) o `SubArray`, y ahorrando así ineficiencias de asignación de memoria y copia.
 
-`DenseArray` is an abstract subtype of `AbstractArray` intended to include all arrays that are
-laid out at regular offsets in memory, and which can therefore be passed to external C and Fortran
-functions expecting this memory layout. Subtypes should provide a method [`stride(A,k)`](@ref)
-that returns the "stride" of dimension `k`: increasing the index of dimension `k` by `1` should
-increase the index `i` of [`getindex(A,i)`](@ref) by [`stride(A,k)`](@ref). If a pointer conversion
-method [`Base.unsafe_convert(Ptr{T}, A)`](@ref) is provided, the memory layout should correspond
-in the same way to these strides.
-
-The [`Array`](@ref) type is a specific instance of `DenseArray` where elements are stored in column-major
-order (see additional notes in [Performance Tips](@ref man-performance-tips)). [`Vector`](@ref) and [`Matrix`](@ref) are aliases for
-the 1-d and 2-d cases. Specific operations such as scalar indexing, assignment, and a few other
-basic storage-specific operations are all that have to be implemented for [`Array`](@ref), so
-that the rest of the array library can be implemented in a generic manner.
-
-`SubArray` is a specialization of `AbstractArray` that performs indexing by reference rather than
-by copying. A `SubArray` is created with the [`view()`](@ref) function, which is called the same
-way as [`getindex()`](@ref) (with an array and a series of index arguments). The result of [`view()`](@ref)
-looks the same as the result of [`getindex()`](@ref), except the data is left in place. [`view()`](@ref)
-stores the input index vectors in a `SubArray` object, which can later be used to index the original
-array indirectly.  By putting the [`@views`](@ref) macro in front of an expression or
-block of code, any `array[...]` slice in that expression will be converted to
-create a `SubArray` view instead.
-
-`StridedVector` and `StridedMatrix` are convenient aliases defined to make it possible for Julia
-to call a wider range of BLAS and LAPACK functions by passing them either [`Array`](@ref) or
-`SubArray` objects, and thus saving inefficiencies from memory allocation and copying.
-
-The following example computes the QR decomposition of a small section of a larger array, without
-creating any temporaries, and by calling the appropriate LAPACK function with the right leading
-dimension size and stride parameters.
+El siguiente ejemplo calcula la descomposición QR de una pequeña sección de una matriz más grande, sin crear ningún temporario, y llamando a la función LAPACK apropiada con el tamaño de la dimensión principal adelantada y los parámetros de salto.
 
 ```julia-repl
 julia> a = rand(10,10)
@@ -595,19 +553,14 @@ julia> r
   0.0       0.866567
 ```
 
-## Sparse Vectors and Matrices
+## Vectores y Matrices *Sparse*
 
-Julia has built-in support for sparse vectors and
-[sparse matrices](https://en.wikipedia.org/wiki/Sparse_matrix). Sparse arrays are arrays
-that contain enough zeros that storing them in a special data structure leads to savings
-in space and execution time, compared to dense arrays.
+Julia tiene soporte integrado para vectores y [matrices dispersas (*sparse*)](https://en.wikipedia.org/wiki/Sparse_matrix). Las matrices *sparse* son matrices que contienen suficientes ceros para almacenarlos en una estructura de datos especial que ahorra espacio y tiempo de ejecución, en comparación con las matrices densas.
 
 ### [Compressed Sparse Column (CSC) Sparse Matrix Storage](@id man-csc)
 
-In Julia, sparse matrices are stored in the [Compressed Sparse Column (CSC) format](https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_column_.28CSC_or_CCS.29).
-Julia sparse matrices have the type [`SparseMatrixCSC{Tv,Ti}`](@ref), where `Tv` is the
-type of the stored values, and `Ti` is the integer type for storing column pointers and
-row indices. The internal representation of `SparseMatrixCSC` is as follows:
+En Julia, las matrices dispersas se almacenan en el formato [Compressed Sparse Column (CSC)] (https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_column_.28CSC_or_CCS.29).
+Las matrices *sparse* de Julia tienen el tipo [`SparseMatrixCSC{Tv, Ti}`](@ref), donde `Tv` es el tipo de los valores almacenados, y` Ti` es el tipo entero para almacenar punteros de columnas e índices de filas. La representación interna de `SparseMatrixCSC` es la siguiente:
 
 ```julia
 struct SparseMatrixCSC{Tv,Ti<:Integer} <: AbstractSparseMatrix{Tv,Ti}
@@ -619,28 +572,14 @@ struct SparseMatrixCSC{Tv,Ti<:Integer} <: AbstractSparseMatrix{Tv,Ti}
 end
 ```
 
-The compressed sparse column storage makes it easy and quick to access the elements in the column
-of a sparse matrix, whereas accessing the sparse matrix by rows is considerably slower. Operations
-such as insertion of previously unstored entries one at a time in the CSC structure tend to be slow. This is
-because all elements of the sparse matrix that are beyond the point of insertion have to be moved
-one place over.
+El almacenamiento de columnas dispersas y comprimidas facilita y agiliza el acceso a los elementos en la columna de una matriz *sparse*, mientras que el acceso a la matriz *sparse* por filas es considerablemente más lento. Las operaciones como la inserción de entradas previamente no almacenadas de una en una en la estructura de CSC tienden a ser lentas. Esto se debe a que todos los elementos de la matriz *sparse* que están más allá del punto de inserción deben moverse un lugar más.
 
-All operations on sparse matrices are carefully implemented to exploit the CSC data structure
-for performance, and to avoid expensive operations.
+Todas las operaciones en matrices *sparse* se implementan cuidadosamente para aprovechar la estructura de datos CSC para el rendimiento y para evitar operaciones costosas.
 
-If you have data in CSC format from a different application or library, and wish to import it
-in Julia, make sure that you use 1-based indexing. The row indices in every column need to be
-sorted. If your `SparseMatrixCSC` object contains unsorted row indices, one quick way to sort
-them is by doing a double transpose.
+Si tiene datos en formato CSC desde una aplicación o biblioteca diferente, y desea importarlos en Julia, asegúrese de utilizar la indexación basada en 1. Los índices de fila en cada columna deben ser ordenados. Si su objeto `SparseMatrixCSC` contiene índices de filas sin clasificar, una forma rápida de ordenarlos es haciendo una doble transposición.
 
-In some applications, it is convenient to store explicit zero values in a `SparseMatrixCSC`. These
-*are* accepted by functions in `Base` (but there is no guarantee that they will be preserved in
-mutating operations). Such explicitly stored zeros are treated as structural nonzeros by many
-routines. The [`nnz()`](@ref) function returns the number of elements explicitly stored in the
-sparse data structure, including structural nonzeros. In order to count the exact number of
-numerical nonzeros, use [`countnz()`](@ref), which inspects every stored element of a sparse
-matrix. [`dropzeros()`](@ref), and the in-place [`dropzeros!()`](@ref), can be used to
-remove stored zeros from the sparse matrix.
+En algunas aplicaciones, es conveniente almacenar valores cero explícitos en `SparseMatrixCSC`. Estas *son* aceptadas por funciones en `Base` (pero no hay garantía de que se conservarán en las operaciones de mutación). Tales ceros explícitamente almacenados son tratados como no estructurales por muchas rutinas. La función [`nnz()`](@ref) devuelve la cantidad de elementos almacenados explícitamente en la estructura de datos dispersos, incluidos los no-ceros estructurales. Para contar el número exacto de nozeros numéricos, use [`countnz()`](@ref), que inspecciona todos los elementos almacenados de un parásito
+matriz. [`dropzeros()`](@ref), y el in-place [`dropzeros!()`](@ref), se puede usar para eliminar ceros almacenados de la matriz dispersa.
 
 ```jldoctest
 julia> A = sparse([1, 2, 3], [1, 2, 3], [0, 2, 0])
@@ -656,10 +595,7 @@ julia> dropzeros(A)
 
 ### Sparse Vector Storage
 
-Sparse vectors are stored in a close analog to compressed sparse column format for sparse
-matrices. In Julia, sparse vectors have the type [`SparseVector{Tv,Ti}`](@ref) where `Tv`
-is the type of the stored values and `Ti` the integer type for the indices. The internal
-representation is as follows:
+Los vectores dispersos se almacenan en un formato de columna dispersa análoga a comprimida para matrices dispersas. En Julia, los vectores dispersos tienen el tipo [`SparseVector {Tv, Ti}`] (@ ref) donde `Tv` es el tipo de los valores almacenados y` Ti` el tipo entero para los índices. La representación interna es la siguiente:
 
 ```julia
 struct SparseVector{Tv,Ti<:Integer} <: AbstractSparseVector{Tv,Ti}
@@ -669,8 +605,7 @@ struct SparseVector{Tv,Ti<:Integer} <: AbstractSparseVector{Tv,Ti}
 end
 ```
 
-As for [`SparseMatrixCSC`](@ref), the `SparseVector` type can also contain explicitly
-stored zeros. (See [Sparse Matrix Storage](@ref man-csc).).
+En cuanto a [`SparseMatrixCSC`](@ref), el tipo` SparseVector` también puede contener ceros almacenados explícitamente. (Consulte [Almacenamiento de matriz *sparse*] (@ ref man-csc).).
 
 ### Sparse Vector and Matrix Constructors
 
@@ -751,11 +686,11 @@ julia> issparse(speye(5))
 true
 ```
 
-### Sparse matrix operations
+### Operaciones con matrices *sparse*
 
 Las operaciones aritméticas en matrices *sparse* también funcionan como lo hacen en matrices densas. La indexación de, la asignación en y la concatenación de matrices *sparse* funcionan de la misma manera que las matrices densas. Las operaciones de indexación, especialmente la asignación, son costosas, cuando se llevan a cabo un elemento a la vez. En muchos casos, puede ser mejor convertir la matriz dispersa en formato `(I,J,V)` usando [`findnz()`](@ref), manipular los valores o la estructura en los vectores densos `(I,J,V) `, y luego reconstruir la matriz *sparse*.
 
-### Correspondence of dense and sparse methods
+### Correspondencia de métodos densos y *sparse*
 
 La siguiente tabla proporciona una correspondencia entre los métodos incorporados en matrices *sparse* y sus métodos correspondientes en tipos de matriz densa. En general, los métodos que generan matrices *sparse* difieren de sus contrapartes densas en que la matriz resultante sigue el mismo patrón de dispersión que una matriz *sparse* dada `S`, o que la matriz *sparse* resultante tiene densidad `d`, es decir, cada elemento de matriz tiene una probabilidad `d` de ser diferente de cero.
 
