@@ -473,17 +473,9 @@ julia> broadcast(+, a, b)
  1.73659  0.873631
 ```
 
-[Dotted operators](@ref man-dot-operators) such as `.+` and `.*` are equivalent
-to `broadcast` calls (except that they fuse, as described below). There is also a
-[`broadcast!()`](@ref) function to specify an explicit destination (which can also
-be accessed in a fusing fashion by `.=` assignment), and functions [`broadcast_getindex()`](@ref)
-and [`broadcast_setindex!()`](@ref) that broadcast the indices before indexing. Moreover, `f.(args...)`
-is equivalent to `broadcast(f, args...)`, providing a convenient syntax to broadcast any function
-([dot syntax](@ref man-vectorized)). Nested "dot calls" `f.(...)` (including calls to `.+` etcetera)
-[automatically fuse](@ref man-dot-operators) into a single `broadcast` call.
+[Los operadores con punto](@ref man-dot-operators) tales como `.+` y `.*` son equivalentes a llamadas a `broadcast` (excepto que se funden, como se describe a continuación). También hay una función [`broadcast!()`](@ref) para especificar un destino explícito (al que también se puede acceder por fusión mediante asignación `.=`), y funciones [`broadcast_getindex ()`](@ref) y [`broadcast_setindex! ()`] (@ref) que retransmiten los índices antes de indexar. Además, `f. (Args ...)` es equivalente a `broadcast(f, args ...)`, proporcionando una sintaxis conveniente para transmitir cualquier función ([sintaxis de punto](@ref man-vectorized)). "Llamadas punto" anidadas `f. (...)` (incluidas las llamadas a `.+` Etcétera) [fusibles automáticamente](@ ref man-dot-operators) en una sola llamada `broadcast`.
 
-Additionally, [`broadcast()`](@ref) is not limited to arrays (see the function documentation),
-it also handles tuples and treats any argument that is not an array, tuple or `Ref` (except for `Ptr`) as a "scalar".
+Además, [`broadcast ()`] (@ref) no está limitado a las matrices (ver la documentación de la función), también maneja tuplas y trata cualquier argumento que no sea una matriz, tupla o `Ref` (excepto para` Ptr` ) como un "escalar".
 
 ```jldoctest
 julia> convert.(Float32, [1, 2])
@@ -503,7 +495,20 @@ julia> string.(1:3, ". ", ["First", "Second", "Third"])
  "3. Third"
 ```
 
-### Implementation
+### Implementación
+
+El tipo de matriz base en Julia es el tipo abstracto [`AbstractArray {T, N}`](@ref). Este tipo está parametrizado por el número de dimensiones `N` y el tipo de elementos `T`. [`AbstractVector`](@ref) y [`AbstractMatrix`](@ref) son alias para los casos 1-d y 2-d. Las operaciones en los objetos `AbstractArray` se definen usando operadores y funciones de alto nivel, de  manera que es independiente del almacenamiento subyacente. Estas operaciones generalmente funcionan correctamente como una alternativa para cualquier implementación de matriz específica.
+
+El tipo `AbstractArray` incluye algo vagamente parecido a un array, y las implementaciones de este podrían ser bastante diferentes de laos arrays convencionales. Por ejemplo, los elementos se pueden calcular a petición en lugar de ser almacenados. Sin embargo, cualquier tipo concreto de `AbstractArray{T, N}` debería implementar al menos [`size(A)`](@ref) (devolviendo una tupla `Int`), [`getindex(A,i)`](@ref) y [`getindex(A, i1, ..., iN)`](@ref getindex); Las matrices mutables también deberían implementar [`setindex!()`](@ ref). Se recomienda que estas operaciones tengan complejidad temporal casi constante, o técnicamente complejidad de orden 1, ya que de lo contrario algún conjunto de funciones pueden ser inesperadamente lentas. Los tipos concretos también deberían proporcionar un método [`similar(A, T = el type(A), dims = size(A))`](@ ref), que se utiliza para asignar un conjunto similar para [`copy()`](@ref) y otras operaciones de actualización. No importa cómo se represente internamente un `AbstractArray {T, N}`, `T` es el tipo de objeto devuelto por *integer* indización (`A [1, ..., 1]`, cuando `A` no está vacío) y` N` debe ser la longitud de la tupla devuelta por [`size()`] (@ref).
+
+`DenseArray` es un subtipo abstracto de` AbstractArray` que pretende incluir todas las matrices que están
+establecido en compensaciones regulares en la memoria, y que por lo tanto se puede pasar a C externo y Fortran
+funciones que esperan este diseño de memoria. Los subtipos deberían proporcionar un método [`stride (A, k)`] (@ ref)
+que devuelve el "paso" de la dimensión `k`: aumentar el índice de dimensión` k` por `1` debería
+aumente el índice `i` de [` getindex (A, i) `] (@ ref) por [` stride (A, k) `] (@ ref). Si una conversión de puntero
+método [`Base.unsafe_convert (Ptr {T}, A)`] (@ ref), el diseño de la memoria debe corresponder
+de la misma manera a estos pasos.
+
 
 The base array type in Julia is the abstract type [`AbstractArray{T,N}`](@ref). It is parametrized by
 the number of dimensions `N` and the element type `T`. [`AbstractVector`](@ref) and [`AbstractMatrix`](@ref) are
