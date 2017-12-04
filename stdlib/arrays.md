@@ -1,6 +1,6 @@
 # [Arrays](@id lib-arrays)
 
-## Constructors and Types
+## Constructores y Tipos
 
 ```@docs
 Core.AbstractArray
@@ -31,7 +31,7 @@ Base.Random.randsubseq
 Base.Random.randsubseq!
 ```
 
-## Basic functions
+## Funciones básicas
 
 ```@docs
 Base.ndims
@@ -51,7 +51,7 @@ Base.sub2ind
 Base.LinAlg.checksquare
 ```
 
-## Broadcast and vectorization
+## Retransmisión y Vectorización
 
 See also the [dot syntax for vectorizing functions](@ref man-vectorized);
 for example, `f.(args...)` implicitly calls `broadcast(f, args...)`.
@@ -66,7 +66,7 @@ Base.Broadcast.broadcast_getindex
 Base.Broadcast.broadcast_setindex!
 ```
 
-## Indexing and assignment
+## Indexación y Asignación
 
 ```@docs
 Base.getindex(::AbstractArray, ::Any...)
@@ -81,7 +81,7 @@ Base.checkbounds
 Base.checkindex
 ```
 
-## Views (SubArrays and other view types)
+## Vistas (SubArrays y otros tipos de vistas)
 
 ```@docs
 Base.view
@@ -96,7 +96,7 @@ Base.squeeze
 Base.vec
 ```
 
-## Concatenation and permutation
+## Concatenación and permutación
 
 ```@docs
 Base.cat
@@ -130,7 +130,7 @@ Base.PermutedDimsArray
 Base.promote_shape
 ```
 
-## Array functions
+## Funciones de Arrays
 
 ```@docs
 Base.accumulate(::Any, ::Any, ::Integer)
@@ -153,7 +153,7 @@ Base.mapslices
 Base.sum_kbn
 ```
 
-## Combinatorics
+## Combinatoria
 
 ```@docs
 Base.Random.randperm
@@ -185,7 +185,7 @@ Base.ror!
 Base.ror
 ```
 
-## [Sparse Vectors and Matrices](@id stdlib-sparse-arrays)
+## [Matrices y Vectores *Sparse*](@id stdlib-sparse-arrays)
 
 Sparse vectors and matrices largely support the same set of operations as their dense counterparts.
 The following functions are specific to sparse arrays.
