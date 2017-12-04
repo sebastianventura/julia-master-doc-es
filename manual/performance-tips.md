@@ -1,50 +1,45 @@
-# [Performance Tips](@id man-performance-tips)
+# [Consejos de rendimiento](@id man-performance-tips)
 
-In the following sections, we briefly go through a few techniques that can help make your Julia
-code run as fast as possible.
+En las siguientes secciones, trataremos brevemente unas pocas técnicas que pueden ayudar a hacer nuestro código Julia lo más rápido posible.
 
-## Avoid global variables
+## Evitar las variables globales
 
-A global variable might have its value, and therefore its type, change at any point. This makes
-it difficult for the compiler to optimize code using global variables. Variables should be local,
-or passed as arguments to functions, whenever possible.
+Una variable global puede cambiar su valor, y por lo tanto su tipo, en cualquier punto. Esto hace que sea difícil para el compilador optimizar el código utilizando variables globales. Las variables deben ser locales, o pasar como argumentos a las funciones, siempre que sea posible.
 
-Any code that is performance critical or being benchmarked should be inside a function.
+Cualquier código que sea crítico para el rendimiento o que esté siendo evaluado debe estar dentro de una función.
 
-We find that global names are frequently constants, and declaring them as such greatly improves
-performance:
+Encontramos que los nombres globales son frecuentemente constantes, y declararlos como tales mejora enormemente el rendimiento:
 
 ```julia
 const DEFAULT_VAL = 0
 ```
 
-Uses of non-constant globals can be optimized by annotating their types at the point of use:
+Los usos de variables globales no constantes se pueden optimizar anotando sus tipos en el punto de uso:
 
 ```julia
 global x
 y = f(x::Int + 1)
 ```
 
-Writing functions is better style. It leads to more reusable code and clarifies what steps are
-being done, and what their inputs and outputs are.
+Escribir funciones es mejor estilo. Conduce a un código más reutilizable y aclara qué pasos se están realizando y cuáles son sus entradas y salidas.
 
 !!! note
-    All code in the REPL is evaluated in global scope, so a variable defined and assigned
-    at toplevel will be a **global** variable.
-
-In the following REPL session:
+    Todo el código en el REPL se evalúa en el alcance global, por lo que una variable definida y asignada en el nivel 
+    superior será una variable **global**.
+    
+En la siguiente sesion del REPL:
 
 ```julia-repl
 julia> x = 1.0
 ```
 
-is equivalent to:
+es equivalente a:
 
 ```julia-repl
 julia> global x = 1.0
 ```
 
-so all the performance issues discussed previously apply.
+por lo que todos los asuntos de rendimiento discutidos previamente se aplican.
 
 ## Measure performance with [`@time`](@ref) and pay attention to memory allocation
 
