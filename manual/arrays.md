@@ -55,9 +55,7 @@ Existen muchas funciones para construir e inicializar matrices. En la siguiente 
 
 [^1]: *iid*, independently and identically distributed.
 
-The syntax `[A, B, C, ...]` constructs a 1-d array (vector) of its arguments. If all
-arguments have a common [promotion type](@ref conversion-and-promotion) then they get
-converted to that type using `convert()`.
+La sintaxis `[A, B, C, ...]` construye un array 1-dimensional (vector) a partir de sus argumentos. Si todos los argumentos tienen un [tipo de promocion](@ref conversion-and-promotion) comun entonces ellos son convertidos a este tipo usando `convert()`.
 
 ### Concatenación
 
@@ -291,8 +289,7 @@ En la expresión `A[I_1, I_2, ..., I_n]`, cada `I_k` puede ser un índice escala
 
 #### Índices Cartesianos
 
-The special `CartesianIndex{N}` object represents a scalar index that behaves
-like an `N`-tuple of integers spanning multiple dimensions.  For example:
+El objeto especial `CartesianIndex{N}` representa un índice escalar que se comporta como una `N`-tupla de enteros que abarcan multiples dimensioneas. Por ejemplo:
 
 ```jldoctest cartesianindex
 julia> A = reshape(1:32, 4, 4, 2);
@@ -303,19 +300,9 @@ julia> A[3, 2, 1]
 julia> A[CartesianIndex(3, 2, 1)] == A[3, 2, 1] == 7
 true
 ```
+Considerado solo, esto puede parecer relativamente trivial; `CartesianIndex` simplemente reúne múltiples enteros juntos en un objeto que representa un único índice multidimensional. Sin embargo, cuando se combina con otras formas de indexación e iteradores que producen `CartesianIndex`es, esto puede conducir directamente a un código muy elegante y eficiente. Ver [Iteración](@ref) a continuación, y para algunos ejemplos más avanzados, ver [esta publicación en el blog sobre algoritmos multidimensionales e iteración](https://julialang.org/blog/2016/02/iteration).
 
-Considered alone, this may seem relatively trivial; `CartesianIndex` simply
-gathers multiple integers together into one object that represents a single
-multidimensional index. When combined with other indexing forms and iterators
-that yield `CartesianIndex`es, however, this can lead directly to very elegant
-and efficient code. See [Iteration](@ref) below, and for some more advanced
-examples, see [this blog post on multidimensional algorithms and
-iteration](https://julialang.org/blog/2016/02/iteration).
-
-Arrays of `CartesianIndex{N}` are also supported. They represent a collection
-of scalar indices that each span `N` dimensions, enabling a form of indexing
-that is sometimes referred to as pointwise indexing. For example, it enables
-accessing the diagonal elements from the first "page" of `A` from above:
+Las matrices de `CartesianIndex {N}` también son compatibles. Representan una colección de índices escalares que abarcan cada una de las dimensiones `N`, lo que permite una forma de indexación que a veces se denomina indexación puntual. Por ejemplo, permite acceder a los elementos diagonales desde la primera "página" de 'A' desde arriba:
 
 ```jldoctest cartesianindex
 julia> page = A[:,:,1]
@@ -335,11 +322,7 @@ julia> page[[CartesianIndex(1,1),
  11
  16
 ```
-
-This can be expressed much more simply with [dot broadcasting](@ref man-vectorized)
-and by combining it with a normal integer index (instead of extracting the
-first `page` from `A` as a separate step). It can even be combined with a `:`
-to extract both diagonals from the two pages at the same time:
+Esto se puede expresar mucho más simplemente con [*dot broadcasting*] (@ref man-vectorized) y combinándolo con un índice entero normal (en lugar de extraer la primera `page` de` A` como un paso separado). Incluso se puede combinar con `:` para extraer ambas diagonales de las dos páginas al mismo tiempo:
 
 ```jldoctest cartesianindex
 julia> A[CartesianIndex.(indices(A, 1), indices(A, 2)), 1]
@@ -359,22 +342,13 @@ julia> A[CartesianIndex.(indices(A, 1), indices(A, 2)), :]
 
 !!! warning
 
-    `CartesianIndex` and arrays of `CartesianIndex` are not compatible with the
-    `end` keyword to represent the last index of a dimension. Do not use `end`
-    in indexing expressions that may contain either `CartesianIndex` or arrays thereof.
+    Los objetos `CartesianIndex` y los arrays de `CartesianIndex` no son compatibles con la palabra clave 
+    `end` para representar el último índice de una dimensión. No use la palabra `end` en expresiones de
+    indexación que puedan contener `CartesianIndex` o *arrays* en ellos.
 
-#### Logical indexing
+#### Indexacin Lógica
 
-Often referred to as logical indexing or indexing with a logical mask, indexing
-by a boolean array selects elements at the indices where its values are `true`.
-Indexing by a boolean vector `B` is effectively the same as indexing by the
-vector of integers that is returned by [`find(B)`](@ref). Similarly, indexing
-by a `N`-dimensional boolean array is effectively the same as indexing by the
-vector of `CartesianIndex{N}`s where its values are `true`. A logical index
-must be a vector of the same length as the dimension it indexes into, or it
-must be the only index provided and match the size and dimensionality of the
-array it indexes into. It is generally more efficient to use boolean arrays as
-indices directly instead of first calling [`find()`](@ref).
+A menudo denomnada indexación lógica o indexación con una máscara lógica, la indexación mediante  una matriz booleana selecciona elementos en los índices cuyos valores son `verdaderos`. La indexación por un vector booleano `B` es efectivamente igual a la indexación por el vector de enteros que es devuelto por [`find (B)`](@ref). De forma similar, la indexación por una matriz booleana `N`-dimensional es efectivamente igual a la indexación por el vector de `CartesianIndex{N}`s donde sus valores son` true`. Un índice lógico debe ser un vector de la misma longitud que la dimensión en la que indexa, o debe ser el único índice proporcionado y debe coincidir con el tamaño y la dimensionalidad de la matriz en la que se indexa. En general, es más eficiente usar matrices booleanas como índices directamente en lugar de llamar primero a [`find()`](@ref).
 
 ```jldoctest
 julia> x = reshape(1:16, 4, 4)
@@ -405,9 +379,9 @@ julia> x[mask]
  16
 ```
 
-### Iteration
+### Iteración
 
-The recommended ways to iterate over a whole array are
+Las formas recomendadas de iterar sobre un array completo son:
 
 ```julia
 for a in A
@@ -419,9 +393,7 @@ for i in eachindex(A)
 end
 ```
 
-The first construct is used when you need the value, but not index, of each element. In the second
-construct, `i` will be an `Int` if `A` is an array type with fast linear indexing; otherwise,
-it will be a `CartesianIndex`:
+La primera construcción se usa cuando necesitamos el valor, pero no los índices, de cada elemento. En la segunda construcción, `i` será un `Int` si `A` es un tipo array con indexacin lineal rápida; en caso contrario será un `CartesianIndex`:
 
 ```jldoctest
 julia> A = rand(4,3);
@@ -439,56 +411,40 @@ i = CartesianIndex{2}((2, 2))
 i = CartesianIndex{2}((3, 2))
 ```
 
-In contrast with `for i = 1:length(A)`, iterating with `eachindex` provides an efficient way to
-iterate over any array type.
+En contraste con `for i = 1:length(A)`, iterar con `eachindex` proporciona una forma eficiente de iterar sobre cualquier tipo de array.
 
 ### Array traits
 
-If you write a custom [`AbstractArray`](@ref) type, you can specify that it has fast linear indexing using
+Si uno escribe un tipo [`AbstractArray`](@ref) personalizado, uno puede especificar que el tipo tiene indexación lineal rápida usando
 
 ```julia
 Base.IndexStyle(::Type{<:MyArray}) = IndexLinear()
 ```
 
-This setting will cause `eachindex` iteration over a `MyArray` to use integers. If you don't
-specify this trait, the default value `IndexCartesian()` is used.
+Esta configuración hará que la iteración `eachindex` sobre un objeto `MyArray` use enteros. Si no especifica este rasgo, se usa el valor predeterminado `IndexCartesian()`.
 
-### Array and Vectorized Operators and Functions
+### Operaciones y Funciones Array y Vectorizadas
 
-The following operators are supported for arrays:
+Los siguientes operadores están soportados para arrays:
 
-1. Unary arithmetic -- `-`, `+`
-2. Binary arithmetic -- `-`, `+`, `*`, `/`, `\`, `^`
-3. Comparison -- `==`, `!=`, `≈` ([`isapprox`](@ref)), `≉`
+1. Aritmética unaria -- `-`, `+`
+2. Aritmética binaria -- `-`, `+`, `*`, `/`, `\`, `^`
+3. Comparación -- `==`, `!=`, `≈` ([`isapprox`](@ref)), `≉`
 
-Most of the binary arithmetic operators listed above also operate elementwise
-when one argument is scalar: `-`, `+`, and `*` when either argument is scalar,
-and `/` and `\` when the denominator is scalar. For example, `[1, 2] + 3 == [4, 5]`
-and `[6, 4] / 2 == [3, 2]`.
+La mayoría de los operadores aritméticos binarios enumerados anteriormente también funcionan con elementos cuando un argumento es escalar: `-`,` + `, y` * `cuando cualquiera de los argumentos es escalar, y `/` y `\` cuando el denominador es escalar. Por ejemplo, `[1, 2] + 3 == [4, 5]` y `[6, 4] / 2 == [3, 2]`.
 
-Additionally, to enable convenient vectorization of mathematical and other operations,
-Julia [provides the dot syntax](@ref man-vectorized) `f.(args...)`, e.g. `sin.(x)`
-or `min.(x,y)`, for elementwise operations over arrays or mixtures of arrays and
-scalars (a [Broadcasting](@ref) operation); these have the additional advantage of
-"fusing" into a single loop when combined with other dot calls, e.g. `sin.(cos.(x))`.
+Además, para permitir una conveniente vectorización de operaciones matemáticas y de otro tipo, Julia [proporciona la sintaxis punto](@ref man-vectorized) `f.(args ...)`, por ejemplo, `sin.(x)` o `min.(x, y)`, para operaciones con elementos sobre arrays o mezclas de matrices y escalares (una [Retransmisión (*broadcasting*)](@ref)); estos tienen la ventaja adicional de
+"fusión" en un solo bucle cuando se combina con otras llamadas de puntos, por ejemplo, `sin.(cos.(x))`.
 
-Also, *every* binary operator supports a [dot version](@ref man-dot-operators)
-that can be applied to arrays (and combinations of arrays and scalars) in such
-[fused broadcasting operations](@ref man-vectorized), e.g. `z .== sin.(x .* y)`.
+Además, *cada* operador binario admite una [versión de punto](@ref man-dot-operators) que se puede aplicar a matrices (y combinaciones de matrices y escalares) en tales [operaciones de retransmisión fusionadas](@ref man-vectorized), por ejemplo, `z .== sin.(x. * y)`.
 
-Note that comparisons such as `==` operate on whole arrays, giving a single boolean
-answer. Use dot operators like `.==` for elementwise comparisons. (For comparison
-operations like `<`, *only* the elementwise `.<` version is applicable to arrays.)
+Tenga en cuenta que las comparaciones como `==` operan en arrays completos, dando un solo booleano como respuesta. Use operadores de punto como `.==` para comparaciones elemento a elemento. (Para operaciones de comparación como `<`, *solo* la versión de elementos `.<` es aplicable a las matrices).
 
-Also notice the difference between `max.(a,b)`, which `broadcast`s [`max()`](@ref)
-elementwise over `a` and `b`, and `maximum(a)`, which finds the largest value within
-`a`. The same relationship holds for `min.(a,b)` and `minimum(a)`.
+También note la diferencia entre `max.(a, b)`, que retransmitir [`max()`](@ref) elemento a elemento sobre `a` y` b`, y `maximum(a)`, que encuentra el mayor valor dentro de `a`. La misma relación se cumple para `min.(A, b)` y `minimum(a)`.
 
-### Broadcasting
+### Retransmisión
 
-It is sometimes useful to perform element-by-element binary operations on arrays of different
-sizes, such as adding a vector to each column of a matrix. An inefficient way to do this would
-be to replicate the vector to the size of the matrix:
+A veces es útil realizar operaciones binarias elemento por elemento en matrices de diferentes tamaños, como agregar un vector a cada columna de una matriz. Una forma ineficiente de hacer esto sería replicar el vector al tamaño de la matriz:
 
 ```julia-repl
 julia> a = rand(2,1); A = rand(2,3);
@@ -499,9 +455,7 @@ julia> repmat(a,1,3)+A
  1.56851  1.86401  1.67846
 ```
 
-This is wasteful when dimensions get large, so Julia offers [`broadcast()`](@ref), which expands
-singleton dimensions in array arguments to match the corresponding dimension in the other array
-without using extra memory, and applies the given function elementwise:
+Esto es un desperdicio cuando las dimensiones son grandes, entonces Julia ofrece [`broadcast()`](@ref), que expande las dimensiones *singleton* en los argumentos del matriz para hacer coincidir la dimensión correspondiente en la otra matriz sin usar memoria extra, y aplica la función dada elemento a elemento:
 
 ```julia-repl
 julia> broadcast(+, a, A)
