@@ -12,10 +12,7 @@ Una llamada remota devuelve un [`Future`](@ref) a su resultado. Las llamadas rem
 
 Por otro lado, los objetos [`RemoteChannel`](@ref) son reescribibles. Por ejemplo, varios procesos pueden coordinar su procesamiento haciendo referencia al mismo canal (`Channel`) remoto.
 
-Each process has an associated identifier. The process providing the interactive Julia prompt
-always has an `id` equal to 1. The processes used by default for parallel operations are referred
-to as "workers". When there is only one process, process 1 is considered a worker. Otherwise,
-workers are considered to be all processes other than process 1.
+Cada proceso tiene un identificador asociado. El proceso que proporciona el *prompt* interactivo de Julia siempre tiene un `id` igual a 1. Los procesos utilizados por defecto para operaciones paralelas se conocen como "workers". Cuando solo hay un proceso, el proceso 1 se considera trabajador. De lo contrario, se considera que los trabajadores son todos procesos distintos del proceso 1.
 
 Vamos a probar esto. Comenzar con `julia -p n` proporciona `n` procesos *workers* en la máquina local. Generalmente tiene sentido igualar `n` al número de núcleos de la CPU en la máquina.
 
@@ -34,21 +31,12 @@ julia> fetch(s)
  1.16296  1.60607
 ```
 
-The first argument to [`remotecall()`](@ref) is the function to call. Most parallel programming
-in Julia does not reference specific processes or the number of processes available, but [`remotecall()`](@ref)
-is considered a low-level interface providing finer control. The second argument to [`remotecall()`](@ref)
-is the `id` of the process that will do the work, and the remaining arguments will be passed to
-the function being called.
+El primer argumento para [`remotecall()`](@ref) es la función para llamar. La mayoría de la programación paralela en Julia no hace referencia a procesos específicos ni a la cantidad de procesos disponibles, pero [`remotecall()`](@ref) se considera una interfaz de bajo nivel que proporciona un control más preciso. El segundo argumento para [`remotecall()`](@ref) es el `id` del proceso que hará el trabajo, y los argumentos restantes se pasarán a la función a la que se llama.
 
-As you can see, in the first line we asked process 2 to construct a 2-by-2 random matrix, and
-in the second line we asked it to add 1 to it. The result of both calculations is available in
-the two futures, `r` and `s`. The [`@spawnat`](@ref) macro evaluates the expression in the second
-argument on the process specified by the first argument.
+Como puede ver, en la primera línea le pedimos al proceso 2 que construyera una matriz aleatoria de 2 por 2, y en la segunda línea le pedimos que agregara 1 a ella. El resultado de ambos cálculos está disponible en los dos futuros, `r` y` s`. La macro [`@ spawnat`] (@ ref) evalúa la expresión en el segundo argumento sobre el proceso especificado por el primer argumento.
 
-Occasionally you might want a remotely-computed value immediately. This typically happens when
-you read from a remote object to obtain data needed by the next local operation. The function
-[`remotecall_fetch()`](@ref) exists for this purpose. It is equivalent to `fetch(remotecall(...))`
-but is more efficient.
+Ocasionalmente, es posible que desee un valor calculado de forma remota de inmediato. Esto suele ocurrir cuando lee desde un objeto remoto para obtener los datos que necesita la próxima operación local. La función [`remotecall_fetch ()`](@ref) existe para este propósito. Es equivalente a `fetch (remotecall (...))`
+pero es más eficiente
 
 ```julia-repl
 julia> remotecall_fetch(getindex, 2, r, 1, 1)
