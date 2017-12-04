@@ -717,9 +717,7 @@ stored zeros. (See [Sparse Matrix Storage](@ref man-csc).).
 
 ### Sparse Vector and Matrix Constructors
 
-The simplest way to create sparse arrays is to use functions equivalent to the [`zeros()`](@ref)
-and [`eye()`](@ref) functions that Julia provides for working with dense arrays. To produce
-sparse arrays instead, you can use the same names with an `sp` prefix:
+La forma más sencilla de crear matrices dispersas es usar funciones equivalentes a las funciones [`zeros()`](@ref) y [`eye()`](@ref) que proporciona Julia para trabajar con matrices densas. Para producir matrices *sparse* en su lugar, puede usar los mismos nombres con el prefijo `sp`:
 
 ```jldoctest
 julia> spzeros(3)
@@ -732,14 +730,7 @@ julia> speye(3,5)
   [3, 3]  =  1.0
 ```
 
-The [`sparse()`](@ref) function is often a handy way to construct sparse arrays. For
-example, to construct a sparse matrix we can input a vector `I` of row indices, a vector
-`J` of column indices, and a vector `V` of stored values (this is also known as the
-[COO (coordinate) format](https://en.wikipedia.org/wiki/Sparse_matrix#Coordinate_list_.28COO.29)).
-`sparse(I,J,V)` then constructs a sparse matrix such that `S[I[k], J[k]] = V[k]`. The
-equivalent sparse vector constructor is [`sparsevec`](@ref), which takes the (row) index
-vector `I` and the vector `V` with the stored values and constructs a sparse vector `R`
-such that `R[I[k]] = V[k]`.
+La función [`sparse()`](@ref) suele ser una forma útil de construir matrices *sparse*. Por ejemplo, para construir una matriz *sparse*, podemos ingresar un vector `I` de índices de fila, un vector` J` de índices de columna, y un vector `V` de valores almacenados (esto también se conoce como [formato COO (coordenada)](https://en.wikipedia.org/wiki/Sparse_matrix#Coordinate_list_.28COO.29)). `esparse (I,J,V)` construye una matriz *sparse* tal que `S[I[k], J[k]] = V[k]`. El constructor vectorial *sparse* equivalente es [`sparsevec`](@ref), que toma el vector de índice (fila)` I` y el vector `V` con los valores almacenados y construye un vector disperso `R` tal que `R[I[k]] = V[k]`.
 
 ```jldoctest sparse_function
 julia> I = [1, 4, 3, 5]; J = [4, 7, 18, 9]; V = [1, 2, -5, 3];
@@ -759,9 +750,7 @@ julia> R = sparsevec(I,V)
   [5]  =  3
 ```
 
-The inverse of the [`sparse()`](@ref) and [`sparsevec`](@ref) functions is
-[`findnz()`](@ref), which retrieves the inputs used to create the sparse array.
-There is also a [`findn`](@ref) function which only returns the index vectors.
+La inversa de las funciones [`sparse()`](@ref) y [`sparsevec`](@ref) es [`findnz()`](@ref), que recupera las entradas utilizadas para crear la matriz *sparse*. También hay una función [`findn`](@ref) que solo devuelve los vectores índice.
 
 ```jldoctest sparse_function
 julia> findnz(S)
@@ -781,8 +770,7 @@ julia> findn(R)
  5
 ```
 
-Another way to create a sparse array is to convert a dense array into a sparse array using
-the [`sparse()`](@ref) function:
+Otra forma de crear una matriz *sparse* es convertir una matriz densa en una matriz *sparse* usando la función [`sparse()`](@ ref):
 
 ```jldoctest
 julia> sparse(eye(5))
@@ -799,8 +787,7 @@ julia> sparse([1.0, 0.0, 1.0])
   [3]  =  1.0
 ```
 
-You can go in the other direction using the [`Array`](@ref) constructor. The [`issparse()`](@ref)
-function can be used to query if a matrix is sparse.
+Puede ir en la otra dirección usando el constructor [`Array`](@ref). La función [`issparse()`](@ref) se puede usar para consultar si una matriz es dispersa.
 
 ```jldoctest
 julia> issparse(speye(5))
@@ -809,25 +796,15 @@ true
 
 ### Sparse matrix operations
 
-Arithmetic operations on sparse matrices also work as they do on dense matrices. Indexing of,
-assignment into, and concatenation of sparse matrices work in the same way as dense matrices.
-Indexing operations, especially assignment, are expensive, when carried out one element at a time.
-In many cases it may be better to convert the sparse matrix into `(I,J,V)` format using [`findnz()`](@ref),
-manipulate the values or the structure in the dense vectors `(I,J,V)`, and then reconstruct
-the sparse matrix.
+Las operaciones aritméticas en matrices *sparse* también funcionan como lo hacen en matrices densas. La indexación de, la asignación en y la concatenación de matrices *sparse* funcionan de la misma manera que las matrices densas. Las operaciones de indexación, especialmente la asignación, son costosas, cuando se llevan a cabo un elemento a la vez. En muchos casos, puede ser mejor convertir la matriz dispersa en formato `(I,J,V)` usando [`findnz()`](@ref), manipular los valores o la estructura en los vectores densos `(I,J,V) `, y luego reconstruir la matriz *sparse*.
 
 ### Correspondence of dense and sparse methods
 
-The following table gives a correspondence between built-in methods on sparse matrices and their
-corresponding methods on dense matrix types. In general, methods that generate sparse matrices
-differ from their dense counterparts in that the resulting matrix follows the same sparsity pattern
-as a given sparse matrix `S`, or that the resulting sparse matrix has density `d`, i.e. each matrix
-element has a probability `d` of being non-zero.
+La siguiente tabla proporciona una correspondencia entre los métodos incorporados en matrices *sparse* y sus métodos correspondientes en tipos de matriz densa. En general, los métodos que generan matrices *sparse* difieren de sus contrapartes densas en que la matriz resultante sigue el mismo patrón de dispersión que una matriz *sparse* dada `S`, o que la matriz *sparse* resultante tiene densidad `d`, es decir, cada elemento de matriz tiene una probabilidad `d` de ser diferente de cero.
 
-Details can be found in the [Sparse Vectors and Matrices](@ref stdlib-sparse-arrays)
-section of the standard library reference.
+Los detalles se pueden encontrar en la sección [Vectores y Matrices *Sparse*](@ ref stdlib-sparse-arrays) de la referencia de biblioteca estándar.
 
-| Sparse                     | Dense                  | Description                                                                                                                                                           |
+| Sparse                     | Densa                  | Descripción                                                                                                                                                           |
 |:-------------------------- |:---------------------- |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`spzeros(m,n)`](@ref)     | [`zeros(m,n)`](@ref)   | Creates a *m*-by-*n* matrix of zeros. ([`spzeros(m,n)`](@ref) is empty.)                                                                                              |
 | [`spones(S)`](@ref)        | [`ones(m,n)`](@ref)    | Creates a matrix filled with ones. Unlike the dense version, [`spones()`](@ref) has the same sparsity pattern as *S*.                                                 |
