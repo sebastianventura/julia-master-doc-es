@@ -20,7 +20,7 @@ el espacio de nombres actual.
 modifican sus argumentos. Algunas funciones tienen las dos versiones (con y sin modificación 
 de los argumentos).
 
-## Getting Around
+## Arrancando
 
 ```@docs
 Base.exit
@@ -57,7 +57,7 @@ Base.workspace
 ans
 ```
 
-## All Objects
+## Todos los Objetos
 
 ```@docs
 Core.:(===)
@@ -87,7 +87,7 @@ Base.widen
 Base.identity
 ```
 
-## Types
+## Tipos
 
 ```@docs
 Base.supertype
@@ -118,7 +118,7 @@ Base.Enums.@enum
 Base.instances
 ```
 
-## Generic Functions
+## Funciones Genéricas
 
 ```@docs
 Core.Function
@@ -130,7 +130,7 @@ Base.:(|>)
 Base.:(∘)
 ```
 
-## Syntax
+## Sintaxis
 
 ```@docs
 Core.eval
@@ -148,7 +148,7 @@ Base.parse(::Any, ::Any)
 Base.parse(::Any)
 ```
 
-## Nullables
+## *Nullables*
 
 ```@docs
 Base.Nullable
@@ -157,7 +157,7 @@ Base.isnull
 Base.unsafe_get
 ```
 
-## System
+## Sistema
 
 ```@docs
 Base.run
@@ -201,7 +201,7 @@ Base.Sys.windows_version
 Base.@static
 ```
 
-## Errors
+## Errores
 
 ```@docs
 Base.error
@@ -240,7 +240,7 @@ Base.retry
 Base.ExponentialBackOff
 ```
 
-## Events
+## Eventos
 
 ```@docs
 Base.Timer(::Function, ::Real, ::Real)
@@ -249,7 +249,7 @@ Base.AsyncCondition
 Base.AsyncCondition(::Function)
 ```
 
-## Reflection
+## Reflexión
 
 ```@docs
 Base.module_name
@@ -272,7 +272,7 @@ Base.functionloc(::Method)
 Base.@functionloc
 ```
 
-## Internals
+## Interioridades
 
 ```@docs
 Base.gc
