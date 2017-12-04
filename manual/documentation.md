@@ -133,6 +133,7 @@ A continuación, puede ejecutar `make -C doc doctest` para ejecutar todos los do
     backticks dobles `` `` `` ``.
     Use caracteres Unicode en lugar de su secuencia de escape LaTeX, es decir `` `` `α = 1``` `` en lugar de 
     `` `` `\\ alpha = 1``` ``.
+    
 7. Coloque los caracteres iniciales y finales `` `` `en líneas por sí mismos.
 
    Esto es, escriba:
@@ -156,6 +157,7 @@ A continuación, puede ejecutar `make -C doc doctest` para ejecutar todos los do
    ```
 
 Esto deja más claro dónde comienzan y finalizan las cadenas de documentos.
+
 8. Respete el límite de longitud de línea utilizado en el código circundante.
 
     Las *Docstrings* se editan usando las mismas herramientas que el código. Por lo tanto, las mismas convenciones deberían aplicarse.
