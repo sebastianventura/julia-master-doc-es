@@ -1,10 +1,6 @@
-# Interacting With Julia
+# Interactuando con Julia
 
-Julia comes with a full-featured interactive command-line REPL (read-eval-print loop) built into
-the `julia` executable. In addition to allowing quick and easy evaluation of Julia statements,
-it has a searchable history, tab-completion, many helpful keybindings, and dedicated help and
-shell modes. The REPL can be started by simply calling `julia` with no arguments or double-clicking
-on the executable:
+Julia viene con un REPL (read-eval-print loop) interactivo de línea de comando  integrado en el ejecutable `julia`. Además de permitir una evaluación rápida y fácil de las declaraciones de Julia, tiene un historial de búsqueda, finalización de pestañas, muchas combinaciones útiles de teclas, ayuda dedicada y modos de shell. El REPL se puede iniciar simplemente llamando a `julia` sin argumentos o haciendo doble clic en el ejecutable:
 
 ```
 $ julia
@@ -20,27 +16,19 @@ $ julia
 julia>
 ```
 
-To exit the interactive session, type `^D` -- the control key together with the `d` key on a blank
-line -- or type `quit()` followed by the return or enter key. The REPL greets you with a banner
-and a `julia>` prompt.
+Para salir de la sesión interactiva, escriba `^D` - la tecla de control junto con la tecla `d` en una línea en blanco - o escriba `quit()` seguido de la tecla return o enter. El REPL te saluda con un banner y un prompt `julia>`.
 
-## The different prompt modes
+## Los distintos modos de prompt
 
-### The Julian mode
+### El modo Juliano
 
-The REPL has four main modes of operation. The first and most common is the Julian prompt. It
-is the default mode of operation; each new line initially starts with `julia>`. It is here that
-you can enter Julia expressions. Hitting return or enter after a complete expression has been
-entered will evaluate the entry and show the result of the last expression.
+El REPL tiene cuatro modos principales de operación. El primero y más común es el prompt Juliano. Es el modo de operación predeterminado; cada nueva línea inicialmente comienza con `julia>`. Es aquí donde puede ingresar las expresiones de Julia. Pulsando *return* o *enter* después de haber ingresado una expresión completa, se evaluará la entrada y se mostrará el resultado de la última expresión.
 
 ```jldoctest
 julia> string(1 + 2)
 "3"
 ```
-
-There are a number useful features unique to interactive work. In addition to showing the result,
-the REPL also binds the result to the variable `ans`. A trailing semicolon on the line can be
-used as a flag to suppress showing the result.
+Hay varias funciones útiles únicas para el trabajo interactivo. Además de mostrar el resultado, el REPL también vincula el resultado a la variable `ans`. Un punto y coma final en la línea se puede utilizar como un indicador para suprimir mostrar el resultado.
 
 ```jldoctest
 julia> string(3 * 4);
@@ -49,19 +37,11 @@ julia> ans
 "12"
 ```
 
-In Julia mode, the REPL supports something called *prompt pasting*. This activates when pasting
-text that starts with `julia> ` into the REPL. In that case, only expressions starting with
-`julia> ` are parsed, others are removed. This makes it is possible to paste a chunk of code
-that has been copied from a REPL session without having to scrub away prompts and outputs. This
-feature is enabled by default but can be disabled or enabled at will with `Base.REPL.enable_promptpaste(::Bool)`.
-If it is enabled, you can try it out by pasting the code block above this paragraph straight into
-the REPL. This feature does not work on the standard Windows command prompt due to its limitation
-at detecting when a paste occurs.
+En el modo Julia, el REPL es compatible con algo llamado *pegado rápido*. Esto se activa al pegar texto que comienza con `julia>` en REPL. En ese caso, solo las expresiones que comienzan con `julia>` se analizan, otras se eliminan. Esto hace que sea posible pegar un trozo de código que ha sido copiado de una sesión REPL sin tener que eliminar los prompts y las salidas. Esta característica está habilitada de forma predeterminada, pero se puede desactivar o habilitar a voluntad con `Base.REPL.enable_promptpaste(:: Bool)`. Si está habilitado, puedes probar pegando el bloque de código arriba de este párrafo directamente en REPL. Esta función no funciona en el símbolo del sistema estándar de Windows debido a su limitación para detectar cuándo se produce un pegado.
 
-### Help mode
+### Modo Ayuda
 
-When the cursor is at the beginning of the line, the prompt can be changed to a help mode by typing
-`?`. Julia will attempt to print help or documentation for anything entered in help mode:
+Cuando el cursor está al principio de la línea, el aviso se puede cambiar a un modo de ayuda escribiendo `?`. Julia intentará imprimir ayuda o documentación para todo lo ingresado en modo de ayuda:
 
 ```julia-repl
 julia> ? # upon typing ?, the prompt changes (in place) to: help?>
@@ -74,7 +54,7 @@ search: string String stringmime Cstring Cwstring RevString randstring bytestrin
   Create a string from any values using the print function.
 ```
 
-Macros, types and variables can also be queried:
+Las macros, los tipos y las variables también se pueden consultar:
 
 ```
 help?> @time
@@ -102,14 +82,11 @@ search: AbstractString AbstractSparseMatrix AbstractSparseVector AbstractSet
   String
 ```
 
-Help mode can be exited by pressing backspace at the beginning of the line.
+El modo de ayuda puede salir presionando la tecla de retroceso al comienzo de la línea.
 
-### [Shell mode](@id man-shell-mode)
+### [Modo Shell](@id man-shell-mode)
 
-Just as help mode is useful for quick access to documentation, another common task is to use the
-system shell to execute system commands. Just as `?` entered help mode when at the beginning
-of the line, a semicolon (`;`) will enter the shell mode. And it can be exited by pressing backspace
-at the beginning of the line.
+Del mismo modo que el modo de ayuda es útil para acceder rápidamente a la documentación, otra tarea común es utilizar el shell del sistema para ejecutar los comandos del sistema. Así como `?` Ingresó al modo de ayuda cuando está al principio de la línea, un punto y coma (`;`) ingresará al modo shell. Y puede salir presionando el retroceso al comienzo de la línea.
 
 ```julia-repl
 julia> ; # upon typing ;, the prompt changes (in place) to: shell>
@@ -118,26 +95,15 @@ shell> echo hello
 hello
 ```
 
-### Search modes
+### Modos de búsqueda
 
-In all of the above modes, the executed lines get saved to a history file, which can be searched.
- To initiate an incremental search through the previous history, type `^R` -- the control key
-together with the `r` key. The prompt will change to ```(reverse-i-search)`':```, and as you
-type the search query will appear in the quotes. The most recent result that matches the query
-will dynamically update to the right of the colon as more is typed. To find an older result using
-the same query, simply type `^R` again.
+En todos los modos anteriores, las líneas ejecutadas se guardan en un archivo de historial, que se puede buscar. Para iniciar una búsqueda incremental a través del historial anterior, escriba `^R` - la tecla de control junto con la tecla `r`. El aviso cambiará a ```(reverse-i-search)` ': ```, y al escribir, la consulta de búsqueda aparecerá en las comillas. El resultado más reciente que coincida con la consulta se actualizará dinámicamente a la derecha de los dos puntos a medida que se escriba más. Para encontrar un resultado anterior usando la misma consulta, simplemente escriba `^R` de nuevo.
 
-Just as `^R` is a reverse search, `^S` is a forward search, with the prompt ```(i-search)`':```.
- The two may be used in conjunction with each other to move through the previous or next matching
-results, respectively.
+Del mismo modo que `^ R` es una búsqueda inversa,` ^ S` es una búsqueda directa, con el indicador ```(i-search)` ': ```. Los dos pueden usarse conjuntamente para avanzar entre los resultados de coincidencia anterior o siguiente, respectivamente.
 
-## Key bindings
+## Asociaciones de teclas
 
-The Julia REPL makes great use of key bindings. Several control-key bindings were already introduced
-above (`^D` to exit, `^R` and `^S` for searching), but there are many more. In addition to the
-control-key, there are also meta-key bindings. These vary more by platform, but most terminals
-default to using alt- or option- held down with a key to send the meta-key (or can be configured
-to do so).
+El REPL de Julia hace un gran uso de las asociaciones de teclas. Varias combinaciones de teclas de control ya se han introducido anteriormente (`^D` para salir,` ^R` y `^S` para buscar), pero hay muchas más. Además de la tecla de control, también hay enlaces de meta-clave. Estos varían según la plataforma, pero la mayoría de los terminales utilizan de forma predeterminada alt- u opción-, mantenida presionada con una tecla para enviar la meta-clave (o puede configurarse para hacerlo).
 
 | Keybinding          | Description                                                                                |
 |:------------------- |:------------------------------------------------------------------------------------------ |
@@ -176,16 +142,9 @@ to do so).
 | `^Q`                | Write a number in REPL and press `^Q` to open editor at corresponding stackframe or method |
 
 
-### Customizing keybindings
+### Personalizando asociaciones de teclas
 
-Julia's REPL keybindings may be fully customized to a user's preferences by passing a dictionary
-to `REPL.setup_interface()`. The keys of this dictionary may be characters or strings. The key
-`'*'` refers to the default action. Control plus character `x` bindings are indicated with `"^x"`.
-Meta plus `x` can be written `"\\Mx"`. The values of the custom keymap must be `nothing` (indicating
-that the input should be ignored) or functions that accept the signature `(PromptState, AbstractREPL, Char)`.
-The `REPL.setup_interface()` function must be called before the REPL is initialized, by registering
-the operation with `atreplinit()`. For example, to bind the up and down arrow keys to move through
-history without prefix search, one could put the following code in `.juliarc.jl`:
+Las combinaciones de teclas en el REPL de Julia pueden personalizarse completamente según las preferencias de un usuario pasando un diccionario a `REPL.setup_interface()`. Las claves de este diccionario pueden ser caracteres o cadenas. La tecla `'*'` se refiere a la acción predeterminada. Las asociaciones de control y carácter `x` se indican con` "^x" `. Meta plus `x` se puede escribir` "\\ Mx" `. Los valores del mapa de teclas personalizado deben ser ``nothing`` (lo que indica que la entrada debe ignorarse) o las funciones que aceptan la firma `(PromptState, AbstractREPL, Char)`. La función `REPL.setup_interface()` debe invocarse antes de que se inicialice REPL, registrando la operación con `atreplinit()`. Por ejemplo, para enlazar las teclas de flecha hacia arriba y hacia abajo para moverse a través del historial sin búsqueda de prefijos, uno podría poner el siguiente código en `.juliarc.jl`:
 
 ```julia
 import Base: LineEdit, REPL
