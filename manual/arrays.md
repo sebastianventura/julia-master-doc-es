@@ -272,26 +272,24 @@ julia> x
  3   6   9
 ```
 
-### [Supported index types](@id man-supported-index-types)
+### [Tipos índices Soportados](@id man-supported-index-types)
 
-In the expression `A[I_1, I_2, ..., I_n]`, each `I_k` may be a scalar index, an
-array of scalar indices, or an object that represents an array of scalar
-indices and can be converted to such by [`to_indices`](@ref):
+En la expresión `A[I_1, I_2, ..., I_n]`, cada `I_k` puede ser un índice escalar, un array de índices escalares o un objeto que repreenta un array de índices escalares y puede ser convertido a tal mediante [`to_indices`](@ref):
 
-1. A scalar index. By default this includes:
-    * Non-boolean integers
-    * `CartesianIndex{N}`s, which behave like an `N`-tuple of integers spanning multiple dimensions (see below for more details)
-2. An array of scalar indices. This includes:
-    * Vectors and multidimensional arrays of integers
-    * Empty arrays like `[]`, which select no elements
-    * `Range`s of the form `a:c` or `a:b:c`, which select contiguous or strided subsections from `a` to `c` (inclusive)
-    * Any custom array of scalar indices that is a subtype of `AbstractArray`
-    * Arrays of `CartesianIndex{N}` (see below for more details)
-3. An object that represents an array of scalar indices and can be converted to such by [`to_indices`](@ref). By default this includes:
-    * [`Colon()`](@ref) (`:`), which represents all indices within an entire dimension or across the entire array
-    * Arrays of booleans, which select elements at their `true` indices (see below for more details)
+1. Un índice escalar. Por defecto esto incluye:
+    * Enteros no booleanos
+    * `CartesianIndex{N}`s, que se comportan como una `N`-tupla de enteros abarcando múltiples dimensiones (ver abajo para ms detalles)
+2. Un array de índices escalares. Esto incluye:
+    * Vectores y arrays multidimensionales de enteros
+    * Arrays vacíos como `[]`, que no selecciona elementos
+    * `Range`s de la forma `a:c` o `a:b:c`, que seleccionan subsecciones contiguas o con salto desde `a` hasta `c` (inclusive)
+    * Cualquier array de índices escalares que sea un subtipo de `AbstractArray`
+    * Arrays de `CartesianIndex{N}` (ver abajo para ms detalles)
+3. Un objeto que representa un array de índice escalares y puede ser convertido a tal mediante [`to_indices`](@ref). Por defecto esto incluye:
+    * [`Colon()`](@ref) (`:`), qu representa todos los índices dentro de una dimensin entera o a través del array completo
+    * Arrays de booleans, que seleccionan los elementos en los que sus índices son `true` indices (ver abajo para más detalles)
 
-#### Cartesian indices
+#### Índices Cartesianos
 
 The special `CartesianIndex{N}` object represents a scalar index that behaves
 like an `N`-tuple of integers spanning multiple dimensions.  For example:
