@@ -138,7 +138,7 @@ Sobreescribe la variable global [`Base.Sys.CPU_CORES`](@ref), el número de núc
 
 ### `JULIA_WORKER_TIMEOUT`
 
-A [`Float64`](@ref) que establece el valor de` Base.worker_timeout()` (predeterminado:` 60.0`). Esta función proporciona la cantidad de segundos que un proceso de trabajo esperará un proceso maestro para establecer una conexión antes de morir.
+Un [`Float64`](@ref) que establece el valor de` Base.worker_timeout()` (predeterminado:` 60.0`). Esta función proporciona la cantidad de segundos que un proceso de trabajo esperará un proceso maestro para establecer una conexión antes de morir.
 
 ### `JULIA_NUM_THREADS`
 
@@ -171,102 +171,84 @@ El formato `Base.info_color()` (predeterminado: cyan, `"\033[36m"`) que debería
 
 ### `JULIA_INPUT_COLOR`
 
-The formatting `Base.input_color()` (default: normal, `"\033[0m"`) that input
-should have at the terminal.
+El formato `Base.input_color()` (predeterminado: normal, `"\033[0m"`) que debería haber en el terminal.
 
 ### `JULIA_ANSWER_COLOR`
 
-The formatting `Base.answer_color()` (default: normal, `"\033[0m"`) that output
-should have at the terminal.
+El formato `Base.answer_color()` (predeterminado:  normal, `"\033[0m"`) que debería haber en el terminal..
 
 ### `JULIA_STACKFRAME_LINEINFO_COLOR`
 
-The formatting `Base.stackframe_lineinfo_color()` (default: bold, `"\033[1m"`)
-that line info should have during a stack trace at the terminal.
+El formato `Base.stackframe_lineinfo_color()` (predeterminado:  bold, `"\033[1m"`) que la línea info debería tener durante una traza de la pila en el terminal.
 
 ### `JULIA_STACKFRAME_FUNCTION_COLOR`
 
-The formatting `Base.stackframe_function_color()` (default: bold, `"\033[1m"`)
-that function calls should have during a stack trace at the terminal.
+El formato `Base.stackframe_function_color()` (predeterminado:  bold, `"\033[1m"`) que las llamadas a funcin deberían tener durante una traza de la pila en el terminal.
 
-## Debugging and profiling
+## Depuración y profiling
 
 ### `JULIA_GC_ALLOC_POOL`, `JULIA_GC_ALLOC_OTHER`, `JULIA_GC_ALLOC_PRINT`
 
-If set, these environment variables take strings that optionally start with the
-character `'r'`, followed by a string interpolation of a colon-separated list of
-three signed 64-bit integers (`int64_t`). This triple of integers `a:b:c`
-represents the arithmetic sequence `a`, `a + b`, `a + 2*b`, ... `c`.
+Si se establecen, estas variables de entorno toman cadenas que opcionalmente comienzan con el carácter `'r'`, seguido por una interpolación de cadenas de una lista separada por dos puntos de tres enteros de 64 bits (`int64_t`). Este triplete de enteros `a:b:c` representa la secuencia aritmética `a`, `a + b`,` a + 2*b`, ... `c`.
 
-*   If it's the `n`th time that `jl_gc_pool_alloc()` has been called, and `n`
-    belongs to the arithmetic sequence represented by `$JULIA_GC_ALLOC_POOL`,
-    then garbage collection is forced.
-*   If it's the `n`th time that `maybe_collect()` has been called, and `n` belongs
-    to the arithmetic sequence represented by `$JULIA_GC_ALLOC_OTHER`, then garbage
-    collection is forced.
-*   If it's the `n`th time that `jl_gc_collect()` has been called, and `n` belongs
-    to the arithmetic sequence represented by `$JULIA_GC_ALLOC_PRINT`, then counts
-    for the number of calls to `jl_gc_pool_alloc()` and `maybe_collect()` are
-    printed.
+ * Si es la "n" vez que se ha llamado a `jl_gc_pool_alloc ()`, y `n` pertenece a la secuencia aritmética 
+   representada por` $ JULIA_GC_ALLOC_POOL`, entonces se forzará la recolección de elementos no utilizados.
+ * Si es la `n`th vez que` maybe_collect () `ha sido llamado, y `n` pertenece a la secuencia aritmética 
+   representada por `$JULIA_GC_ALLOC_OTHER`, entonces se forzará la recolección de elementos no utilizados.
+ * Si es la `n` th vez que` jl_gc_collect()` ha sido llamado, y `n` pertenece a la secuencia aritmética 
+   representada por `$JULIA_GC_ALLOC_PRINT`, entonces cuenta para el número de llamadas a `jl_gc_pool_alloc()` y
+   `maybe_collect()` están impresos.
 
-If the value of the environment variable begins with the character `'r'`, then
-the interval between garbage collection events is randomized.
+Si el valor de la variable de entorno comienza con el carácter `'r'`, entonces el intervalo entre los eventos de recolección de basura es aleatorio.
 
 !!! note
 
-    These environment variables only have an effect if Julia was compiled with
-    garbage-collection debugging (that is, if `WITH_GC_DEBUG_ENV` is set to `1`
-    in the build configuration).
+    Estas variables de entorno solo tienen un efecto si Julia se compiló con la 
+    depuración de la recolección de basura (es decir, si `WITH_GC_DEBUG_ENV` 
+    se fija a `1` en la configuración de compilación).
 
 ### `JULIA_GC_NO_GENERATIONAL`
 
-If set to anything besides `0`, then the Julia garbage collector never performs
-"quick sweeps" of memory.
+Si se fija a algo por encima de `0`, entonces el recolector de basura de Julia nunca realizará barridos rápidos de memoria.
 
 !!! note
 
-    This environment variable only has an effect if Julia was compiled with
-    garbage-collection debugging (that is, if `WITH_GC_DEBUG_ENV` is set to `1`
-    in the build configuration).
-
+    Esta variable de entorno solo tiene un efecto si Julia se compiló con depuración de recolección de elementos 
+    no utilizados (es decir, si `WITH_GC_DEBUG_ENV` está establecido en` 1` en la configuración de compilación).
+    
 ### `JULIA_GC_WAIT_FOR_DEBUGGER`
 
-If set to anything besides `0`, then the Julia garbage collector will wait for
-a debugger to attach instead of aborting whenever there's a critical error.
+Si se fija a algo por encima de `0`, entonces el recolector de basura esperará a que un depurador la enlace en lugar de abortar cuando haya un error crítico.
 
 !!! note
 
-    This environment variable only has an effect if Julia was compiled with
-    garbage-collection debugging (that is, if `WITH_GC_DEBUG_ENV` is set to `1`
-    in the build configuration).
+    Esta variable de entorno solo tiene un efecto si Julia se compiló con depuración de recolección de elementos 
+    no utilizados (es decir, si `WITH_GC_DEBUG_ENV` está establecido en` 1` en la configuración de compilación).
 
 ### `ENABLE_JITPROFILING`
 
-If set to anything besides `0`, then the compiler will create and register an
-event listener for just-in-time (JIT) profiling.
+Si se fija a un valor por encima de `0`, entonces el compilador creará y registrará un detector de evaentos (*event listener*)  para *for just-in-time (JIT) profiling*.
 
 !!! note
 
-    This environment variable only has an effect if Julia was compiled with JIT
-    profiling support, using either
+    Esta variable de entorno sólo tiene efecto su Julia se compiló con soporte de JIT profiling usando 
 
-*   Intel's [VTune™ Amplifier](https://software.intel.com/en-us/intel-vtune-amplifier-xe)
-    (`USE_INTEL_JITEVENTS` set to `1` in the build configuration), or
+*   [VTune™ Amplifier](https://software.intel.com/en-us/intel-vtune-amplifier-xe) de Intel
+    (`USE_INTEL_JITEVENTS` set to `1` in the build configuration), o bien
 *   [OProfile](http://oprofile.sourceforge.net/news/) (`USE_OPROFILE_JITEVENTS` set to `1`
     in the build configuration).
 
 ### `JULIA_LLVM_ARGS`
 
-Arguments to be passed to the LLVM backend.
+Arguments para pasar al backend de LLVM.
 
 !!! note
 
-    This environment variable has an effect only if Julia was compiled with
-    `JL_DEBUG_BUILD` set — in particular, the `julia-debug` executable is always
-    compiled with this build variable.
+    Esta variable de entorno sólo tiene efecto su Julia se compiló con
+    `JL_DEBUG_BUILD` fijado — en particular, el ejecutable `julia-debug` siempre es compilado con
+    esta variable.
 
 ### `JULIA_DEBUG_LOADING`
 
-If set, then Julia prints detailed information about the cache in the loading
-process of [`Base.require`](@ref).
+Si se establece, entonces Julia imprime información detallada sobre la caché en el proceso de carga de [`Base.require`](@ref).
 
