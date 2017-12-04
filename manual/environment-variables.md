@@ -1,65 +1,48 @@
-# Environment Variables
+# Variables de Entorno
 
-Julia may be configured with a number of environment variables, either in the
-usual way of the operating system, or in a portable way from within Julia.
-Suppose you want to set the environment variable `JULIA_EDITOR` to
-`vim`, then either type `ENV["JULIA_EDITOR"] = "vim"` for instance in the REPL
-to make this change on a case by case basis, or add the same to the user
-configuration file `.juliarc.jl` in the user's home directory to have
-a permanent effect. The current value of the same environment variable is
-determined by evaluating `ENV["JULIA_EDITOR"]`.
+Julia se puede configurar con varias variables de entorno, ya sea de la manera habitual del sistema operativo o de manera portátil desde Julia. Supongamos que quiere establecer la variable de entorno `JULIA_EDITOR` como `vim`, para ello escribirá `ENV["JULIA_EDITOR"] = "vim"` en el REPL para llevar a cabo este cambio en la sesión actual, o agregará lo mismo en el archivo de configuración `.juliarc.jl` en el directorio de inicio del usuario para tener un efecto permanente. El valor actual de la misma variable de entorno se determina evaluando `ENV ["JULIA_EDITOR"]`.
 
-The environment variables that Julia uses generally start with `JULIA`. If
-[`Base.versioninfo`](@ref) is called with `verbose` equal to `true`, then the
-output will list defined environment variables relevant for Julia, including
-those for which `JULIA` appears in the name.
+Las variables de entorno que usa Julia generalmente comienzan con `JULIA`. Si [`Base.versioninfo`](@ref) se llama con `verbose` igual a `true`, la salida mostrará una lista de variables de entorno definidas relevantes para Julia, incluidas aquellas para las cuales` JULIA` aparece en el nombre.
 
-## File locations
+## Localizaciones de fichero
 
 ### `JULIA_HOME`
 
-The absolute path of the directory containing the Julia executable, which sets
-the global variable [`Base.JULIA_HOME`](@ref). If `$JULIA_HOME` is not set, then
-Julia determines the value `Base.JULIA_HOME` at run-time.
+La ruta absoluta del directorio que contiene el ejecutable de Julia, que establece la variable global [`Base.JULIA_HOME`](@ref). Si `$JULIA_HOME` no está configurado, entonces Julia determina el valor` Base.JULIA_HOME` en el tiempo de ejecución.
 
-The executable itself is one of
+El ejecutable en sí es uno de
 
 ```
-$JULIA_HOME/julia
-$JULIA_HOME/julia-debug
+$ JULIA_HOME/julia
+$ JULIA_HOME/julia-debug
 ```
 
-by default.
+por defecto.
 
-The global variable `Base.DATAROOTDIR` determines a relative path from
-`Base.JULIA_HOME` to the data directory associated with Julia. Then the path
-
-```
-$JULIA_HOME/$DATAROOTDIR/julia/base
-```
-
-determines the directory in which Julia initially searches for source files (via
-`Base.find_source_file()`).
-
-Likewise, the global variable `Base.SYSCONFDIR` determines a relative path to the
-configuration file directory. Then Julia searches for a `juliarc.jl` file at
+La variable global `Base.DATAROOTDIR` determina una ruta relativa de `Base.JULIA_HOME` al directorio de datos asociado con Julia. Entonces el camino
 
 ```
+$ JULIA_HOME / $ DATAROOTDIR / julia / base
+```
+
+determina el directorio en el que Julia inicialmente busca los archivos fuente (a través de `Base.find_source_file()`).
+
+Del mismo modo, la variable global `Base.SYSCONFDIR` determina una ruta relativa al directorio del archivo de configuración. Entonces Julia busca un archivo `juliarc.jl` en
+
+`` `
 $JULIA_HOME/$SYSCONFDIR/julia/juliarc.jl
 $JULIA_HOME/../etc/julia/juliarc.jl
-```
+`` `
 
-by default (via `Base.load_juliarc()`).
+por defecto (a través de `Base.load_juliarc()`).
 
-For example, a Linux installation with a Julia executable located at
-`/bin/julia`, a `DATAROOTDIR` of `../share`, and a `SYSCONFDIR` of `../etc` will
-have `JULIA_HOME` set to `/bin`, a source-file search path of
+Por ejemplo, una instalación de Linux con un ejecutable de Julia ubicado en `/bin/julia`, un` DATAROOTDIR` de `../ share`, y un` SYSCONFDIR` de `../ etc` tendrá `JULIA_HOME` establecido en `/bin`, una ruta de búsqueda de archivo fuente de
 
 ```
 /share/julia/base
 ```
 
-and a global configuration search path of
+y una ruta de búsqueda de configuración global de
 
 ```
 /etc/julia/juliarc.jl
@@ -67,19 +50,14 @@ and a global configuration search path of
 
 ### `JULIA_LOAD_PATH`
 
-A separated list of absolute paths that are to be appended to the variable
-[`LOAD_PATH`](@ref). (In Unix-like systems, the path separator is `:`; in Windows
-systems, the path separator is `;`.) The `LOAD_PATH` variable is where
-[`Base.require`](@ref) and `Base.load_in_path()` look for code; it defaults to the absolute
-paths
+Una lista separada de rutas absolutas que se anexarán a la variable [`LOAD_PATH`](@ref). (En sistemas tipo Unix, el separador de ruta es `:`; en sistemas Windows, el separador de ruta es `;`.) La variable `LOAD_PATH` es donde [`Base.require`](@ref) y `Base.load_in_path()` busca el código; se predetermina a las rutas absolutas
 
 ```
 $JULIA_HOME/../local/share/julia/site/v$(VERSION.major).$(VERSION.minor)
 $JULIA_HOME/../share/julia/site/v$(VERSION.major).$(VERSION.minor)
 ```
 
-so that, e.g., version 0.6 of Julia on a Linux system with a Julia executable at
-`/bin/julia` will have a default `LOAD_PATH` of
+de modo que, por ejemplo, la versión 0.6 de Julia en un sistema Linux con un ejecutable de Julia en `/bin/julia` tendrá un` LOAD_PATH` predeterminado de
 
 ```
 /local/share/julia/site/v0.6
@@ -88,29 +66,25 @@ so that, e.g., version 0.6 of Julia on a Linux system with a Julia executable at
 
 ### `JULIA_PKGDIR`
 
-The path of the parent directory `Pkg.Dir._pkgroot()` for the version-specific
-Julia package repositories. If the path is relative, then it is taken with
-respect to the working directory. If `$JULIA_PKGDIR` is not set, then
-`Pkg.Dir._pkgroot()` defaults to
+La ruta del directorio principal `Pkg.Dir._pkgroot()` para los repositorios de paquetes Julia específicos de la versión. Si la ruta es relativa, entonces se toma con respecto al directorio de trabajo. Si `$JULIA_PKGDIR` no está configurado, entonces` Pkg.Dir._pkgroot() `se establece por defecto en
 
 ```
 $HOME/.julia
 ```
 
-Then the repository location [`Pkg.dir`](@ref) for a given Julia version is
+Entonces la localizacíon del repositorio [`Pkg.dir`](@ref) para una versin dada de Julia es
 
 ```
 $JULIA_PKGDIR/v$(VERSION.major).$(VERSION.minor)
 ```
 
-For example, for a Linux user whose home directory is `/home/alice`, the directory
-containing the package repositories would by default be
+Por ejemplo, para un usuario Linux cuyo directorio home ea `/home/alice`, el directorio que contiene los repositorios de paquetes por defecto sería
 
 ```
 /home/alice/.julia
 ```
 
-and the package repository for version 0.6 of Julia would be
+y el repositorio de paquetes paa la versión 0.6 de Julia sería
 
 ```
 /home/alice/.julia/v0.6
@@ -118,8 +92,7 @@ and the package repository for version 0.6 of Julia would be
 
 ### `JULIA_HISTORY`
 
-The absolute path `Base.REPL.find_hist_file()` of the REPL's history file. If
-`$JULIA_HISTORY` is not set, then `Base.REPL.find_hist_file()` defaults to
+El camino absoluto `Base.REPL.find_hist_file()` del fichero de historia del REPL. Si `$JULIA_HISTORY` no está fijado, encontces `Base.REPL.find_hist_file()` tiene como valor por defecto
 
 ```
 $HOME/.julia_history
@@ -127,102 +100,74 @@ $HOME/.julia_history
 
 ### `JULIA_PKGRESOLVE_ACCURACY`
 
-A positive `Int` that determines how much time the max-sum subroutine
-`MaxSum.maxsum()` of the package dependency resolver [`Base.Pkg.resolve`](@ref)
-will devote to attempting satisfying constraints before giving up: this value is
-by default `1`, and larger values correspond to larger amounts of time.
+Un `Int` positivo que determina cuánto tiempo la subrutina de suma máxima` MaxSum.maxsum () `del resolvedor de dependencia de paquetes [` Base.Pkg.resolve`](@ref) dedicará a intentar las restricciones satisfactorias antes de abandonar: este valor es por defecto `1`, y los valores más grandes corresponden a mayores cantidades de tiempo.
 
-Suppose the value of `$JULIA_PKGRESOLVE_ACCURACY` is `n`. Then
+Supongamos que el valor de `$ JULIA_PKGRESOLVE_ACCURACY` es `n`. Entonces
 
-*   the number of pre-decimation iterations is `20*n`,
-*   the number of iterations between decimation steps is `10*n`, and
-*   at decimation steps, at most one in every `20*n` packages is decimated.
+* el número de iteraciones de pre-decimación es `20*n`,
+* el número de iteraciones entre los pasos de aniquilación es `10*n`, y
+* en los pasos de aniquilación, como máximo se destruye uno de cada paquetes `20*n`.
 
-## External applications
+
+## Aplicaciones externas
 
 ### `JULIA_SHELL`
 
-The absolute path of the shell with which Julia should execute external commands
-(via `Base.repl_cmd()`). Defaults to the environment variable `$SHELL`, and
-falls back to `/bin/sh` if `$SHELL` is unset.
+La ruta absoluta del shell con el que Julia debe ejecutar comandos externos (a través de `Base.repl_cmd ()`). Se predetermina a la variable de entorno `$SHELL`, y vuelve a `/bin/sh` si `$SHELL` está desactivado.
 
 !!! note
 
-    On Windows, this environment variable is ignored, and external commands are
-    executed directly.
+     En Windows, esta variable de entorno se ignora y los comandos externos se ejecutan directamente.
 
 ### `JULIA_EDITOR`
 
-The editor returned by `Base.editor()` and used in, e.g., [`Base.edit`](@ref),
-referring to the command of the preferred editor, for instance `vim`.
+El editor devuelto por `Base.editor()` y utilizado en, por ejemplo, [`Base.edit`] (@ref), refiriéndose al comando del editor preferido, por ejemplo` vim`.
 
-`$JULIA_EDITOR` takes precedence over `$VISUAL`, which in turn takes precedence
-over `$EDITOR`. If none of these environment variables is set, then the editor
-is taken to be `open` on Windows and OS X, or `/etc/alternatives/editor` if it
-exists, or `emacs` otherwise.
+`$JULIA_EDITOR` tiene prioridad sobre` $VISUAL`, que a su vez tiene prioridad sobre `$EDITOR`. Si no se establece ninguna de estas variables de entorno, entonces el editor se considera `abierto` en Windows y OS X, o` /etc/alternatives/editor` si
+existe, o `emacs` de lo contrario.
 
 !!! note
 
-    `$JULIA_EDITOR` is *not* used in the determination of the editor for
-    [`Base.Pkg.edit`](@ref): this function checks `$VISUAL` and `$EDITOR` alone.
+    `$JULIA_EDITOR` *no se usa* en la determinación del editor para [`Base.Pkg.edit`](@ref): esta función verifica `$VISUAL` y` $EDITOR` solo.
 
-## Parallelization
+## Paralelización
 
 ### `JULIA_CPU_CORES`
 
-Overrides the global variable [`Base.Sys.CPU_CORES`](@ref), the number of
-logical CPU cores available.
+Sobreescribe la variable global [`Base.Sys.CPU_CORES`](@ref), el número de núcleos de CPU lógicos disponible.
 
 ### `JULIA_WORKER_TIMEOUT`
 
-A [`Float64`](@ref) that sets the value of `Base.worker_timeout()` (default: `60.0`).
-This function gives the number of seconds a worker process will wait for
-a master process to establish a connection before dying.
+A [`Float64`](@ref) que establece el valor de` Base.worker_timeout()` (predeterminado:` 60.0`). Esta función proporciona la cantidad de segundos que un proceso de trabajo esperará un proceso maestro para establecer una conexión antes de morir.
 
 ### `JULIA_NUM_THREADS`
 
-An unsigned 64-bit integer (`uint64_t`) that sets the maximum number of threads
-available to Julia. If `$JULIA_NUM_THREADS` exceeds the number of available
-physical CPU cores, then the number of threads is set to the number of cores. If
-`$JULIA_NUM_THREADS` is not positive or is not set, or if the number of CPU
-cores cannot be determined through system calls, then the number of threads is
-set to `1`.
+Un entero sin signo de 64 bits (`uint64_t`) que establece el número máximo de subprocesos disponiblew para Julia. Si `$JULIA_NUM_THREADS` excede la cantidad disponiblede núcleos de CPU físicos, el número de subprocesos se establece en la cantidad de núcleos. Si `$JULIA_NUM_THREADS` no es positivo o no está configurado, o si el número de núcleos de CPU no se puede determinar a través de llamadas al sistema, entonces la cantidad de hilos es establecida en `1`.
 
 ### `JULIA_THREAD_SLEEP_THRESHOLD`
 
-If set to a string that starts with the case-insensitive substring `"infinite"`,
-then spinning threads never sleep. Otherwise, `$JULIA_THREAD_SLEEP_THRESHOLD` is
-interpreted as an unsigned 64-bit integer (`uint64_t`) and gives, in
-nanoseconds, the amount of time after which spinning threads should sleep.
+Si se fija a una cadena que comienza con la subcadena insensible a mayúsculas y minúsculas `"infinite"`, entonces los hilos vivos nunva duermen. En caso contrario, `$JULIA_THREAD_SLEEP_THRESHOLD` es interpretado como un entero sin signo de 64 bits (`uint64_t`) y da, en nanosegundos, la cantidad de tiempo después del cual los hilos deben dormir.
 
 ### `JULIA_EXCLUSIVE`
 
-If set to anything besides `0`, then Julia's thread policy is consistent with
-running on a dedicated machine: the master thread is on proc 0, and threads are
-affinitized. Otherwise, Julia lets the operating system handle thread policy.
+Si se establece en algo además de `0`, entonces la política de hilos de Julia es consistente con la ejecución en una máquina dedicada: el hilo maestro está en proc 0, y los hilos están affinitizados. De lo contrario, Julia deja que el sistema operativo maneje la política de hilos.
 
-## REPL formatting
+## Formateo del REPL
 
-Environment variables that determine how REPL output should be formatted at the
-terminal. Generally, these variables should be set to [ANSI terminal escape
-sequences](http://ascii-table.com/ansi-escape-sequences.php). Julia provides
-a high-level interface with much of the same functionality: see the section on
-[Interacting With Julia](@ref).
+Variables de entorno que determinan cómo debe formatearse la salida REPL en el terminal. En general, estas variables deben establecerse en [seciencias de scape de terminal ANSI](http://ascii-table.com/ansi-escape-sequences.php). Julia proporciona
+una interfaz de alto nivel con gran parte de la misma funcionalidad: ver la sección sobre [Interacción con Julia](@ref).
 
 ### `JULIA_ERROR_COLOR`
 
-The formatting `Base.error_color()` (default: light red, `"\033[91m"`) that
-errors should have at the terminal.
+El formato `Base.error_color()` (predeterminado: rojo claro, `"\033[91m "`) que los errores deberían tener en la terminal.
 
 ### `JULIA_WARN_COLOR`
 
-The formatting `Base.warn_color()` (default: yellow, `"\033[93m"`) that warnings
-should have at the terminal.
+El formato `Base.warn_color()` (preeterminado: amarillo, `"\033[93m"`) que deberían tener las advertencias en el terminal.
 
 ### `JULIA_INFO_COLOR`
 
-The formatting `Base.info_color()` (default: cyan, `"\033[36m"`) that info
-should have at the terminal.
+El formato `Base.info_color()` (predeterminado: cyan, `"\033[36m"`) que debería tener la info en el terminal. 
 
 ### `JULIA_INPUT_COLOR`
 
