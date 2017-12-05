@@ -23,7 +23,7 @@
 * [Arrays Multi-dimensionales](manual/arrays)
 * [Álgebra Lineal](manual/linear-algebra)
 * [Networking and Streams](manual/networking-and-streams)
-* [Parallel Computing](manual/parallel-computing)
+* [Computación Paralela](manual/parallel-computing)
 * [Date and DateTime](manual/dates)
 * [Ejecutando Programas Externos](manual/running-external-programs)
 * [Calling C and Fortran Code](manual/calling-c-and-fortran-code)
