@@ -78,37 +78,29 @@ end
 
 ## Text I/O
 
-Note that the [`write()`](@ref) method mentioned above operates on binary streams. In particular,
-values do not get converted to any canonical text representation but are written out as is:
+Note que el método [`write()`](@ref) mencionado arriba opera sobre flujos binarios. En particular, los valores no son convertidos a ninguna representación de texto canónica sino que son escritas tal cual:
 
 ```jldoctest
 julia> write(STDOUT,0x61);  # suppress return value 1 with ;
 a
 ```
 
-Note that `a` is written to [`STDOUT`](@ref) by the [`write()`](@ref) function and that the returned
-value is `1` (since `0x61` is one byte).
+Note que `a` es escrito a [`STDOUT`](@ref) por la función [`write()`](@ref) y que el valor devuelto es `1` (ya que `0x61` es un byte).
 
-For text I/O, use the [`print()`](@ref) or [`show()`](@ref) methods, depending on your needs (see
-the standard library reference for a detailed discussion of the difference between the two):
+Para E/S texto, use los métodos [`print()`](@ref) o [`show()`](@ref) methods, dependiendo de sus necesidades (ver la referencia de la librería estándar para una discusin detallada de la diferencia entre las dos):
 
 ```jldoctest
 julia> print(STDOUT, 0x61)
 97
 ```
 
-## IO Output Contextual Properties
+## Propiedades contextuales de salida IO
 
-Sometimes IO output can benefit from the ability to pass contextual information into show methods.
-The [`IOContext`](@ref) object provides this framework for associating arbitrary metadata with an IO object.
-For example, [`showcompact`](@ref) adds a hinting parameter to the IO object that the invoked show method
-should print a shorter output (if applicable).
+En ocasiones, la salida de IO puede beneficiarse de la capacidad de pasar información contextual a los métodos de muestra. El objeto [`IOContext`](@ref) proporciona este marco para asociar metadatos arbitrarios con un objeto IO. Por ejemplo, [`showcompact`](@ref) agrega un parámetro de alusión al objeto IO para que el método del espectáculo invocado imprima un resultado más corto (si corresponde).
 
-## Working with Files
+## Trabajando con Ficheros
 
-Like many other environments, Julia has an [`open()`](@ref) function, which takes a filename and
-returns an `IOStream` object that you can use to read and write things from the file. For example
-if we have a file, `hello.txt`, whose contents are `Hello, World!`:
+Al igual que muchos otros entornos, Julia tiene una función [`open()`](@ref), que toma un nombre de archivo y devuelve un objeto `IOStream` que puede usar para leer y escribir cosas del archivo. Por ejemplo, si tenemos un archivo, `hello.txt`, cuyo contenido es `Hello, World!`:
 
 ```julia-repl
 julia> f = open("hello.txt")
@@ -119,7 +111,7 @@ julia> readlines(f)
  "Hello, World!"
 ```
 
-If you want to write to a file, you can open it with the write (`"w"`) flag:
+Si desea escribir a un fichero, puede abrirlo con el flag de escritura (`"w"`):
 
 ```julia-repl
 julia> f = open("hello.txt","w")
@@ -129,20 +121,15 @@ julia> write(f,"Hello again.")
 12
 ```
 
-If you examine the contents of `hello.txt` at this point, you will notice that it is empty; nothing
-has actually been written to disk yet. This is because the `IOStream` must be closed before the
-write is actually flushed to disk:
+Si examina el contenido de `hello.txt` en este punto, notará que está vacío; no se ha escrito nada en el disco todavía. Esto se debe a que el `IOStream` debe cerrarse antes de que la escritura realmente se vacíe en el disco:
 
 ```julia-repl
 julia> close(f)
 ```
 
-Examining `hello.txt` again will show its contents have been changed.
+Examinando `hello.txt` nuevamente mostrará que su contenido ha sido cambiado.
 
-Opening a file, doing something to its contents, and closing it again is a very common pattern.
-To make this easier, there exists another invocation of [`open()`](@ref) which takes a function
-as its first argument and filename as its second, opens the file, calls the function with the
-file as an argument, and then closes it again. For example, given a function:
+Abrir un archivo, hacer algo con su contenido y volver a cerrarlo es un patrón muy común. Para hacerlo más fácil, existe otra invocación de [`open()`](@ref) que toma una función como su primer argumento y nombre de archivo como su segundo, abre el archivo, llama a la función con el archivo como argumento, y luego lo cierra de nuevo. Por ejemplo, dada una función:
 
 ```julia
 function read_and_capitalize(f::IOStream)
@@ -150,18 +137,16 @@ function read_and_capitalize(f::IOStream)
 end
 ```
 
-You can call:
+Uno puede llamar a:
 
 ```julia-repl
 julia> open(read_and_capitalize, "hello.txt")
 "HELLO AGAIN."
 ```
 
-to open `hello.txt`, call `read_and_capitalize on it`, close `hello.txt` and return the capitalized
-contents.
+para abrir `hello.txt`, llamar `read_and_capitalize on it`, cerrar `hello.txt` y devolver los contenidos capitalizados.
 
-To avoid even having to define a named function, you can use the `do` syntax, which creates an
-anonymous function on the fly:
+Para incluso evitar tener que definir una función nombrada, puede usarse la sintaxis `do`, que crea una función anónima sobre la marcha:
 
 ```julia-repl
 julia> open("hello.txt") do f
@@ -170,9 +155,9 @@ julia> open("hello.txt") do f
 "HELLO AGAIN."
 ```
 
-## A simple TCP example
+## Un ejemplo TCP simple
 
-Let's jump right in with a simple example involving TCP sockets. Let's first create a simple server:
+Saltemos directamente con un ejemplo simple que involucra sockets TCP. Primero creemos un servidor simple:
 
 ```julia-repl
 julia> @async begin
@@ -185,10 +170,7 @@ julia> @async begin
 Task (runnable) @0x00007fd31dc11ae0
 ```
 
-To those familiar with the Unix socket API, the method names will feel familiar, though their
-usage is somewhat simpler than the raw Unix socket API. The first call to [`listen()`](@ref) will
-create a server waiting for incoming connections on the specified port (2000) in this case. The
-same function may also be used to create various other kinds of servers:
+Para quienes estén familiarizados con la API de socket de Unix, los nombres de los métodos se sentirán familiares, aunque su uso es algo más simple que la API de socket Raw de Unix. La primera llamada a [`listen()`](@ref) creará un servidor en espera de conexiones entrantes en el puerto especificado (2000) en este caso. La misma función también se puede usar para crear otros tipos de servidores:
 
 ```julia-repl
 julia> listen(2000) # Listens on localhost:2000 (IPv4)
@@ -213,18 +195,7 @@ julia> listen("\\\\.\\pipe\\testsocket") # Listens on a Windows named pipe
 Base.PipeServer(active)
 ```
 
-Note that the return type of the last invocation is different. This is because this server does not
-listen on TCP, but rather on a named pipe (Windows) or UNIX domain socket. Also note that Windows
-named pipe format has to be a specific pattern such that the name prefix (`\\.\pipe\`) uniquely
-identifies the [file type](https://msdn.microsoft.com/en-
-us/library/windows/desktop/aa365783(v=vs.85).aspx). The difference between TCP and named pipes or
-UNIX domain sockets is subtle and has to do with the [`accept()`](@ref) and [`connect()`](@ref)
-methods. The [`accept()`](@ref) method retrieves a connection to the client that is connecting on
-the server we just created, while the [`connect()`](@ref) function connects to a server using the
-specified method. The [`connect()`](@ref) function takes the same arguments as [`listen()`](@ref),
-so, assuming the environment (i.e. host, cwd, etc.) is the same you should be able to pass the same
-arguments to [`connect()`](@ref) as you did to listen to establish the connection. So let's try that
-out (after having created the server above):
+Tengase en cuenta que el tipo de retorno de la última invocación es diferente. Esto se debe a que este servidor no escucha en TCP, sino sobre una tubería nombrada (Windows) o socket de dominio UNIX. También tenga en cuenta que el formato de tubería nombrada de Windows debe ser un patrón específico tal que el prefijo del nombre (`\\.\pipe\`) identifique de manera única el [tipo de archivo](https://msdn.microsoft.com/en-us/library/windows/desktop/aa365783(v=vs.85).aspx). La diferencia entre TCP y tuberías nombradas o sockets de dominio UNIX es sutil y tiene que ver con los métodos [`accept()`](@ref) y [`connect()`](@ref). El método [`accept()`](@ref) recupera una conexión con el cliente que se está conectando en el servidor que acabamos de crear, mientras que la función [`connect()`](@ref) se conecta a un servidor usando el método especificado. La función [`connect()`](@ ref) toma los mismos argumentos que [`listen()`](@ref), por lo tanto, suponiendo que el entorno (es decir, host, cwd, etc.) es el mismo uno debería capaz de pasar los mismos argumentos a [`connect()`](@ref) como lo se hizo para escuchar en el establecimiento de la conexión. Así que vamos a intentarlo (después de haber creado el servidor anterior):
 
 ```julia-repl
 julia> connect(2000)
@@ -233,18 +204,9 @@ TCPSocket(open, 0 bytes waiting)
 julia> Hello World
 ```
 
-As expected we saw "Hello World" printed. So, let's actually analyze what happened behind the
-scenes. When we called [`connect()`](@ref), we connect to the server we had just created. Meanwhile,
-the accept function returns a server-side connection to the newly created socket and prints "Hello
-World" to indicate that the connection was successful.
+Como era de esperar, vimos "Hello World" impreso. Entonces, analicemos realmente lo que sucedió detrás de escena. Cuando llamamos a [`connect()`](@ref), nos conectamos al servidor que acabamos de crear. Mientras tanto, la función `accept` devuelve una conexión del lado del servidor al socket recién creado e imprime "Hello World" para indicar que la conexión fue exitosa.
 
-A great strength of Julia is that since the API is exposed synchronously even though the I/O is
-actually happening asynchronously, we didn't have to worry callbacks or even making sure that
-the server gets to run. When we called [`connect()`](@ref) the current task waited for the connection
-to be established and only continued executing after that was done. In this pause, the server
-task resumed execution (because a connection request was now available), accepted the connection,
-printed the message and waited for the next client. Reading and writing works in the same way.
-To see this, consider the following simple echo server:
+Una gran fortaleza de Julia es que, dado que la API se expone sincrónicamente a pesar de que la E/S realmente está sucediendo de forma asíncrona, no tuvimos que preocuparnos de las devoluciones de llamadas ni siquiera de asegurarnos de que el servidor se ejecute. Cuando llamamos a [`connect()`](@ref) la tarea actual esperó a que se estableciera la conexión y solo continuó ejecutándose después de que se hizo. En esta pausa, la tarea del servidor reanudó la ejecución (porque una solicitud de conexión ya estaba disponible), aceptó la conexión, imprimió el mensaje y esperó al próximo cliente. Leer y escribir funciona de la misma manera. Para ver esto, considere el siguiente servidor de eco simple:
 
 ```julia-repl
 julia> @async begin
@@ -270,7 +232,7 @@ julia> println(clientside,"Hello World from the Echo Server")
 Hello World from the Echo Server
 ```
 
-As with other streams, use [`close()`](@ref) to disconnect the socket:
+Como con otros flujos, use [`close()`](@ref) para desconectar el socket:
 
 ```julia-repl
 julia> close(clientside)
@@ -278,17 +240,14 @@ julia> close(clientside)
 
 ## Resolving IP Addresses
 
-One of the [`connect()`](@ref) methods that does not follow the [`listen()`](@ref) methods is
-`connect(host::String,port)`, which will attempt to connect to the host given by the `host` parameter
-on the port given by the port parameter. It allows you to do things like:
+Uno de los métodos [`connect()`](@ref) que no sigue los métodos [`listen()`](@ref) es `connect(host::String, port)`, que intentará conectarse al host dado por el parámetro `host` en el puerto dado por el parámetro port. Te permite hacer cosas como:
 
 ```julia-repl
 julia> connect("google.com",80)
 TCPSocket(RawFD(30) open, 0 bytes waiting)
 ```
 
-At the base of this functionality is [`getaddrinfo()`](@ref), which will do the appropriate address
-resolution:
+En la base de esta funcionalidad está [`getaddrinfo()`](@ref), que hará la resolución de dirección apropiada:
 
 ```julia-repl
 julia> getaddrinfo("google.com")
