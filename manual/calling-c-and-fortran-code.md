@@ -11,28 +11,25 @@ El nombre de una función se puede usar solo en lugar de la tupla (solo `:funci�
 Por defecto, los compiladores Fortran [generan nombres destrozados](https://en.wikipedia.org/wiki/Name_mangling#Fortran)
 (por ejemplo, convirtiendo nombres de funciones a minúsculas o mayúsculas, a menudo añadiendo un guión bajo), y para llamar a una función Fortran a través de [`ccall`](@ref) debe pasar el identificador mutilado correspondiente a la regla seguida por su compilador Fortran . Además, cuando se llama a una función Fortran, todas las entradas se deben pasar por referencia.
 
-Finally, you can use [`ccall`](@ref) to actually generate a call to the library function. Arguments
-to [`ccall`](@ref) are as follows:
+Por último, se puede usar [`ccall`](@ref) para generar de hecho una llamada a la función de librería. Los argumentos a  [`ccall`](@ref) son los siguientes:
 
-1. A `(:function, "library")` pair, which must be written as a literal constant,
+1. Una pareja `(:función, "librería")`, que debe ser escrita como una constante literal,
 
-   OR
+   O
 
-   a function pointer (for example, from `dlsym`).
+   un puntero a función (por ejemplo, de `dlsym`).
 
-2. Return type (see below for mapping the declared C type to Julia)
+2. Tipo de retorno (ver abajo para la correspondencia entre el tipo declarado en C y Julia)
 
-     * This argument will be evaluated at compile-time, when the containing method is defined.
+     * Este argumento será evaluado en tiempo de compilación, cuando se defina el método que lo contiene.
 
-3. A tuple of input types. The input types must be written as a literal tuple, not a tuple-valued
-   variable or expression.
+3. Una tupla de tipos de entrada. Los tipos de entrada deben ser escritos como un literal tupla, no como una variable o expresión de valor tupla.
 
-     * This argument will be evaluated at compile-time, when the containing method is defined.
+     * Este argumento será evaluado en tiempo de compilación, cuando se defina el método que lo contiene.
 
-4. The following arguments, if any, are the actual argument values passed to the function.
+4. Los siguientes argumentos, si los hay, son los valores de los argumentos actuales pasados a la función.
 
-As a complete but simple example, the following calls the `clock` function from the standard C
-library:
+Como un ejemplo completo pero simple, el siguiente código llama a la función `clock` de la librería estándar C:
 
 ```julia-repl
 julia> t = ccall((:clock, "libc"), Int32, ())
@@ -45,9 +42,7 @@ julia> typeof(ans)
 Int32
 ```
 
-`clock` takes no arguments and returns an [`Int32`](@ref). One common gotcha is that a 1-tuple must be
-written with a trailing comma. For example, to call the `getenv` function to get a pointer to
-the value of an environment variable, one makes a call like this:
+`clock` no toma argumentos y devuelve un [`Int32`](@ref). Un problema común es que una 1-tupla debe escribirse con una coma al final. Por ejemplo, para llamar a la función `getenv` para obtener un puntero al valor de una variable de entorno, se realiza una llamada como esta:
 
 ```julia-repl
 julia> path = ccall((:getenv, "libc"), Cstring, (Cstring,), "SHELL")
@@ -57,9 +52,7 @@ julia> unsafe_string(path)
 "/bin/bash"
 ```
 
-Note that the argument type tuple must be written as `(Cstring,)`, rather than `(Cstring)`. This
-is because `(Cstring)` is just the expression `Cstring` surrounded by parentheses, rather than
-a 1-tuple containing `Cstring`:
+Note que la tupla del tipo de argumento debe ser escrita como `(Cstring,)`, en lugar de como `(Cstring)`. Esto es debido a que `(Cstring)` es justo la expresión `Cstring` rodeada entre paréntesis, en lugar de una tupla que contiene a `Cstring`:
 
 ```jldoctest
 julia> (Cstring)
