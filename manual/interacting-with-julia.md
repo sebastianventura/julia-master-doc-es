@@ -165,10 +165,9 @@ atreplinit(customize_keys)
 
 Users should refer to `LineEdit.jl` to discover the available actions on key input.
 
-## Tab completion
+## Uso de Tab para completar expresiones
 
-In both the Julian and help modes of the REPL, one can enter the first few characters of a function
-or type and then press the tab key to get a list all matches:
+Tanto en los moddos Juliano como de ayuda del REPL, uno puede entrar los primeros caracteres de una función o tipo y luego pulsar la tecla del tabulador para obtener una lista de posibles coincidencias:
 
 ```julia-repl
 julia> stri[TAB]
@@ -178,8 +177,7 @@ julia> Stri[TAB]
 StridedArray    StridedMatrix    StridedVecOrMat  StridedVector    String
 ```
 
-The tab key can also be used to substitute LaTeX math symbols with their Unicode equivalents,
-and get a list of LaTeX matches as well:
+La tecla tabulador puede también usarse para sustituir los símbolos matemáticos de LaTeX con sus equivalentes Unicode, y obtener también una lista de coincidencias LaTeX:
 
 ```julia-repl
 julia> \pi[TAB]
@@ -215,9 +213,9 @@ julia> α="\alpha[TAB]"   # LaTeX completion also works in strings
 julia> α="α"
 ```
 
-A full list of tab-completions can be found in the [Unicode Input](@ref) section of the manual.
+En la sección [Unicode Input](@ref) del manual puede encontrarse una lista completa de finalizaciones usando tabulador.
 
-Completion of paths works for strings and julia's shell mode:
+En modo shell también puede usarse el tabulador para completar cadenas relativas a caminos de fichero:
 
 ```julia-repl
 julia> path="/[TAB]"
@@ -228,7 +226,7 @@ shell> /[TAB]
 .dockerinit bin/         dev/         home/        lib64/       mnt/         proc/        run/         srv/         tmp/         var/
 ```
 
-Tab completion can help with investigation of the available methods matching the input arguments:
+Esta funcionalidad puede ayudar con la investigación de los métodos disponibles que coinciden con los argumentos de entrada:
 
 ```julia-repl
 julia> max([TAB] # All methods are displayed, not shown here due to size of the list
@@ -242,8 +240,7 @@ max(x, y) in Base at operators.jl:215
 max(a, b, c, xs...) in Base at operators.jl:281
 ```
 
-Keywords are also displayed in the suggested methods, see second line after `;` where `limit`
-and `keep` are keyword arguments:
+Las palabras clave (*keywords*) son también mostradas en los métodos sugeridos, ver la segunda línea después de `;` donde `limit` y `keep` son argumentos palabras clave:
 
 ```julia-repl
 julia> split("1 1 1", [TAB]
@@ -251,32 +248,27 @@ split(str::AbstractString) in Base at strings/util.jl:302
 split(str::T, splitter; limit, keep) where T<:AbstractString in Base at strings/util.jl:277
 ```
 
-The completion of the methods uses type inference and can therefore see if the arguments match
-even if the arguments are output from functions. The function needs to be type stable for the
-completion to be able to remove non-matching methods.
+La acción de completar los métodos usa inferencia de tipos y puede por tanto ver si los argumentos coinciden incluso si los argumentos son la salida de funcionees La función necesita se estable de tipos para que la acción de completar sea capaz de borrar los métodos no coincidentes.
 
-Tab completion can also help completing fields:
+La acción de completar puede también ayudar a completar campos:
 
 ```julia-repl
 julia> Pkg.a[TAB]
 add       available
 ```
 
-Fields for output from functions can also be completed:
+También pueden completarse los campos para la salida de funciones:
 
 ```julia-repl
 julia> split("","")[1].[TAB]
 endof  offset  string
 ```
 
-The completion of fields for output from functions uses type inference, and it can only suggest
-fields if the function is type stable.
+La accin de completar campos para la salida de funciones usa inferencia de tipos, y sólo puede sugerir campos si la función es estable en los tipos.
 
 ## Customizing Colors
 
-The colors used by Julia and the REPL can be customized, as well. To change the
-color of the Julia prompt you can add something like the following to your
-`.juliarc.jl` file, which is to be placed inside your home directory:
+Los colores utilizados por Julia y REPL se pueden personalizar también. Para cambiar el color del *prompt* de Julia, puede agregar algo como lo siguiente a su `.juliarc.jl`, que se debe colocar dentro del directorio de inicio:
 
 ```julia
 function customize_colors(repl)
@@ -286,18 +278,11 @@ end
 atreplinit(customize_colors)
 ```
 
-The available color keys can be seen by typing `Base.text_colors` in the help mode of the REPL.
-In addition, the integers 0 to 255 can be used as color keys for terminals
-with 256 color support.
+Las teclas de color disponibles se pueden ver escribiendo `Base.text_colors` en el modo de ayuda de REPL. Además, los números enteros 0 a 255 se pueden usar como teclas de color para terminales con soporte de 256 colores.
 
-You can also change the colors for the help and shell prompts and
-input and answer text by setting the appropriate field of `repl` in the `customize_colors` function
-above (respectively, `help_color`, `shell_color`, `input_color`, and `answer_color`). For the
-latter two, be sure that the `envcolors` field is also set to false.
+También puede cambiar los colores para la ayuda y las instrucciones del shell e ingresar y contestar el texto configurando el campo apropiado de `repl` en la función `customize_colors` arriba (respectivamente, `help_color`, `shell_color`, `input_color`, y `answer_color`). Para los dos últimos, asegúrese de que el campo `envcolors` también esté configurado a false.
 
-It is also possible to apply boldface formatting by using
-`Base.text_colors[:bold]` as a color. For instance, to print answers in
-boldface font, one can use the following as a `.juliarc.jl`:
+También es posible aplicar el formato en negrita mediante el uso de `Base.text_colors[: bold]` como color. Por ejemplo, para imprimir las respuestas en letra negrita, se puede usar lo siguiente como `.juliarc.jl`:
 
 ```julia
 function customize_colors(repl)
@@ -308,9 +293,7 @@ end
 atreplinit(customize_colors)
 ```
 
-You can also customize the color used to render warning and informational messages by
-setting the appropriate environment variables. For instance, to render error, warning, and informational
-messages respectively in magenta, yellow, and cyan you can add the following to your `.juliarc.jl` file:
+También puede personalizarse el color utilizado para presentar mensajes de advertencia e información estableciendo las variables de entorno apropiadas. Por ejemplo, para generar mensajes de error, de advertencia y de información respectivamente en magenta, amarillo y cian, puede agregar lo siguiente a su archivo `.juliarc.jl`:
 
 ```julia
 ENV["JULIA_ERROR_COLOR"] = :magenta
