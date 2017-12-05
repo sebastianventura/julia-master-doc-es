@@ -44,10 +44,7 @@ julia> eigvecs(A)
    0.68501+0.0im  0.254058-0.513301im  0.254058+0.513301im
 ```
 
-In addition, Julia provides many [factorizations](@ref man-linalg-factorizations) which can be used to
-speed up problems such as linear solve or matrix exponentiation by pre-factorizing a matrix into a form
-more amenable (for performance or memory reasons) to the problem. See the documentation on [`factorize`](@ref)
-for more information. As an example:
+Además, Julia proporciona muchas [factorizaciones](@ref man-linalg-factorizations) que pueden usarse para acelerar problemas como la resolución lineal o la exponenciación de matrices mediante la pre-factorización de una matriz en una forma más adecuada (por razones de rendimiento o memoria) ) al problema. Consulte la documentación en [`factorize`](@ref) para obtener más información. Como ejemplo:
 
 ```jldoctest
 julia> A = [1.5 2 -4; 3 -1 -6; -10 2.3 4]
@@ -138,13 +135,9 @@ La operación realiza aquí la resolución de la ecuación lineal. El analizador
 
 ## Matrices especiales
 
-[Matrices with special symmetries and structures](http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=3274)
-arise often in linear algebra and are frequently associated with various matrix factorizations.
-Julia features a rich collection of special matrix types, which allow for fast computation with
-specialized routines that are specially developed for particular matrix types.
+[Las matrices con simetrías y estructuras especiales](http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=3274) surgen a menudo en el álgebra lineal y frecuentemente se asocian con varias factorizaciones matriciales. Julia presenta una rica colección de tipos de matrices especiales, que permiten un cálculo rápido con rutinas especializadas que están especialmente desarrolladas para estos tipos particuales de matrices.
 
-The following tables summarize the types of special matrices that have been implemented in Julia,
-as well as whether hooks to various optimized methods for them in LAPACK are available.
+Las siguientes tablas resumen los tipos de matrices especiales que se han implementado en Julia, así como si están disponibles ganchos para varios métodos optimizados para ellos en LAPACK.
 
 | Type                      | Description                                                                      |
 |:------------------------- |:-------------------------------------------------------------------------------- |
@@ -202,24 +195,16 @@ Legend:
 | I (interval) | An optimized method to find the characteristic values in the interval [`vl`, `vh`] is available                                 | `eigvals(M, vl, vh)` |
 | V (vectors)  | An optimized method to find the characteristic vectors corresponding to the characteristic values `x=[x1, x2,...]` is available | `eigvecs(M, x)`      |
 
-### The uniform scaling operator
+### El operador de escalado uniforme
 
-A [`UniformScaling`](@ref) operator represents a scalar times the identity operator, `λ*I`. The identity
-operator `I` is defined as a constant and is an instance of `UniformScaling`. The size of these
-operators are generic and match the other matrix in the binary operations [`+`](@ref), [`-`](@ref),
-[`*`](@ref) and [`\`](@ref). For `A+I` and `A-I` this means that `A` must be square. Multiplication
-with the identity operator `I` is a noop (except for checking that the scaling factor is one)
-and therefore almost without overhead.
+Un operador [`UniformScaling`](@ref) representa un escalar multiplicado por el operador de identidad, `λ*I`. El operador de identidad `I` se define como una constante y es una instancia de `UniformScaling`. El tamaño de estos operadores es genérico y coincide con la otra matriz en las operaciones binarias [`+`](@ref), [`-`](@ref), [`*`](@ref) y [`\`](@ref). Para `A+I` y` A-I` esto significa que `A` debe ser cuadrado. La multiplicación con el operador de identidad `I` es un *noop* (excepto para comprobar que el factor de escala es uno) y, por lo tanto, casi sin sobrecarga.
 
-## [Matrix factorizations](@id man-linalg-factorizations)
+## [Factorizaciones de matrices](@id man-linalg-factorizations)
 
-[Matrix factorizations (a.k.a. matrix decompositions)](https://en.wikipedia.org/wiki/Matrix_decomposition)
-compute the factorization of a matrix into a product of matrices, and are one of the central concepts
-in linear algebra.
+[las factorizaciones de matrices (a.k.a. descomposiciones de matrices)](https://en.wikipedia.org/wiki/Matrix_decomposition)
+calculan la factorizacin de una matriz en un producto de matrices, y son uno de los conceptos centrales del álgebra lineal.
 
-The following table summarizes the types of matrix factorizations that have been implemented in
-Julia. Details of their associated methods can be found in the [Linear Algebra](@ref) section
-of the standard library documentation.
+La siguiente tabla resume los tipos de factorizaciones de matrices que han sido implementados en Julia. En la sección [Linear Algebra](@ref) de la documentación de la librería estándar pueden encontrarse más detalles de los métodos asociados.
 
 | Type              | Description                                                                                                    |
 |:----------------- |:-------------------------------------------------------------------------------------------------------------- |
