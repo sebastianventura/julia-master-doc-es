@@ -4,7 +4,7 @@ Julia proporciona una interfaz rica para tratar objetos que representen un flujo
 
 ## Flujos de E/S básico
 
-Todos loos flujos en Julia exponen al menos un método [`read()`](@ref) y un [`write()`](@ref), tomando el flujo como su primer argumento, por ejemplo:
+Todos los flujos en Julia exponen al menos un método [`read()`](@ref) y un [`write()`](@ref), tomando el flujo como su primer argumento, por ejemplo:
 
 ```julia-repl
 julia> write(STDOUT,"Hello World");  # suppress return value 11 with ;
@@ -14,14 +14,11 @@ julia> read(STDIN,Char)
 '\n': ASCII/Unicode U+000a (category Cc: Other, control)
 ```
 
-Note that [`write()`](@ref) returns 11, the number of bytes (in `"Hello World"`) written to [`STDOUT`](@ref),
-but this return value is suppressed with the `;`.
+Tenga en cuenta que [`write()`](@ref) devuelve 11, el número de bytes (en `"Hello World"`) escrito en [`STDOUT`](@ref), pero este valor de retorno se suprime con `;`.
 
-Here Enter was pressed again so that Julia would read the newline. Now, as you can see from this
-example, [`write()`](@ref) takes the data to write as its second argument, while [`read()`](@ref)
-takes the type of the data to be read as the second argument.
+Aquí Enter fue presionado nuevamente para que Julia leyera la nueva línea. Ahora, como puede ver en este ejemplo, [`write()`] (@ref) toma los datos para escribir como su segundo argumento, mientras que [`read()`](@ref) toma el tipo de datos para ser leído como el segundo argumento.
 
-For example, to read a simple byte array, we could do:
+Por ejemplo, para leer una matriz de bytes simple, podríamos hacer:
 
 ```julia-repl
 julia> x = zeros(UInt8, 4)
@@ -40,8 +37,7 @@ abcd
  0x64
 ```
 
-However, since this is slightly cumbersome, there are several convenience methods provided. For
-example, we could have written the above as:
+Sin embargo, dado que esto es un poco engorroso, se proporcionan varios métodos de conveniencia. Por ejemplo, podríamos haber escrito lo anterior como:
 
 ```julia-repl
 julia> read(STDIN,4)
@@ -53,7 +49,7 @@ abcd
  0x64
 ```
 
-or if we had wanted to read the entire line instead:
+o si hubiéramos querido leer toda la línea en su lugar:
 
 ```julia-repl
 julia> readline(STDIN)
@@ -61,10 +57,9 @@ abcd
 "abcd"
 ```
 
-Note that depending on your terminal settings, your TTY may be line buffered and might thus require
-an additional enter before the data is sent to Julia.
+Tenga en cuenta que, dependiendo de la configuración de su terminal, su TTY puede estar almacenado en línea y, por lo tanto, podría requerir una entrada adicional antes de enviar los datos a Julia.
 
-To read every line from [`STDIN`](@ref) you can use [`eachline()`](@ref):
+Para leer cada línea desde [`STDIN`](@ref), puede usar [`eachline()`](@ref):
 
 ```julia
 for line in eachline(STDIN)
@@ -72,7 +67,7 @@ for line in eachline(STDIN)
 end
 ```
 
-or [`read()`](@ref) if you wanted to read by character instead:
+o [`read()`](@ref) si deseamos leer carácter a carácter en lugar de lo anterior:
 
 ```julia
 while !eof(STDIN)
