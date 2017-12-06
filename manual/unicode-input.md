@@ -1,19 +1,14 @@
 # Unicode Input
 
-The following table lists Unicode characters that can be entered via
-tab completion of LaTeX-like abbreviations in the Julia REPL (and
-in various other editing environments).  You can also get information on how to
-type a symbol by entering it in the REPL help, i.e. by typing `?` and then
-entering the symbol in the REPL (e.g., by copy-paste from somewhere you saw
-the symbol).
+La siguiente tabla enumera los caracteres Unicode que pueden ingresarse mediante la terminación de pestañas de las abreviaturas similares a LaTeX en Julia REPL (y en otros entornos de edición). También puede obtener información sobre cómo escribir un símbolo ingresándolo en la ayuda REPL, es decir, escribiendo `?` Y luego ingresando el símbolo en REPL (por ejemplo, mediante copiar y pegar desde algún lugar donde vio el símbolo).
 
 !!! warning
 
-    This table may appear to contain missing characters in the second column, or even
-    show characters that are inconsistent with the characters as they are rendered in
-    the Julia REPL. In these cases, users are strongly advised to check their choice
-    of fonts in their browser and REPL environment, as there are known issues with
-    glyphs in many fonts.
+    Puede parecer que esta tabla contiene caracteres faltantes en la segunda columna, 
+    o incluso muestra caracteres que son inconsistentes con los caracteres tal como 
+    se representan en Julia REPL. En estos casos, se recomienda encarecidamente a los 
+    usuarios que comprueben la elección de las fuentes en su navegador y entorno REPL, 
+    ya que existen problemas conocidos con los glifos en muchas fuentes.
 
 ```@eval
 #
