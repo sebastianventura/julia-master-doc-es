@@ -1,20 +1,12 @@
-# Packages
+# Paquetes
 
-Julia has a built-in package manager for installing add-on functionality written in Julia. It
-can also install external libraries using your operating system's standard system for doing so,
-or by compiling from source. The list of registered Julia packages can be found at [http://pkg.julialang.org](http://pkg.julialang.org).
-All package manager commands are found in the `Pkg` module, included in Julia's `Base`
-install.
+Julia tiene un administrador de paquetes incorporado para instalar la funcionalidad añadida y escrita en Julia. También puede instalar bibliotecas externas utilizando el sistema estándar de su sistema operativo para hacerlo, o compilando desde los fuentes. La lista de paquetes Julia registrados se puede encontrar en [http://pkg.julialang.org](http://pkg.julialang.org). Todos los mandatos del gestor de paquetes se encuentran en el módulo `Pkg`, incluido en la instalación `Base` de Julia.
 
-First we'll go over the mechanics of the `Pkg` family of commands and then we'll provide some
-guidance on how to get your package registered. Be sure to read the section below on package naming
-conventions, tagging versions and the importance of a `REQUIRE` file for when you're ready to
-add your code to the curated METADATA repository.
+Primero revisaremos los mecanismos de la familia de mandatos de `Pkg` y luego brindaremos algunas pautas sobre cómo registrar sus paquetes. Asegúrese de leer la siguiente sección sobre las convenciones de nombres de paquetes, las versiones de etiquetado y la importancia de un archivo `REQUIRE` para cuando esté listo para agregar su código al repositorio de METADATA seleccionado.
 
-## Package Status
+## Estado de un paquete
 
-The [`Pkg.status()`](@ref) function prints out a summary of the state of packages you have installed.
-Initially, you'll have no packages installed:
+La función [`Pkg.status()`](@ref) imprime un resumen del estado de los paquetes que uno ha instalado. Inicialmente uno no tendrá paquetes instalados:
 
 ```julia-repl
 julia> Pkg.status()
@@ -23,9 +15,7 @@ INFO: Cloning METADATA from git://github.com/JuliaLang/METADATA.jl
 No packages installed.
 ```
 
-Your package directory is automatically initialized the first time you run a `Pkg` command
-that expects it to exist – which includes [`Pkg.status()`](@ref). Here's an example non-trivial
-set of required and additional packages:
+El directorio de paquetes es inicializado automáticamente la primera vez que una ejecute un mandato `Pkg` que asume su existencia – que incluya [`Pkg.status()`](@ref). He aquí un conjunto de ejemplo no trivial de paquetes requeridos y adicionales:
 
 ```julia-repl
 julia> Pkg.status()
@@ -37,11 +27,7 @@ Additional packages:
  - Stats                         0.2.6
 ```
 
-These packages are all on registered versions, managed by `Pkg`. Packages can be in more
-complicated states, indicated by annotations to the right of the installed package version; we
-will explain these states and annotations as we encounter them. For programmatic usage, [`Pkg.installed()`](@ref)
-returns a dictionary, mapping installed package names to the version of that package which is
-installed:
+Estos paquetes están todos en versiones registradas, administradas por `Pkg`. Los paquetes pueden estar en estados más complicados, indicados por anotaciones a la derecha de la versión del paquete instalado; estos estados y anotaciones serán explicados a medida que los encontremos. Para el uso programático, [`Pkg.installed ()`](@ref) devuelve un diccionario, donde se hacen corresponder los nombres de paquetes instalados con la versión instalada de ese paquete:
 
 ```julia-repl
 julia> Pkg.installed()
@@ -52,13 +38,9 @@ Dict{String,VersionNumber} with 4 entries:
 "NumericExtensions" => v"0.2.17"
 ```
 
-## Adding and Removing Packages
+## Añadir y eliminar paquetes
 
-Julia's package manager is a little unusual in that it is declarative rather than imperative.
-This means that you tell it what you want and it figures out what versions to install (or remove)
-to satisfy those requirements optimally – and minimally. So rather than installing a package,
-you just add it to the list of requirements and then "resolve" what needs to be installed. In
-particular, this means that if some package had been installed because it was needed by a previous
+Julia's package manager is a little unusual in that it is declarative rather than imperative. This means that you tell it what you want and it figures out what versions to install (or remove) to satisfy those requirements optimally – and minimally. So rather than installing a package,  you just add it to the list of requirements and then "resolve" what needs to be installed. In particular, this means that if some package had been installed because it was needed by a previous
 version of something you wanted, and a newer version doesn't have that requirement anymore, updating
 will actually remove that package.
 
