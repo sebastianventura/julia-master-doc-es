@@ -171,8 +171,8 @@ Por convención, los nombres de los repositorios de Julia terminan con `.jl` (el
 Si los paquetes no registrados contienen un archivo `REQUIRE` en la parte superior de su árbol fuente, ese archivo se usará para determinar de qué paquetes registrados depende el paquete no registrado, y se instalarán automáticamente. Los paquetes no registrados participan en la misma lógica de resolución de versiones que los paquetes registrados, por lo que las versiones de paquetes instalados se ajustarán según sea necesario para satisfacer los requisitos de los paquetes registrados y no registrados.
 
 [^1]:
-    El conjunto oficial de paquetes está en     
-    [https://github.com/JuliaLang/METADATA.jl(https://github.com/JuliaLang/METADATA.jl), 
+
+    El conjunto oficial de paquetes está en  [https://github.com/JuliaLang/METADATA.jl(https://github.com/JuliaLang/METADATA.jl), 
     pero los individuos y las organizaciones pueden usar fácilmente un repositorio de 
     metadatos diferente. Esto permite controlar qué paquetes están disponibles para la i
     nstalación automática. Solo se pueden permitir versiones de paquete auditadas y aprobadas, 
@@ -180,6 +180,8 @@ Si los paquetes no registrados contienen un archivo `REQUIRE` en la parte superi
     para más detalles.
     
 ## Updating Packages
+
+Cuando los desarrolladores de paquetes publican nuevas versiones registradas de los paquetes que está utilizando, por supuesto, querrá las nuevas versiones brillantes. Para obtener las últimas y mejores versiones de todos sus paquetes, simplemente haga [`Pkg.update ()`] (@ ref):
 
 When package developers publish new registered versions of packages that you're using, you will,
 of course, want the new shiny versions. To get the latest and greatest versions of all your packages,
@@ -193,31 +195,28 @@ INFO: Upgrading Distributions: v0.2.8 => v0.2.10
 INFO: Upgrading Stats: v0.2.7 => v0.2.8
 ```
 
-The first step of updating packages is to pull new changes to `~/.julia/v0.6/METADATA` and see
-if any new registered package versions have been published. After this, [`Pkg.update()`](@ref)
-attempts to update packages that are checked out on a branch and not dirty (i.e. no changes have
-been made to files tracked by git) by pulling changes from the package's upstream repository.
-Upstream changes will only be applied if no merging or rebasing is necessary – i.e. if the branch
-can be ["fast-forwarded"](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging).
-If the branch cannot be fast-forwarded, it is assumed that you're working on it and will update
-the repository yourself.
+El primer paso para actualizar paquetes es generar nuevos cambios en `~/.julia/v0.6/ METADATA` y ver
+si se ha publicado alguna nueva versión del paquete registrado. Después de esto, [`Pkg.update()`](@ref)
+intenta actualizar paquetes que están desprotegidos en una rama y no están sucios (es decir, no se han realizado cambios a los archivos rastreados por git) al extraer los cambios del repositorio en sentido ascendente del paquete.
+Los cambios en sentido ascendente solo se aplicarán si no es necesaria la fusión o rebase, es decir, si la rama
+puede ser ["fast-forwarded"](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging).
+Si la rama no se puede reenviar rápidamente, se supone que está trabajando en ella y actualizará
+el repositorio usted mismo.
 
-Finally, the update process recomputes an optimal set of package versions to have installed to
-satisfy your top-level requirements and the requirements of "fixed" packages. A package is considered
-fixed if it is one of the following:
+Finalmente, el proceso de actualización vuelve a calcular un conjunto óptimo de versiones de paquetes a tener instalado para satisfacer sus requisitos de nivel superior y los requisitos de paquetes "fijos". Un paquete es considerado
+corregido si es uno de los siguientes:
 
-1. **Unregistered:** the package is not in `METADATA` – you installed it with [`Pkg.clone()`](@ref).
-2. **Checked out:** the package repo is on a development branch.
-3. **Dirty:** changes have been made to files in the repo.
+1. **No registrado:** el paquete no está en `METADATA` - uno lo instaló con [`Pkg.clone()`](@ref).
+2. **Retirado:** el repositorio del paquete está en una rama de desarrollo.
+3. **Sucio:** se han realizado cambios a los archivos en el repositorio.
 
-If any of these are the case, the package manager cannot freely change the installed version of
-the package, so its requirements must be satisfied by whatever other package versions it picks.
-The combination of top-level requirements in `~/.julia/v0.6/REQUIRE` and the requirement of fixed
-packages are used to determine what should be installed.
+Si cualquiera de estos es el caso, el administrador del paquete no puede cambiar libremente la versión instalada de
+el paquete, por lo que sus requisitos deben ser satisfechos por cualquier otra versión del paquete que elija.
+La combinación de requisitos de nivel superior en `~/.julia/v0.6/REQUIRE` y el requisito de requisitos fijos
+los paquetes se usan para determinar qué se debe instalar.
 
-You can also update only a subset of the installed packages, by providing arguments to the [`Pkg.update`](@ref)
-function. In that case, only the packages provided as arguments and their dependencies will be
-updated:
+También puede actualizar solo un subconjunto de los paquetes instalados, proporcionando argumentos a la función [`Pkg.update`](@ref). En ese caso, solo los paquetes proporcionados como argumentos y sus dependencias serán
+actualizados:
 
 ```julia-repl
 julia> Pkg.update("Example")
@@ -226,9 +225,7 @@ INFO: Computing changes...
 INFO: Upgrading Example: v0.4.0 => 0.4.1
 ```
 
-This partial update process still computes the new set of package versions according to top-level
-requirements and "fixed" packages, but it additionally considers all other packages except those
-explicitly provided, and their dependencies, as fixed.
+Este proceso de actualización parcial todavía calcula el nuevo conjunto de versiones de paquetes de acuerdo con los requisitos de nivel superior y los paquetes "fijos", pero considera además todos los demás paquetes, excepto los explícitamente proporcionados, y sus dependencias, como corregidas.
 
 ## Checkout, Pin and Free
 
