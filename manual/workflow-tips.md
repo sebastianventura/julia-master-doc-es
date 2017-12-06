@@ -19,7 +19,8 @@ Los flujos de trabajo de Julia más básicos implican el uso de un editor de tex
 
     end
     ```
-  * **Ponga el código de test en otro fichero.** Cree otro fichero, digamos `tst.jl`, que comience con
+  
+  * **Ponga el código de test en otro fichero.** Cree otro fichero, digamos `tst.jl`, que comience con
 
     ```julia
     import Tmp
