@@ -43,12 +43,9 @@ julia> remotecall_fetch(getindex, 2, r, 1, 1)
 0.18526337335308085
 ```
 
-Remember that [`getindex(r,1,1)`](@ref) is [equivalent](@ref man-array-indexing) to `r[1,1]`, so this call fetches
-the first element of the future `r`.
+Recuerde que [`getindex(r,1,1)`](@ref) es [equivalente](@ref man-array-indexing) a `r[1,1]`, por lo que esta llamada capta el primer elemento del futuro `r`.
 
-The syntax of [`remotecall()`](@ref) is not especially convenient. The macro [`@spawn`](@ref)
-makes things easier. It operates on an expression rather than a function, and picks where to do
-the operation for you:
+La sintaxis de [`remotecall()`](@ref) no es especialmente conveniente. La macro [`@spawn`](@ref) hace las cosas más fáciles. Ella opera sobre una expresión en lugar de sobre una función, y elige dónde hacer la operación por ti:
 
 ```julia-repl
 julia> r = @spawn rand(2,2)
@@ -63,17 +60,11 @@ julia> fetch(s)
  1.20939  1.57158
 ```
 
-Note that we used `1 .+ fetch(r)` instead of `1 .+ r`. This is because we do not know where the
-code will run, so in general a [`fetch()`](@ref) might be required to move `r` to the process
-doing the addition. In this case, [`@spawn`](@ref) is smart enough to perform the computation
-on the process that owns `r`, so the [`fetch()`](@ref) will be a no-op (no work is done).
+Note que usamos `1 .+ fetch(r)` en lugar de `1 .+ r`. Esto es debido a que no sabemos dónde se ejecutará el código, por lo que en general puede que se requiera un[`fetch()`](@ref) para mover `r` al proceso que esta realizando la suma. En este caso, [`@spawn`](@ref) es bastante inteligente como para realizar el computo sobre el proceso que posee `r`, por lo que la llamada [`fetch()`](@ref) será una no-op (no se realiza trabajo).
 
-(It is worth noting that [`@spawn`](@ref) is not built-in but defined in Julia as a [macro](@ref man-macros).
-It is possible to define your own such constructs.)
+(Hay que notar que [`@spawn`](@ref) no es una función predefinida sino que está definida en Julia como una [macro](@ref man-macros). Es posible definir nuestras propias construcciones de ese tipo).
 
-An important thing to remember is that, once fetched, a [`Future`](@ref) will cache its value
-locally. Further [`fetch()`](@ref) calls do not entail a network hop. Once all referencing [`Future`](@ref)s
-have fetched, the remote stored value is deleted.
+Una importante cosa a recordar es que, una vez traída, un [`Future`](@ref) cacheará su valor localmente. Las llamadas adicionales a [`fetch()`](@ref) calls no implican un salto de red. Una vez que todos los [`Future`](@ref)s que referencian ha sido recuperados, el valor remoto almacenado es borrado.
 
 ## Code Availability and Loading Packages
 
