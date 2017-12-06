@@ -1,90 +1,39 @@
-# Noteworthy Differences from other Languages
+# Diferencias notables con otros idiomas
 
-## Noteworthy differences from MATLAB
+## Diferencias notables con MATLAB
 
-Although MATLAB users may find Julia's syntax familiar, Julia is not a MATLAB clone. There are
-major syntactic and functional differences. The following are some noteworthy differences that
-may trip up Julia users accustomed to MATLAB:
+Aunque los usuarios de MATLAB pueden encontrar la sintaxis de Julia familiar, Julia no es un clon de MATLAB. Hay importantes diferencias sintácticas y funcionales. Las siguientes son algunas diferencias notables que pueden hacer tropezar a los usuarios de Julia acostumbrados a MATLAB:
 
-  * Julia arrays are indexed with square brackets, `A[i,j]`.
-  * Julia arrays are assigned by reference. After `A=B`, changing elements of `B` will modify `A`
-    as well.
-  * Julia values are passed and assigned by reference. If a function modifies an array, the changes
-    will be visible in the caller.
-  * Julia does not automatically grow arrays in an assignment statement. Whereas in MATLAB `a(4) = 3.2`
-    can create the array `a = [0 0 0 3.2]` and `a(5) = 7` can grow it into `a = [0 0 0 3.2 7]`, the
-    corresponding Julia statement `a[5] = 7` throws an error if the length of `a` is less than 5 or
-    if this statement is the first use of the identifier `a`. Julia has [`push!()`](@ref) and [`append!()`](@ref),
-    which grow `Vector`s much more efficiently than MATLAB's `a(end+1) = val`.
-  * The imaginary unit `sqrt(-1)` is represented in Julia as [`im`](@ref), not `i` or `j` as in MATLAB.
-  * In Julia, literal numbers without a decimal point (such as `42`) create integers instead of floating
-    point numbers. Arbitrarily large integer literals are supported. As a result, some operations
-    such as `2^-1` will throw a domain error as the result is not an integer (see [the FAQ entry on domain errors](@ref faq-domain-errors)
-    for details).
-  * In Julia, multiple values are returned and assigned as tuples, e.g. `(a, b) = (1, 2)` or `a, b = 1, 2`.
-    MATLAB's `nargout`, which is often used in MATLAB to do optional work based on the number of returned
-    values, does not exist in Julia. Instead, users can use optional and keyword arguments to achieve
-    similar capabilities.
-  * Julia has true one-dimensional arrays. Column vectors are of size `N`, not `Nx1`. For example,
-    [`rand(N)`](@ref) makes a 1-dimensional array.
-  * In Julia, `[x,y,z]` will always construct a 3-element array containing `x`, `y` and `z`.
-    - To concatenate in the first ("vertical") dimension use either [`vcat(x,y,z)`](@ref) or separate
-      with semicolons (`[x; y; z]`).
-    - To concatenate in the second ("horizontal") dimension use either [`hcat(x,y,z)`](@ref) or separate
-      with spaces (`[x y z]`).
-    - To construct block matrices (concatenating in the first two dimensions), use either [`hvcat()`](@ref)
-      or combine spaces and semicolons (`[a b; c d]`).
-  * In Julia, `a:b` and `a:b:c` construct `Range` objects. To construct a full vector like in MATLAB,
-    use [`collect(a:b)`](@ref). Generally, there is no need to call `collect` though. `Range` will
-    act like a normal array in most cases but is more efficient because it lazily computes its values.
-    This pattern of creating specialized objects instead of full arrays is used frequently, and is
-    also seen in functions such as [`linspace`](@ref), or with iterators such as `enumerate`, and
-    `zip`. The special objects can mostly be used as if they were normal arrays.
-  * Functions in Julia return values from their last expression or the `return` keyword instead of
-    listing the names of variables to return in the function definition (see [The return Keyword](@ref)
-    for details).
-  * A Julia script may contain any number of functions, and all definitions will be externally visible
-    when the file is loaded. Function definitions can be loaded from files outside the current working
-    directory.
-  * In Julia, reductions such as [`sum()`](@ref), [`prod()`](@ref), and [`max()`](@ref) are performed
-    over every element of an array when called with a single argument, as in `sum(A)`, even if `A`
-    has more than one dimension.
-  * In Julia, functions such as [`sort()`](@ref) that operate column-wise by default (`sort(A)` is
-    equivalent to `sort(A,1)`) do not have special behavior for `1xN` arrays; the argument is returned
-    unmodified since it still performs `sort(A,1)`. To sort a `1xN` matrix like a vector, use `sort(A,2)`.
-  * In Julia, parentheses must be used to call a function with zero arguments, like in [`tic()`](@ref)
-    and [`toc()`](@ref).
-  * Julia discourages the used of semicolons to end statements. The results of statements are not
-    automatically printed (except at the interactive prompt), and lines of code do not need to end
-    with semicolons. [`println()`](@ref) or [`@printf()`](@ref) can be used to print specific output.
-  * In Julia, if `A` and `B` are arrays, logical comparison operations like `A == B` do not return
-    an array of booleans. Instead, use `A .== B`, and similarly for the other boolean operators like
-    [`<`](@ref), [`>`](@ref) and `=`.
-  * In Julia, the operators [`&`](@ref), [`|`](@ref), and [`⊻`](@ref xor) ([`xor`](@ref)) perform the
-    bitwise operations equivalent to `and`, `or`, and `xor` respectively in MATLAB, and have precedence
-    similar to Python's bitwise operators (unlike C). They can operate on scalars or element-wise
-    across arrays and can be used to combine logical arrays, but note the difference in order of operations:
-    parentheses may be required (e.g., to select elements of `A` equal to 1 or 2 use `(A .== 1) | (A .== 2)`).
-  * In Julia, the elements of a collection can be passed as arguments to a function using the splat
-    operator `...`, as in `xs=[1,2]; f(xs...)`.
-  * Julia's [`svd()`](@ref) returns singular values as a vector instead of as a dense diagonal matrix.
-  * In Julia, `...` is not used to continue lines of code. Instead, incomplete expressions automatically
-    continue onto the next line.
-  * In both Julia and MATLAB, the variable `ans` is set to the value of the last expression issued
-    in an interactive session. In Julia, unlike MATLAB, `ans` is not set when Julia code is run in
-    non-interactive mode.
-  * Julia's `type`s do not support dynamically adding fields at runtime, unlike MATLAB's `class`es.
-    Instead, use a [`Dict`](@ref).
-  * In Julia each module has its own global scope/namespace, whereas in MATLAB there is just one global
-    scope.
-  * In MATLAB, an idiomatic way to remove unwanted values is to use logical indexing, like in the
-    expression `x(x>3)` or in the statement `x(x>3) = []` to modify `x` in-place. In contrast, Julia
-    provides the higher order functions [`filter()`](@ref) and [`filter!()`](@ref), allowing users
-    to write `filter(z->z>3, x)` and `filter!(z->z>3, x)` as alternatives to the corresponding transliterations
-    `x[x.>3]` and `x = x[x.>3]`. Using [`filter!()`](@ref) reduces the use of temporary arrays.
-  * The analogue of extracting (or "dereferencing") all elements of a cell array, e.g. in `vertcat(A{:})`
-    in MATLAB, is written using the splat operator in Julia, e.g. as `vcat(A...)`.
-
+  * Los arrays de Julia están indexados con corchetes, `A[i, j]`.
+  * Los arrays de Julia se asignan por referencia. Después de `A = B`, el cambio de elementos de `B` también modificará `A`.
+  * Los valores de Julia se pasan y se asignan por referencia. Si una función modifica una matriz, los cambios serán visibles en el código que la invoca.
+  * Julia no genera automáticamente matrices en una declaración de asignación. Mientras que en MATLAB `a(4) = 3.2` puede crear la matriz `a = [0 0 0 3.2]` y `a(5) = 7` puede crecer hasta `a = [0 0 0 3.2 7]`, la declaración correspondiente de Julia `a[5] = 7` arroja un error si la longitud de `a` es menor que 5 o si esta afirmación es el primer uso del identificador `a`. Julia tiene [`push!()`](@ref) y [`append!()`](@ref), que crecen `Vector`s mucho más eficientemente que `a(end + 1) = val` de MATLAB.
+  * La unidad imaginaria `sqrt(-1)` se representa en Julia como [`im`](@ref), no como `i` o `j` como en MATLAB.
+  * En Julia, los números literales sin un punto decimal (como `42`) crean números enteros en lugar de números de coma flotante. Se admiten literales enteros arbitrariamente grandes. Como resultado, algunas operaciones como `2^-1` arrojarán un error de dominio ya que el resultado no es un número entero (ver [la entrada de preguntas frecuentes sobre errores de dominio] (@ref faq-domain-errors) para más detalles).
+  * En Julia, los valores múltiples se devuelven y se asignan como tuplas, p. `(a, b) = (1, 2)` o `a, b = 1, 2`. `"nargout"` de MATLAB, que a menudo se usa en MATLAB para hacer trabajos opcionales basados en el número de valores devueltos, no existe en Julia. En cambio, los usuarios pueden usar argumentos opcionales y de palabras clave para lograr capacidades similares.
+  * Julia tiene verdaderos arrays unidimensionales. Los vectores columna son de tamaño `N`, no` Nx1`. Por ejemplo, [`rand(N)`] (@ref) forma una matriz de 1 dimensión.
+  * En Julia, `[x, y, z]` siempre construirá una matriz de 3 elementos que contiene `x`,` y` y `z`.
+    - Para concatenar en la primera dimensión ("vertical") se usa [`vcat(x, y, z)`](@ref) o se separa con punto y coma (`[x; y; z]`).
+    - Para concatenar en la segunda dimensión ("horizontal"), se usa [`hcat(x, y, z)`](@ref) o se separa con espacios (`[x y z]`).
+    - Para construir matrices de bloques (concatenando en las dos primeras dimensiones), se usa [`hvcat()`](@ref) o se combinan espacios y puntos y comas (`[a b; c d]`).
+  * En Julia, `a:b` y` a:b:c` construyen objetos `Range`. Para construir un vector completo como en MATLAB, use [`collect(a:b)`](@ref). En general, no es necesario llamar a `collect` aunque. `Range` actuará como un array normal en la mayoría de los casos, pero es más eficiente porque calcula perezosamente sus valores. Este patrón de creación de objetos especializados en lugar de matrices completas se usa con frecuencia, y también se ve en funciones como [`linspace`](@ref), o con iteradores como `enumerate` y `zip`. Los objetos especiales se pueden usar principalmente como si fueran matrices normales.
+  * Las funciones en Julia devuelven valores de su última expresión o la palabra clave `return` en lugar de enumerar los nombres de las variables a devolver en la definición de la función (ver [La palabra clave return](@ref) para más detalles).
+  * Un script de Julia puede contener cualquier cantidad de funciones, y todas las definiciones serán visibles externamente cuando se cargue el archivo. Las definiciones de funciones se pueden cargar desde archivos fuera del directorio de trabajo actual.
+  * En Julia, las reducciones como [`sum()`](@ref), [`prod()`](@ref), y [`max()`](@ref) se realizan sobre cada elemento de un array cuando se llama con un solo argumento, como en `sum(A)`, incluso si `A` tiene más de una dimensión.
+  * En Julia, las funciones como [`sort()`](@ref) que operan en forma de columnas por defecto (`sort(A)` es equivalente a `sort(A,1)`) no tienen un comportamiento especial para Conjuntos `1xN`; el argumento se devuelve sin modificar ya que todavía ejecuta `sort (A,1)`. Para ordenar una matriz `1xN` como un vector, use` sort(A,2) `.
+  * En Julia, los paréntesis se deben usar para llamar a una función con cero argumentos, como en [`tic()`](@ref) y [`toc()`](@ref).
+  * Julia desalienta el uso de punto y coma para finalizar las declaraciones. Los resultados de las declaraciones no se imprimen automáticamente (excepto en el aviso interactivo), y las líneas de código no necesitan terminar con punto y coma. [`println()`](@ref) o [`@printf()`](@ref) se pueden usar para imprimir resultados específicos.
+  * En Julia, si `A` y` B` son matrices, las operaciones de comparación lógica como `A == B` no devuelven una matriz de booleanos. En cambio, use `A == B`, y de manera similar para los otros operadores booleanos como [`<`](@ref), [`>`](@ref) y `=`.
+  * En Julia, los operadores [`&`](@ref), [`|`](@ref) y [`⊻`](@ref xor) ([`xor`](@ref)) realizan el operaciones a nivel de bit equivalentes a `y`,` o`, y `xor` respectivamente en MATLAB, y tienen precedencia similar a los operadores de bit a bit de Python (a diferencia de C). Pueden operar en escalas o en elementos a través de matrices y se pueden usar para combinar matrices lógicas, pero tenga en cuenta la diferencia en el orden de las operaciones: pueden ser necesarios paréntesis (por ejemplo, para seleccionar elementos de 'A' igual a 1 o 2 use `(A. == 1) | (A. == 2) `).
+  * En Julia, los elementos de una colección se pueden pasar como argumentos a una función usando el operador splat `...`, como en `xs = [1,2]; f(xs...) `.
+  * Julia [`svd()`](@ref) devuelve valores singulares como un vector en lugar de una matriz diagonal densa.
+  * En Julia, `...` no se usa para continuar líneas de código. En cambio, las expresiones incompletas continúan automáticamente en la siguiente línea.
+  * Tanto en Julia como en MATLAB, la variable `ans` se establece en el valor de la última expresión emitida en una sesión interactiva. En Julia, a diferencia de MATLAB, `ans` no se establece cuando el código de Julia se ejecuta en modo no interactivo.
+  * Los `type`s de Julia no son compatibles con la adición dinámica de campos en el tiempo de ejecución, a diferencia de `classes` es de MATLAB. En su lugar, use un [`Dict`](@ref).
+  * En Julia, cada módulo tiene su propio ámbito / espacio de nombres global, mientras que en MATLAB solo hay un ámbito global.
+  * En MATLAB, una forma idiomática de eliminar valores no deseados es usar la indexación lógica, como en la expresión `x (x> 3)` o en la declaración `x (x> 3) = []` para modificar `x` en -lugar. Por el contrario, Julia proporciona las funciones de orden superior [`filter()`](@ref) y [`filter!()`](@ref), permitiendo a los usuarios escribir `filter (z-> z> 3, x)` y `filter! (z-> z> 3, x)` como alternativas a las transliteraciones correspondientes `x [x.> 3]` y `x = x [x.> 3]`. El uso de [`filter! ()`](@ref) reduce el uso de matrices temporales.
+  * El análogo de extracción (o "desreferenciación") de todos los elementos de una matriz de celdas, p. en `vertcat(A {:})` en MATLAB, se escribe utilizando el operador splat en Julia, p. como `vcat(A ...)`.
+  
 ## Noteworthy differences from R
 
 One of Julia's goals is to provide an effective language for data analysis and statistical programming.
