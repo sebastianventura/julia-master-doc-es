@@ -151,7 +151,7 @@ Para las máquinas sin conexión a Internet, los paquetes se pueden instalar cop
     externas binarias. Dichos paquetes pueden romperse debido a diferencias en las versiones del sistema 
     operativo, entornos de compilación y / o dependencias absolutas de rutas.
 
-## Instalar paquietes no registrados
+## Instalar paquetes no registrados
 
 Los paquetes de Julia son simplemente repositorios git, clonables a través de cualquiera de los [protocolos] (https://www.kernel.org/pub/software/scm/git/docs/git-clone.html#URLS) que admite git, y que contienen código Julia que sigue ciertas convenciones de diseño. Los paquetes oficiales de Julia están registrados en el repositorio [METADATA.jl](https://github.com/JuliaLang/METADATA.jl), disponible en una ubicación conocida [^1]. Los mandatos [`Pkg.add()`](@ref) y [`Pkg.rm()`](@ref) de la sección anterior interactúan con los paquetes registrados, pero el administrador de paquetes también puede instalar y trabajar con paquetes no registrados. Para instalar un paquete no registrado, usaremos [`Pkg.clone(url)`](@ref), donde `url` es una URL de git desde la cual se puede clonar el paquete:
 
@@ -179,7 +179,7 @@ Si los paquetes no registrados contienen un archivo `REQUIRE` en la parte superi
     y hacer paquetes privados u horquillas disponibles. Ver [Repositorio METADATA personalizado](@ref) 
     para más detalles.
     
-## Updating Packages
+## Actualizando Paquetes
 
 Cuando los desarrolladores de paquetes publican nuevas versiones registradas de los paquetes que está utilizando, por supuesto, querrá las nuevas versiones brillantes. Para obtener las últimas y mejores versiones de todos sus paquetes, simplemente haga [`Pkg.update ()`] (@ ref):
 
@@ -227,13 +227,9 @@ INFO: Upgrading Example: v0.4.0 => 0.4.1
 
 Este proceso de actualización parcial todavía calcula el nuevo conjunto de versiones de paquetes de acuerdo con los requisitos de nivel superior y los paquetes "fijos", pero considera además todos los demás paquetes, excepto los explícitamente proporcionados, y sus dependencias, como corregidas.
 
-## Checkout, Pin and Free
+## Pago, Pin y Gratis
 
-You may want to use the `master` version of a package rather than one of its registered versions.
-There might be fixes or functionality on master that you need that aren't yet published in any
-registered versions, or you may be a developer of the package and need to make changes on `master`
-or some other development branch. In such cases, you can do [`Pkg.checkout(pkg)`](@ref) to checkout
-the `master` branch of `pkg` or [`Pkg.checkout(pkg,branch)`](@ref) to checkout some other branch:
+Puede querer usar la versión `maestra` de un paquete en lugar de una de sus versiones registradas. Es posible que haya correcciones o funcionalidades que necesite y que aún no se hayan publicado en ninguna versión registrada, o puede que sea un desarrollador del paquetes y necesite realizar cambios en `master` o en alguna otra rama de desarrollo. En tales casos, puede hacer [`Pkg.checkout(pkg)`](@ ref) para verificar la rama `master` de` pkg` o [`Pkg.checkout(pkg, branch)`](@ref) para verificar alguna otra rama:
 
 ```julia-repl
 julia> Pkg.add("Distributions")
@@ -261,21 +257,11 @@ Additional packages:
  - Stats                         0.2.7
 ```
 
-Immediately after installing `Distributions` with [`Pkg.add()`](@ref) it is on the current most
-recent registered version – `0.2.9` at the time of writing this. Then after running [`Pkg.checkout("Distributions")`](@ref),
-you can see from the output of [`Pkg.status()`](@ref) that `Distributions` is on an unregistered
-version greater than `0.2.9`, indicated by the "pseudo-version" number `0.2.9+`.
+Inmediatamente después de instalar `Distributions` con [`Pkg.add()`](@ref) está en la versión registrada más reciente actual - `0.2.9` en el momento de escribir esto. Luego, después de ejecutar [`Pkg.checkout("Distributions")`](@ref), puede ver en la salida de [`Pkg.status()`](@ref) que `Distributions` está en una versión no registrada mayor que `0.2.9`, indicado por el número de "pseudo-versión" `0.2.9+`.
 
-When you checkout an unregistered version of a package, the copy of the `REQUIRE` file in the
-package repo takes precedence over any requirements registered in `METADATA`, so it is important
-that developers keep this file accurate and up-to-date, reflecting the actual requirements of
-the current version of the package. If the `REQUIRE` file in the package repo is incorrect or
-missing, dependencies may be removed when the package is checked out. This file is also used to
-populate newly published versions of the package if you use the API that `Pkg` provides
-for this (described below).
+Cuando compra una versión no registrada de un paquete, la copia del archivo `REQUIRE` en el repositorio del paquete tiene prioridad sobre cualquier requisito registrado en `METADATA`, por lo que es importante que los desarrolladores mantengan este archivo exacto y actualizado, lo que refleja los requisitos reales de la versión actual del paquete. Si el archivo `REQUIRE` en el repositorio del paquete es incorrecto o falta, las dependencias se pueden eliminar cuando se desprotege el paquete. Este archivo también se usa para completar las versiones del paquete publicadas recientemente si utiliza la API que `Pkg` proporciona para esto (que se describe a continuación).
 
-When you decide that you no longer want to have a package checked out on a branch, you can "free"
-it back to the control of the package manager with [`Pkg.free(pkg)`](@ref):
+Cuando decide que ya no desea tener un paquete desprotegido en una rama, puede "liberarlo" de nuevo al control del administrador de paquetes con [`Pkg.free(pkg)`](@ref):
 
 ```julia-repl
 julia> Pkg.free("Distributions")
@@ -290,11 +276,10 @@ Additional packages:
  - Stats                         0.2.7
 ```
 
-After this, since the package is on a registered version and not on a branch, its version will
-be updated as new registered versions of the package are published.
+Después de esto, dado que el paquete está en una versión registrada y no en una sucursal, su versión se actualizará a medida que se publiquen nuevas versiones registradas del paquete.
 
-If you want to pin a package at a specific version so that calling [`Pkg.update()`](@ref) won't
-change the version the package is on, you can use the [`Pkg.pin()`](@ref) function:
+Si desea fijar un paquete en una versión específica para que llamar [`Pkg.update()`](@ref) no cambie la versión en la que está el paquete, puede usar [`Pkg.pin()`](@ref) función:
+
 
 ```julia-repl
 julia> Pkg.pin("Stats")
@@ -308,11 +293,7 @@ Additional packages:
  - Stats                         0.2.7              pinned.47c198b1.tmp
 ```
 
-After this, the `Stats` package will remain pinned at version `0.2.7` – or more specifically,
-at commit `47c198b1`, but since versions are permanently associated a given git hash, this is
-the same thing. [`Pkg.pin()`](@ref) works by creating a throw-away branch for the commit you want
-to pin the package at and then checking that branch out. By default, it pins a package at the
-current commit, but you can choose a different version by passing a second argument:
+Después de esto, el paquete `Stats` permanecerá anclado en la versión` 0.2.7` - o más específicamente, en el `commit  47c198b1`, pero como las versiones están asociadas permanentemente a un hash git dado, esto es lo mismo. [`Pkg.pin()`](@ref) funciona creando una rama descartable para la confirmación a la que desea fijar el paquete y luego verificando esa ramificación. De forma predeterminada, fija un paquete en la confirmación actual, pero puede elegir una versión diferente pasando un segundo argumento:
 
 ```julia-repl
 julia> Pkg.pin("Stats",v"0.2.5")
@@ -327,9 +308,7 @@ Additional packages:
  - Stats                         0.2.5              pinned.1fd0983b.tmp
 ```
 
-Now the `Stats` package is pinned at commit `1fd0983b`, which corresponds to version `0.2.5`.
-When you decide to "unpin" a package and let the package manager update it again, you can use
-[`Pkg.free()`](@ref) like you would to move off of any branch:
+Ahora el paquete `Stats` está anclado en `commit 1fd0983b`, que corresponde a la versión `0.2.5`. Cuando decides "desanclar" un paquete y dejar que el administrador de paquetes lo actualice nuevamente, puedes usar [`Pkg.free()`](@ref) como lo harías para deshacerte de cualquier rama:
 
 ```julia-repl
 julia> Pkg.free("Stats")
@@ -344,15 +323,11 @@ Additional packages:
  - Stats                         0.2.7
 ```
 
-After this, the `Stats` package is managed by the package manager again, and future calls to
-[`Pkg.update()`](@ref) will upgrade it to newer versions when they are published. The throw-away
-`pinned.1fd0983b.tmp` branch remains in your local `Stats` repo, but since git branches are extremely
-lightweight, this doesn't really matter; if you feel like cleaning them up, you can go into the
-repo and delete those branches [^2].
+Después de esto, el paquete `Stats` es gestionado nuevamente por el administrador del paquete, y las futuras llamadas a [`Pkg.update()`](@ref) lo actualizarán a versiones más nuevas cuando se publiquen. La rama descartable `pinned.1fd0983b.tmp` permanece en el repositorio local de` Stats`, pero como las ramas de git son extremadamente livianas, esto realmente no importa; si desea limpiarlos, puede acceder al repositorio y eliminar esas ramas [^2].
 
 [^2]:
-    Packages that aren't on branches will also be marked as dirty if you make changes in the repo,
-    but that's a less common thing to do.
+    Los paquetes que no están en las ramas también se marcarán como sucios si realiza cambios en el repositorio, 
+    pero eso es menos común.
 
 ## Custom METADATA Repository
 
