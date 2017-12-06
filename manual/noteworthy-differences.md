@@ -102,85 +102,48 @@ Uno de los objetivos de Julia es proporcionar un lenguaje efectivo para el anál
 
 ## Noteworthy differences from C/C++
 
-  * Julia arrays are indexed with square brackets, and can have more than one dimension `A[i,j]`.
-    This syntax is not just syntactic sugar for a reference to a pointer or address as in C/C++. See
-    the Julia documentation for the syntax for array construction (it has changed between versions).
-  * In Julia, indexing of arrays, strings, etc. is 1-based not 0-based.
-  * Julia arrays are assigned by reference. After `A=B`, changing elements of `B` will modify `A`
-    as well. Updating operators like `+=` do not operate in-place, they are equivalent to `A = A + B`
-    which rebinds the left-hand side to the result of the right-hand side expression.
-  * Julia arrays are column major (Fortran ordered) whereas C/C++ arrays are row major ordered by
-    default. To get optimal performance when looping over arrays, the order of the loops should be
-    reversed in Julia relative to C/C++ (see relevant section of [Performance Tips](@ref man-performance-tips)).
-  * Julia values are passed and assigned by reference. If a function modifies an array, the changes
-    will be visible in the caller.
-  * In Julia, whitespace is significant, unlike C/C++, so care must be taken when adding/removing
-    whitespace from a Julia program.
-  * In Julia, literal numbers without a decimal point (such as `42`) create signed integers, of type
-    `Int`, but literals too large to fit in the machine word size will automatically be promoted to
-    a larger size type, such as `Int64` (if `Int` is `Int32`), `Int128`, or the arbitrarily large
-    `BigInt` type. There are no numeric literal suffixes, such as `L`, `LL`, `U`, `UL`, `ULL` to indicate
-    unsigned and/or signed vs. unsigned. Decimal literals are always signed, and hexadecimal literals
-    (which start with `0x` like C/C++), are unsigned. Hexadecimal literals also, unlike C/C++/Java
-    and unlike decimal literals in Julia, have a type based on the *length* of the literal, including
-    leading 0s. For example, `0x0` and `0x00` have type [`UInt8`](@ref), `0x000` and `0x0000` have type
-    [`UInt16`](@ref), then literals with 5 to 8 hex digits have type `UInt32`, 9 to 16 hex digits type
-    `UInt64` and 17 to 32 hex digits type `UInt128`. This needs to be taken into account when defining
-    hexadecimal masks, for example `~0xf == 0xf0` is very different from `~0x000f == 0xfff0`. 64 bit `Float64`
-    and 32 bit [`Float32`](@ref) bit literals are expressed as `1.0` and `1.0f0` respectively. Floating point
-    literals are rounded (and not promoted to the `BigFloat` type) if they can not be exactly represented.
-     Floating point literals are closer in behavior to C/C++. Octal (prefixed with `0o`) and binary
-    (prefixed with `0b`) literals are also treated as unsigned.
-  * String literals can be delimited with either `"`  or `"""`, `"""` delimited literals can contain
-    `"` characters without quoting it like `"\""` String literals can have values of other variables
-    or expressions interpolated into them, indicated by `$variablename` or `$(expression)`, which
-    evaluates the variable name or the expression in the context of the function.
-  * `//` indicates a [`Rational`](@ref) number, and not a single-line comment (which is `#` in Julia)
-  * `#=` indicates the start of a multiline comment, and `=#` ends it.
-  * Functions in Julia return values from their last expression(s) or the `return` keyword.  Multiple
-    values can be returned from functions and assigned as tuples, e.g. `(a, b) = myfunction()` or
-    `a, b = myfunction()`, instead of having to pass pointers to values as one would have to do in
-    C/C++ (i.e. `a = myfunction(&b)`.
-  * Julia does not require the use of semicolons to end statements. The results of expressions are
-    not automatically printed (except at the interactive prompt, i.e. the REPL), and lines of code
-    do not need to end with semicolons. [`println()`](@ref) or [`@printf()`](@ref) can be used to
-    print specific output. In the REPL, `;` can be used to suppress output. `;` also has a different
-    meaning within `[ ]`, something to watch out for. `;` can be used to separate expressions on a
-    single line, but are not strictly necessary in many cases, and are more an aid to readability.
-  * In Julia, the operator [`⊻`](@ref xor) ([`xor`](@ref)) performs the bitwise XOR operation, i.e.
-    [`^`](@ref) in C/C++.  Also, the bitwise operators do not have the same precedence as C/++, so
-    parenthesis may be required.
-  * Julia's [`^`](@ref) is exponentiation (pow), not bitwise XOR as in C/C++ (use [`⊻`](@ref xor), or
-    [`xor`](@ref), in Julia)
-  * Julia has two right-shift operators, `>>` and `>>>`.  `>>>` performs an arithmetic shift, `>>`
-    always performs a logical shift, unlike C/C++, where the meaning of `>>` depends on the type of
-    the value being shifted.
-  * Julia's `->` creates an anonymous function, it does not access a member via a pointer.
-  * Julia does not require parentheses when writing `if` statements or `for`/`while` loops: use `for i in [1, 2, 3]`
-    instead of `for (int i=1; i <= 3; i++)` and `if i == 1` instead of `if (i == 1)`.
-  * Julia does not treat the numbers `0` and `1` as Booleans. You cannot write `if (1)` in Julia,
-    because `if` statements accept only booleans. Instead, you can write `if true`, `if Bool(1)`,
-    or `if 1==1`.
-  * Julia uses `end` to denote the end of conditional blocks, like `if`, loop blocks, like `while`/
-    `for`, and functions. In lieu of the one-line `if ( cond ) statement`, Julia allows statements
-    of the form `if cond; statement; end`, `cond && statement` and `!cond || statement`. Assignment
-    statements in the latter two syntaxes must be explicitly wrapped in parentheses, e.g. `cond && (x = value)`,
-    because of the operator precedence.
-  * Julia has no line continuation syntax: if, at the end of a line, the input so far is a complete
-    expression, it is considered done; otherwise the input continues. One way to force an expression
-    to continue is to wrap it in parentheses.
-  * Julia macros operate on parsed expressions, rather than the text of the program, which allows
-    them to perform sophisticated transformations of Julia code. Macro names start with the `@` character,
-    and have both a function-like syntax, `@mymacro(arg1, arg2, arg3)`, and a statement-like syntax,
-    `@mymacro arg1 arg2 arg3`. The forms are interchangable; the function-like form is particularly
-    useful if the macro appears within another expression, and is often clearest. The statement-like
-    form is often used to annotate blocks, as in the parallel `for` construct: `@parallel for i in 1:n; #= body =#; end`.
-    Where the end of the macro construct may be unclear, use the function-like form.
-  * Julia now has an enumeration type, expressed using the macro `@enum(name, value1, value2, ...)`
-    For example: `@enum(Fruit, banana=1, apple, pear)`
-  * By convention, functions that modify their arguments have a `!` at the end of the name, for example
-    `push!`.
-  * In C++, by default, you have static dispatch, i.e. you need to annotate a function as virtual,
-    in order to have dynamic dispatch. On the other hand, in Julia every method is "virtual" (although
-    it's more general than that since methods are dispatched on every argument type, not only `this`,
-    using the most-specific-declaration rule).
+* Los arrays de Julia están indexados con corchetes y pueden tener más de una dimensión `A[i,j]`. Esta sintaxis no es apropiada para una referencia a un puntero o dirección como en C/C ++. Consulte la documentación de Julia sobre la sintaxis para la construcción de matrices (ha cambiado entre versiones).
+* En Julia, la indexación de matrices, cadenas, etc. se basa en 1 y no en 0.
+  * Los arrays de Julia se asignan por referencia. Después de `A = B`, el cambio de elementos de` B` también modificará `A`. Los operadores de actualización como `+ =` no funcionan in situ, son equivalentes a `A = A + B`, que vuelve a enlazar el lado izquierdo con el resultado de la expresión del lado derecho.
+  * Los arrays de Julia son columnas principales (ordenados por Fortran), mientras que los conjuntos de C / C ++ son filas ordenadas por defecto. Para obtener un rendimiento óptimo al realizar un bucle sobre matrices, el orden de los bucles debe invertirse en Julia en relación con C / C ++ (consulte la sección correspondiente de [Sugerencias de rendimiento] (@ ref man-performance-tips)).
+  * Los valores de Julia se pasan y se asignan por referencia. Si una función modifica una matriz, los cambios serán visibles en la persona que llama.
+  * En Julia, el espacio en blanco es significativo, a diferencia de C / C ++, por lo que se debe tener cuidado al agregar / eliminar espacios en blanco de un programa Julia.
+ * En Julia, los números literales sin un punto decimal (como `42`) crean enteros con signo, de tipo` Int`, pero los literales demasiado grandes para caber en el tamaño de palabra de la máquina se promocionarán automáticamente a un tipo de tamaño mayor, como `Int64` (si` Int` es `Int32`),` Int128`, o el tipo arbitrariamente grande `BigInt`. No hay sufijos literales numéricos, tales como `L`,` LL`, `U`,` UL`, `ULL` para indicar unsigned y / o signed vs. unsigned. Los literales decimales siempre se firman y los literales hexadecimales (que comienzan con `0x` como C / C ++), no tienen signo. Los literales hexadecimales también, a diferencia de C / C ++ / Java y, a diferencia de los literales decimales en Julia, tienen un tipo basado en la * longitud * del literal, incluidos los primeros 0. Por ejemplo, `0x0` y` 0x00` tienen el tipo [`UInt8`] (@ ref),` 0x000` y `0x0000` tienen el tipo [` UInt16`] (@ ref), luego los literales con 5 a 8 dígitos hexadecimales tienen escriba `UInt32`, de 9 a 16 dígitos hexadecimales` UInt64` y de 17 a 32 dígitos hexadecibles escriba `UInt128`. Esto debe tenerse en cuenta al definir máscaras hexadecimales, por ejemplo `~ 0xf == 0xf0` es muy diferente de` ~ 0x000f == 0xfff0`. Los literales de 64 bit `Float64` y 32 bit [` Float32`] (@ ref) bit se expresan como `1.0` y` 1.0f0` respectivamente. Los literales de punto flotante se redondean (y no se promocionan al tipo `BigFloat`) si no se pueden representar exactamente. Los literales de coma flotante tienen un comportamiento más cercano a C / C ++. Los literales Octal (prefijado con `0o`) y binario (prefijado con` 0b`) también se tratan como sin signo.
+  * Los literales de cadenas se pueden delimitar con los literales delimitados por `" `o` "" '' ', `' '' '' que pueden contener `" `caracteres sin citarlo como` "\" "` Los literales de cadena pueden tener valores de otras variables
+    o expresiones interpoladas en ellos, indicadas por `$ nombrevariable` o` $ (expresión) `, que
+    evalúa el nombre de la variable o la expresión en el contexto de la función.
+  * `//` indica un número [`Rational`] (@ ref), y no un comentario de una sola línea (que es` # `en Julia)
+  * `# =` indica el comienzo de un comentario de líneas múltiples, y `= #` lo finaliza.
+  * Las funciones en Julia devuelven valores de sus últimas expresiones o la palabra clave `return`. Múltiple
+    los valores pueden devolverse desde funciones y asignarse como tuplas, p. `(a, b) = myfunction ()` o
+    `a, b = myfunction ()`, en lugar de tener que pasar los punteros a los valores como debería hacerse en
+    C / C ++ (es decir, `a = myfunction (& b)`.
+* Julia no requiere el uso de punto y coma para finalizar las declaraciones. Los resultados de las expresiones no se imprimen automáticamente (excepto en el prompt interactivo, es decir, el REPL), y las líneas de código no necesitan terminar con punto y coma. [`println ()`] (@ ref) o [`@printf ()`] (@ ref) se pueden usar para imprimir resultados específicos. En REPL, `;` se puede usar para suprimir la salida. `;` también tiene un significado diferente dentro de `[]`, algo de lo que hay que tener cuidado. `;` se puede usar para separar expresiones en una sola línea, pero no son estrictamente necesarias en muchos casos, y son más una ayuda para la legibilidad.
+  * En Julia, el operador [`⊻`] (@ ref xor) ([` xor`] (@ ref)) realiza la operación XOR bit a bit, es decir [`^`] (@ ref) en C / C ++. Además, los operadores bit a bit no tienen la misma precedencia que C / ++, por lo que puede ser necesario un paréntesis.
+  * Julia [`^`] (@ ref) es exponenciación (pow), no bit a bit XOR como en C / C ++ (use [`⊻`] (@ ref xor), o [` xor`] (@ ref), en Julia)
+  * Julia tiene dos operadores de desplazamiento a la derecha, `>>` y `>>>`. `>>>` realiza un desplazamiento aritmético, `>>` siempre realiza un desplazamiento lógico, a diferencia de C / C ++, donde el significado de `>>` depende del tipo del valor que se está desplazando.
+  * Julia's `->` crea una función anónima, no accede a un miembro a través de un puntero.
+  * Julia no requiere paréntesis cuando escribe declaraciones `if` o` for` / `while` loops: use` for i en [1, 2, 3] `en lugar de` for (int i = 1; i <= 3; i ++) `y` si i == 1` en lugar de `if (i == 1)`.
+  * Julia no trata los números `0` y` 1` como booleanos. No puede escribir `if (1)` en Julia, porque las sentencias `if` solo aceptan booleanos. En su lugar, puede escribir `if true`,` if Bool (1) `, o` if 1 == 1`.
+  * Julia usa `end` para denotar el final de bloques condicionales, como` if`, bloques de bucle, como `while` /` for`, y funciones. En lugar de la sentencia de una línea `if (cond) ', Julia permite las declaraciones de la forma` if cond; declaración; end`, `cond && statement` y`! cond || declaración`. Las declaraciones de asignación en las dos últimas sintaxis deben estar explícitamente entrelazadas entre paréntesis, p. `cond && (x = value)`, debido a la precedencia del operador.
+  * Julia no tiene sintaxis de continuación de línea: si, al final de una línea, la entrada hasta ahora es una expresión completa, se considera hecho; de lo contrario, la entrada continúa. Una forma de forzar que una expresión continúe es envolverla entre paréntesis.
+  * Las macros de Julia operan en expresiones analizadas, en lugar del texto del programa, lo que les permite realizar transformaciones sofisticadas del código de Julia. Los nombres de macro comienzan con el carácter `@`, y tienen una sintaxis similar a la función, `@mymacro (arg1, arg2, arg3)`, y una sintaxis similar a una declaración, `@mymacro arg1 arg2 arg3`. Las formas son intercambiables; la forma de función es particularmente útil si la macro aparece dentro de otra expresión, y es a menudo más clara. La forma similar a una declaración se usa a menudo para anotar bloques, como en la construcción paralela `for`:` @parallel para i en 1: n; # = cuerpo = #; fin`. Donde el final de la macroconstrucción puede no ser claro, use la forma similar a la función.
+  * Julia ahora tiene un tipo de enumeración, expresado con el macro `@enum (name, value1, value2, ...)` Por ejemplo: `@enum (Fruit, banana = 1, apple, pear)`
+  * Por convención, las funciones que modifican sus argumentos tienen un `!` Al final del nombre, por ejemplo `push!`.
+  * En C ++, de forma predeterminada, tiene despacho estático, es decir, necesita anotar una función como virtual, para tener un despacho dinámico. Por otro lado, en Julia todos los métodos son "virtuales" (aunque es más general que eso ya que los métodos se envían en cada tipo de argumento, no solo `this`, usando la regla de declaración más específica).
+  
+  
+    
+  * Julia does not require the use of semicolons to end statements. The results of expressions are not automatically printed (except at the interactive prompt, i.e. the REPL), and lines of code do not need to end with semicolons. [`println()`](@ref) or [`@printf()`](@ref) can be used to print specific output. In the REPL, `;` can be used to suppress output. `;` also has a different meaning within `[ ]`, something to watch out for. `;` can be used to separate expressions on a single line, but are not strictly necessary in many cases, and are more an aid to readability.
+  * In Julia, the operator [`⊻`](@ref xor) ([`xor`](@ref)) performs the bitwise XOR operation, i.e. [`^`](@ref) in C/C++.  Also, the bitwise operators do not have the same precedence as C/++, so parenthesis may be required.
+  * Julia's [`^`](@ref) is exponentiation (pow), not bitwise XOR as in C/C++ (use [`⊻`](@ref xor), or [`xor`](@ref), in Julia)
+  * Julia has two right-shift operators, `>>` and `>>>`.  `>>>` performs an arithmetic shift, `>>` always performs a logical shift, unlike C/C++, where the meaning of `>>` depends on the type of the value being shifted.
+  * Julia's `->` creates an anonymous function, it does not access a member via a pointer. 
+  * Julia does not require parentheses when writing `if` statements or `for`/`while` loops: use `for i in [1, 2, 3]` instead of `for (int i=1; i <= 3; i++)` and `if i == 1` instead of `if (i == 1)`. 
+  * Julia does not treat the numbers `0` and `1` as Booleans. You cannot write `if (1)` in Julia, because `if` statements accept only booleans. Instead, you can write `if true`, `if Bool(1)`, or `if 1==1`.
+  * Julia uses `end` to denote the end of conditional blocks, like `if`, loop blocks, like `while`/ `for`, and functions. In lieu of the one-line `if ( cond ) statement`, Julia allows statements of the form `if cond; statement; end`, `cond && statement` and `!cond || statement`. Assignment statements in the latter two syntaxes must be explicitly wrapped in parentheses, e.g. `cond && (x = value)`, because of the operator precedence.
+  * Julia has no line continuation syntax: if, at the end of a line, the input so far is a complete expression, it is considered done; otherwise the input continues. One way to force an expression to continue is to wrap it in parentheses.
+  * Julia macros operate on parsed expressions, rather than the text of the program, which allows them to perform sophisticated transformations of Julia code. Macro names start with the `@` character, and have both a function-like syntax, `@mymacro(arg1, arg2, arg3)`, and a statement-like syntax, `@mymacro arg1 arg2 arg3`. The forms are interchangable; the function-like form is particularly useful if the macro appears within another expression, and is often clearest. The statement-like form is often used to annotate blocks, as in the parallel `for` construct: `@parallel for i in 1:n; #= body =#; end`. Where the end of the macro construct may be unclear, use the function-like form.
+  * Julia now has an enumeration type, expressed using the macro `@enum(name, value1, value2, ...)` For example: `@enum(Fruit, banana=1, apple, pear)` 
+  * By convention, functions that modify their arguments have a `!` at the end of the name, for example `push!`.
+  * In C++, by default, you have static dispatch, i.e. you need to annotate a function as virtual, in order to have dynamic dispatch. On the other hand, in Julia every method is "virtual" (although it's more general than that since methods are dispatched on every argument type, not only `this`, using the most-specific-declaration rule).
