@@ -41,10 +41,9 @@ julia> global x = 1.0
 
 por lo que todos los asuntos de rendimiento discutidos previamente se aplican.
 
-## Measure performance with [`@time`](@ref) and pay attention to memory allocation
+## Mida el rendimiento con [`@time`](@ref) y preste atención a la asignacin de memoria
 
-A useful tool for measuring performance is the [`@time`](@ref) macro. The following example
-illustrates good working style:
+Una herramienta útil para medir el rendimiento es la macro [`@time`](@ref). El siguiente ejemplo ilustra un buen estilo de trabajo:
 
 ```julia-repl
 julia> function f(n)
@@ -65,23 +64,13 @@ julia> @time f(10^6)
 2.5000025e11
 ```
 
-On the first call (`@time f(1)`), `f` gets compiled.  (If you've not yet used [`@time`](@ref)
-in this session, it will also compile functions needed for timing.)  You should not take the results
-of this run seriously. For the second run, note that in addition to reporting the time, it also
-indicated that a large amount of memory was allocated. This is the single biggest advantage of
-[`@time`](@ref) vs. functions like [`tic()`](@ref) and [`toc()`](@ref), which only report time.
+En la primera llamada (`@time f(1)`), `f` se compila. (Si aún no ha utilizado [`@time`](@ref) en esta sesión, también compilará las funciones necesarias para medir el tiempo). No debe tomar en serio los resultados de esta ejecución. Para la segunda ejecución, tenga en cuenta que, además de informar del tiempo, también indicará que se asignó una gran cantidad de memoria. Esta es la mayor ventaja de [`@time`] (@ref) frente a funciones como [`tic() `](@ref) y [`toc()`](@ ref), que solo informan el tiempo.
 
-Unexpected memory allocation is almost always a sign of some problem with your code, usually a
-problem with type-stability. Consequently, in addition to the allocation itself, it's very likely
-that the code generated for your function is far from optimal. Take such indications seriously
-and follow the advice below.
+La asignación de memoria inesperada casi siempre es un signo de algún problema con el código, generalmente un problema con la estabilidad de tipo. En consecuencia, además de la asignación en sí misma, es muy probable que el código generado para su función esté lejos de ser óptimo. Tome estas indicaciones en serio y sigue los consejos a continuación.
 
-For more serious benchmarking, consider the [BenchmarkTools.jl](https://github.com/JuliaCI/BenchmarkTools.jl)
-package which evaluates the function multiple times in order to reduce noise.
+Para una evaluación comparativa más seria, considere el paquete [BenchmarkTools.jl](https://github.com/JuliaCI/BenchmarkTools.jl) que evalúa la función varias veces para reducir el ruido.
 
-As a teaser, an improved version of this function allocates no memory
-(the allocation reported below is due to running the `@time` macro in global scope)
-and has an order of magnitude faster execution after the first call:
+Como avance, una versión mejorada de esta función no asigna memoria (la asignación que se muestra a continuación se debe a la ejecución de la macro `@time` en el alcance global) y tiene un orden de magnitud más rápido después de la primera llamada:
 
 ```julia-repl
 julia> @time f_improved(1)
@@ -93,14 +82,11 @@ julia> @time f_improved(10^6)
 2.5000025e11
 ```
 
-Below you'll learn how to spot the problem with `f` and how to fix it.
+A continuación, aprenderá cómo detectar el problema con `f` y cómo solucionarlo.
 
-In some situations, your function may need to allocate memory as part of its operation, and this
-can complicate the simple picture above. In such cases, consider using one of the [tools](@ref tools)
-below to diagnose problems, or write a version of your function that separates allocation from
-its algorithmic aspects (see [Pre-allocating outputs](@ref)).
+En algunas situaciones, es posible que su función necesite asignar memoria como parte de su operación, y esto puede complicar la simple imagen anterior. En tales casos, considere usar una de las [herramientas](@ref tools) de abajo para diagnosticar problemas, o escriba una versión de su función que separe la asignación de sus aspectos algorítmicos (consulte [Preasignación de salidas](@ref)).
 
-## [Tools](@id tools)
+## [Herramientas](@id tools)
 
 Julia and its package ecosystem includes tools that may help you diagnose problems and improve
 the performance of your code:
