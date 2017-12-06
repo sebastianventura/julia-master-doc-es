@@ -38,8 +38,8 @@
 * [Workflow Tips](manual/workflow-tips)
 * [Style Guide](manual/style-guide)
 * [Frequently Asked Questions](manual/faq)
-* [Noteworthy Differences from other Languages](manual/noteworthy-differences)
-* [Unicode Input](manual/unicode-input)
+* [Diferencias Notables con otros Languages](manual/noteworthy-differences)
+* [Entrada Unicode](manual/unicode-input)
 
 ## Standard Library
 
