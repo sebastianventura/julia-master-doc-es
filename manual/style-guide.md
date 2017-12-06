@@ -31,16 +31,10 @@ complex(float(x))
 
 La segunda versión convertirá `x` a un tipo apropiado, en lugrar de siempre al mismo tipo. 
 
-This style point is especially relevant to function arguments. For example, don't declare an argument
-to be of type `Int` or [`Int32`](@ref) if it really could be any integer, expressed with the abstract
-type [`Integer`](@ref). In fact, in many cases you can omit the argument type altogether,
-unless it is needed to disambiguate from other method definitions, since a
-[`MethodError`](@ref) will be thrown anyway if a type is passed that does not support any
-of the requisite operations. (This is known as
-[duck typing](https://en.wikipedia.org/wiki/Duck_typing).)
+Este punto de estilo es especialmente relevante para los argumentos de función. Por ejemplo, no declare que un argumento sea de tipo `Int` o [`Int32`](@ref) si realmente pudiera ser cualquier número entero, expresado con el tipo abstracto [`Integer`](@ref). De hecho, en muchos casos puede omitir el tipo de argumento por completo, a menos que sea necesario para eliminar la ambigüedad de otras definiciones de método, ya que se lanzará [`MethodError`](@ref) de todos modos si se pasa un tipo que no admite ninguna de las operaciones requeridas. (Esto se conoce como [*duck typing*] (https://en.wikipedia.org/wiki/Duck_typing).)
 
-For example, consider the following definitions of a function `addone` that returns one plus its
-argument:
+Por ejemplo, considere las siguientes definiciones de una función `addone` que devuelve uno más su argumento:
+
 
 ```julia
 addone(x::Int) = x + 1                 # works only for Int
@@ -49,18 +43,11 @@ addone(x::Number) = x + oneunit(x)     # any numeric type
 addone(x) = x + oneunit(x)             # any type supporting + and oneunit
 ```
 
-The last definition of `addone` handles any type supporting [`oneunit`](@ref) (which returns 1 in
-the same type as `x`, which avoids unwanted type promotion) and the [`+`](@ref) function with
-those arguments. The key thing to realize is that there is *no performance penalty* to defining
-*only* the general `addone(x) = x + oneunit(x)`, because Julia will automatically compile specialized
-versions as needed. For example, the first time you call `addone(12)`, Julia will automatically
-compile a specialized `addone` function for `x::Int` arguments, with the call to `oneunit`
-replaced by its inlined value `1`. Therefore, the first three definitions of `addone` above are
-completely redundant with the fourth definition.
+La última definición de `addone` maneja cualquier tipo que soporte [`oneunit`](@ref) (que devuelve 1 en el mismo tipo que `x`, lo que evita la promoción de tipos no deseados) y  la función [`+`](@ref) con esos argumentos. La clave para darse cuenta es que no hay *ninguna penalización de rendimiento* para definir *solo* el general `addone (x) = x + oneunit (x)`, porque Julia compilará automáticamente versiones especializadas según sea necesario. Por ejemplo, la primera vez que llame a `addone(12)`, Julia compilará automáticamente una función especializada `addone` para argumentos `x :: Int`, reemplazando la llamada a `oneunit` por su valor` 1`. Por lo tanto, las primeras tres definiciones de 'addone' anteriores son completamente redundantes con la cuarta definición.
 
-## Handle excess argument diversity in the caller
+## Manejar el exceso de diversidad de argumentos en el "código llamador"
 
-Instead of:
+En lugar de:
 
 ```julia
 function foo(x, y)
@@ -79,16 +66,13 @@ end
 foo(Int(x), Int(y))
 ```
 
-This is better style because `foo` does not really accept numbers of all types; it really needs
-`Int` s.
+Este es mucho mejor estilo debido a que `foo` no acepta realmente números de todos los tipos, sino que necesita `Int` s.
 
-One issue here is that if a function inherently requires integers, it might be better to force
-the caller to decide how non-integers should be converted (e.g. floor or ceiling). Another issue
-is that declaring more specific types leaves more "space" for future method definitions.
+Un problema aquí es que si una función requiere números enteros intrínsecamente, podría ser mejor forzar al autor de la llamada a decidir cómo deberían convertirse los no enteros (por ejemplo, redondeando por abajo o por arriba). Otro problema es que la declaración de tipos más específicos deja más "espacio" para las futuras definiciones de métodos.
 
-## Append `!` to names of functions that modify their arguments
+## Añadir `!` para los nombres de funciones que modifican sus argumentos
 
-Instead of:
+En lugar de:
 
 ```julia
 function double(a::AbstractArray{<:Number})
@@ -110,18 +94,15 @@ function double!(a::AbstractArray{<:Number})
 end
 ```
 
-The Julia standard library uses this convention throughout and contains examples of functions
-with both copying and modifying forms (e.g., [`sort()`](@ref) and [`sort!()`](@ref)), and others
-which are just modifying (e.g., [`push!()`](@ref), [`pop!()`](@ref), [`splice!()`](@ref)).  It
-is typical for such functions to also return the modified array for convenience.
+La biblioteca estándar de Julia usa esta convención y contiene ejemplos de funciones con formas tanto de copiado como de modificación (por ejemplo, [`sort()`](@ref) y [`sort!()`](@ref)), y otras que simplemente están modificando (por ejemplo, [`push!()`](@ref), [`pop!()`](@ref), [`splice!()`](@ref)). Es típico para tales funciones devolver también la matriz modificada por conveniencia.
 
-## Avoid strange type `Union`s
+## Evitar tipos `Union` extraños
 
-Types such as `Union{Function,AbstractString}` are often a sign that some design could be cleaner.
+Tipos tales como `Union{Function,AbstractString}` son frecuentemente un signo de que hay que limpiar algo en el diseño.
 
-## Avoid type Unions in fields
+## Evitar las Uniones de tipos en campos
 
-When creating a type such as:
+Cuando se crea un tipo tal como :
 
 ```julia
 mutable struct MyType
@@ -130,17 +111,17 @@ mutable struct MyType
 end
 ```
 
-ask whether the option for `x` to be `nothing` (of type `Void`) is really necessary. Here are
-some alternatives to consider:
+pregunte si la opción de `x` para ser `nada` (de tipo `Void`) es realmente necesaria. Aquí hay algunas alternativas a considerar:
 
-  * Find a safe default value to initialize `x` with
-  * Introduce another type that lacks `x`
-  * If there are many fields like `x`, store them in a dictionary
-  * Determine whether there is a simple rule for when `x` is `nothing`. For example, often the field
-    will start as `nothing` but get initialized at some well-defined point. In that case, consider
-    leaving it undefined at first.
-  * If `x` really needs to hold no value at some times, define it as `::Nullable{T}` instead, as this
-    guarantees type-stability in the code accessing this field (see [Nullable types](@ref man-nullable-types)).
+  * Encuentre un valor predeterminado seguro con el que inicializar `x`
+  * Introduce otro tipo del que carece `x`
+  * Si hay muchos campos como `x`, guárdelos en un diccionario
+  * Determine si hay una regla simple para cuando `x` es` nada`. Por ejemplo, a menudo el campo comenzará 
+    como `nada` pero se inicializará en algún punto bien definido. En ese caso, considere dejarlo indefinido 
+    al principio.
+  * Si `x` realmente no necesita contener ningún valor en algún momento, defínalo como `::Nullable{T}` en 
+    su lugar, ya que esto garantiza estabilidad de tipo en el código que accede a este campo 
+    (ver [TiposNullable](@ref man-nullable-types)).
 
 ## Avoid elaborate container types
 
