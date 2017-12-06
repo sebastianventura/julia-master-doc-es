@@ -1,20 +1,16 @@
-# [Workflow Tips](@id man-workflow-tips)
+# [Consejos de *Workflow*](@id man-workflow-tips)
 
-Here are some tips for working with Julia efficiently.
+He aquí algunos consejos para trabajar de forma eficiente con Julia.
 
-## REPL-based workflow
+## *Workflow* basado en el REPL
 
-As already elaborated in [Interacting With Julia](@ref), Julia's REPL provides rich functionality
-that facilitates an efficient interactive workflow. Here are some tips that might further enhance
-your experience at the command line.
+Como ya se explicó en [Interactuando con Julia](@ref), el REPL de Julia proporciona una funcionalidad completa que facilita un flujo de trabajo eficiente e interactivo. Aquí hay algunos consejos que pueden mejorar aún más su experiencia en la línea de mandatos.
 
-### A basic editor/REPL workflow
+### A *workflow* básico editor/REPL 
 
-The most basic Julia workflows involve using a text editor in conjunction with the `julia` command
-line. A common pattern includes the following elements:
+Los flujos de trabajo de Julia más básicos implican el uso de un editor de texto junto con la línea de comando `julia`. Un patrón común incluye los siguientes elementos:
 
-  * **Put code under development in a temporary module.** Create a file, say `Tmp.jl`, and include
-    within it
+  * **Ponga el código en desarrollo dentro de un módulo temporal.** Cree un fichero, digamos `Tmp.jl`, e incluya dentro de él
 
     ```
     module Tmp
@@ -23,19 +19,17 @@ line. A common pattern includes the following elements:
 
     end
     ```
-  * **Put your test code in another file.** Create another file, say `tst.jl`, which begins with
+  * **Ponga el código de test en otro fichero.** Cree otro fichero, digamos `tst.jl`, que comience con
 
     ```julia
     import Tmp
     ```
 
-    and includes tests for the contents of `Tmp`. The value of using `import` versus `using` is that
-    you can call `reload("Tmp")` instead of having to restart the REPL when your definitions change.
-    Of course, the cost is the need to prepend `Tmp.` to uses of names defined in your module. (You
-    can lower that cost by keeping your module name short.)
-
-    Alternatively, you can wrap the contents of your test file in a module, as
-
+    e incluya pruebas para el contenido de `Tmp`. El valor de usar `import` contra` using` es que puede llamar 
+    a `reload("Tmp")` en lugar de tener que reiniciar el REPL cuando cambian sus definiciones. Por supuesto, 
+    el costo es la necesidad de anteponer `Tmp` a los usos de los nombres definidos en su módulo. (Puede reducir
+    ese costo manteniendo el nombre de su módulo corto).
+    
     ```
     module Tst
         using Tmp
@@ -45,36 +39,37 @@ line. A common pattern includes the following elements:
     end
     ```
 
-    The advantage is that you can now do `using Tmp` in your test code and can therefore avoid prepending
-    `Tmp.` everywhere. The disadvantage is that code can no longer be selectively copied to the REPL
-    without some tweaking.
-  * **Lather. Rinse. Repeat.** Explore ideas at the `julia` command prompt. Save good ideas in `tst.jl`.
-    Occasionally restart the REPL, issuing
+    La ventaja es que ahora puede hacer `using Tmp` en su código de prueba y, por lo tanto, puede 
+    evitar anteponer` Tmp` a todas partes. La desventaja es que el código ya no se puede copiar 
+    selectivamente al REPL sin algunos ajustes.
+    
+  * **Enjabonar. Enjuagar. Repetir.** Explore ideas en el prompt de  `julia`. Guarde buenas ideas en
+    `tst.jl`. Ocasionalmente, reinicie el REPL, haciendo
 
     ```julia
     reload("Tmp")
     include("tst.jl")
     ```
 
-### Simplify initialization
+### Simplifique la inicialización
 
-To simplify restarting the REPL, put project-specific initialization code in a file, say `_init.jl`,
-which you can run on startup by issuing the command:
+Para simplificar el reinicio de REPL, coloque el código de inicialización específico del proyecto en 
+un archivo, diga `_init.jl`, que puedes ejecutar en el inicio al emitir el mandato:
 
 ```
 julia -L _init.jl
 ```
 
-If you further add the following to your `.juliarc.jl` file
+Si además agrega lo siguiente a su archivo `.juliarc.jl`
 
 ```julia
 isfile("_init.jl") && include(joinpath(pwd(), "_init.jl"))
 ```
 
-then calling `julia` from that directory will run the initialization code without the additional
-command line argument.
+entonces llamar a `julia` desde este directorio ejecutará el código de inicialización sin el argumento 
+de línea de mandatos adicional.
 
 ## Browser-based workflow
 
-It is also possible to interact with a Julia REPL in the browser via [IJulia](https://github.com/JuliaLang/IJulia.jl).
-See the package home for details.
+Es también posible interactuar con un REPL Julia en el navegador a través de [IJulia](https://github.com/JuliaLang/IJulia.jl).
+Ver la documentación del paquete para más detalles.
