@@ -1,11 +1,10 @@
 # Stack Traces
 
-The `StackTraces` module provides simple stack traces that are both human readable and
-easy to use programmatically.
+El módulo `StackTraces` proporciona simples seguimientos de pila que son legibles para los humanos y fáciles de usar mediante programación.
 
-## Viewing a stack trace
+## Viendo un rastro de pila
 
-The primary function used to obtain a stack trace is [`stacktrace()`](@ref):
+La función principal utilizada para obtener un seguimiento de pila es [`stacktrace()`](@ref):
 
 ```julia-repl
 julia> stacktrace()
@@ -16,9 +15,7 @@ julia> stacktrace()
  (::Base.REPL.##1#2{Base.REPL.REPLBackend})() at event.jl:73
 ```
 
-Calling [`stacktrace()`](@ref) returns a vector of [`StackFrame`](@ref) s. For ease of use, the
-alias [`StackTrace`](@ref) can be used in place of `Vector{StackFrame}`. (Examples with `[...]`
-indicate that output may vary depending on how the code is run.)
+Llamar a [`stacktrace()`](@ref) devuelve un vector de [`StackFrame`](@ref)s. Para facilitar el uso, el alias [`StackTrace`](@ref) se puede usar en lugar de `Vector{StackFrame}`. (Los ejemplos con `[...]` indican que la salida puede variar dependiendo de cómo se ejecuta el código).
 
 ```julia-repl
 julia> example() = stacktrace()
@@ -47,9 +44,7 @@ julia> grandparent()
 [...]
 ```
 
-Note that when calling [`stacktrace()`](@ref) you'll typically see a frame with `eval(...) at boot.jl`.
-When calling [`stacktrace()`](@ref) from the REPL you'll also have a few extra frames in the stack
-from `REPL.jl`, usually looking something like this:
+Tenga en cuenta que cuando llama a [`stacktrace()`](@ref) normalmente verá un marco con `eval (...) en boot.jl`. Al invocar [`stacktrace()`](@ref) desde el REPL, también tendrá algunos fotogramas adicionales en la pila de `REPL.jl`, que generalmente se ve así:
 
 ```julia-repl
 julia> example() = stacktrace()
@@ -66,10 +61,7 @@ julia> example()
 
 ## Extracting useful information
 
-Each [`StackFrame`](@ref) contains the function name, file name, line number, lambda info, a flag
-indicating whether the frame has been inlined, a flag indicating whether it is a C function (by
-default C functions do not appear in the stack trace), and an integer representation of the pointer
-returned by [`backtrace()`](@ref):
+Cada [`StackFrame`](@ref) contiene el nombre de la función, el nombre del archivo, el número de línea, la información lambda, un indicador que indica si el marco ha sido insertado, un indicador que indica si es una función C (por defecto las funciones C no aparecen en el seguimiento de la pila) y una representación entera del puntero devuelto por [`backtrace()`](@ref):
 
 ```julia-repl
 julia> top_frame = stacktrace()[1]
@@ -99,13 +91,11 @@ julia> top_frame.pointer
 0x00007f390d152a59
 ```
 
-This makes stack trace information available programmatically for logging, error handling, and
-more.
+Esto hace que la información de seguimiento de pila esté disponible programáticamente para el registro, el manejo de errores y más.
 
-## Error handling
+## Manejo de Errores
 
-While having easy access to information about the current state of the callstack can be helpful
-in many places, the most obvious application is in error handling and debugging.
+Si bien tener acceso fácil a la información sobre el estado actual de la pila de llamadas puede ser útil en muchos lugares, la aplicación más obvia es la gestión de errores y la depuración.
 
 ```julia-repl
 julia> @noinline bad_function() = undeclared_variable
@@ -125,15 +115,9 @@ julia> example()
 [...]
 ```
 
-You may notice that in the example above the first stack frame points points at line 4, where
-[`stacktrace()`](@ref) is called, rather than line 2, where *bad_function* is called, and `bad_function`'s
-frame is missing entirely. This is understandable, given that [`stacktrace()`](@ref) is called
-from the context of the *catch*. While in this example it's fairly easy to find the actual source
-of the error, in complex cases tracking down the source of the error becomes nontrivial.
+Puede observar que en el ejemplo anterior, el primer marco apila puntos en la línea 4, donde se llama a [`stacktrace()`](@ref), en lugar de a la línea 2, donde se llama *bad_function* y el marco de `bad_function` falta por completo. Esto es comprensible, dado que [`stacktrace()`](@ref) se llama desde el contexto de *catch*. Si bien en este ejemplo es bastante fácil encontrar el origen real del error, en casos complejos, rastrear el origen del error no es trivial.
 
-This can be remedied by calling [`catch_stacktrace()`](@ref) instead of [`stacktrace()`](@ref).
-Instead of returning callstack information for the current context, [`catch_stacktrace()`](@ref)
-returns stack information for the context of the most recent exception:
+Esto se puede remediar llamando a [`catch_stacktrace()`](@ref) en lugar de [`stacktrace ()`] (@ref). En lugar de devolver la información de la pila de llamadas para el contexto actual, [`catch_stacktrace()`](@ref) devuelve la información de la pila para el contexto de la excepción más reciente:
 
 ```julia-repl
 julia> @noinline bad_function() = undeclared_variable
@@ -153,7 +137,7 @@ julia> example()
 [...]
 ```
 
-Notice that the stack trace now indicates the appropriate line number and the missing frame.
+Nótese que la traza de la pila indica ahora el número de línea apropiado y el marco perdido.
 
 ```julia-repl
 julia> @noinline child() = error("Whoops!")
@@ -181,10 +165,9 @@ ERROR: Whoops!
 [...]
 ```
 
-## Comparison with [`backtrace()`](@ref)
+## Comparación con [`backtrace()`](@ref)
 
-A call to [`backtrace()`](@ref) returns a vector of `Ptr{Void}`, which may then be passed into
-[`stacktrace()`](@ref) for translation:
+Una llamada a [`backtrace ()`] (@ ref) devuelve un vector de `Ptr{Void}`, que puede pasarse luego a [`stacktrace()`](@ref) para la traducción:
 
 ```julia-repl
 julia> trace = backtrace()
@@ -220,10 +203,7 @@ julia> stacktrace(trace)
  (::Base.REPL.##1#2{Base.REPL.REPLBackend})() at event.jl:73
 ```
 
-Notice that the vector returned by [`backtrace()`](@ref) had 21 pointers, while the vector returned
-by [`stacktrace()`](@ref) only has 5. This is because, by default, [`stacktrace()`](@ref) removes
-any lower-level C functions from the stack. If you want to include stack frames from C calls,
-you can do it like this:
+Observe que el vector devuelto por [`backtrace()`](@ref) tenía 21 punteros, mientras que el vector devuelto por [`stacktrace ()`](@ref) solo tiene 5. Esto es porque, de forma predeterminada, [`stacktrace()`](@ref) elimina cualquier función C de nivel inferior de la pila. Si desea incluir cuadros de pila de llamadas C, puede hacerlo así:
 
 ```julia-repl
 julia> stacktrace(trace, true)
@@ -257,8 +237,7 @@ julia> stacktrace(trace, true)
  ip:0xffffffffffffffff
 ```
 
-Individual pointers returned by [`backtrace()`](@ref) can be translated into [`StackFrame`](@ref)
-s by passing them into [`StackTraces.lookup()`](@ref):
+Los punteros individuales devueltos por [`backtrace()`](@ref) se pueden traducir a [`StackFrame`](@ref) s pasándolos a [`StackTraces.lookup()`](@ref):
 
 ```julia-repl
 julia> pointer = backtrace()[1];
