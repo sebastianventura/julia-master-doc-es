@@ -1,40 +1,29 @@
-# Profiling
+# *Profiling*
 
-The `Profile` module provides tools to help developers improve the performance of their
-code. When used, it takes measurements on running code, and produces output that helps you understand
-how much time is spent on individual line(s). The most common usage is to identify "bottlenecks"
-as targets for optimization.
+El módulo `Profile` proporciona herramientas para ayudar a los desarrolladores a mejorar el rendimiento de su
+código. Cuando se usa, toma medidas de código en ejecución y produce resultados que lo ayudan a comprender
+cuánto tiempo se gasta en línea(s) individual(es). El uso más común es identificar "cuellos de botella"
+como objetivos para la optimización.
 
-`Profile` implements what is known as a "sampling" or [statistical profiler](https://en.wikipedia.org/wiki/Profiling_(computer_programming)).
- It works by periodically taking a backtrace during the execution of any task. Each backtrace
-captures the currently-running function and line number, plus the complete chain of function calls
-that led to this line, and hence is a "snapshot" of the current state of execution.
+`Profile` implementa lo que se conoce como "sampling" o [*profiler* estadístico](https://en.wikipedia.org/wiki/Profiling_ (computer_programming)). Funciona periódicamente tomando una traza inversa durante la ejecución de cualquier tarea. Cada traz inversa captura la función que se está ejecutando actualmente y el número de línea, más la cadena completa de llamadas a función que llevó a esta línea, y por lo tanto es una "instantánea" del estado actual de ejecución.
 
-If much of your run time is spent executing a particular line of code, this line will show up
-frequently in the set of all backtraces. In other words, the "cost" of a given line--or really,
-the cost of the sequence of function calls up to and including this line--is proportional to how
-often it appears in the set of all backtraces.
+Si se gasta una gran parte de su tiempo de ejecución al ejecutar una línea particular de código, esta línea aparecerá con frecuencia en el conjunto de todas las trazas inversas. En otras palabras, el "costo" de una línea determinada -o, en realidad, el costo de la secuencia de llamadas de función hasta e incluyendo esta línea- es proporcional a la frecuencia con que aparece en el conjunto de todas las trazas inversas.
 
-A sampling profiler does not provide complete line-by-line coverage, because the backtraces occur
-at intervals (by default, 1 ms on Unix systems and 10 ms on Windows, although the actual scheduling
-is subject to operating system load). Moreover, as discussed further below, because samples are
-collected at a sparse subset of all execution points, the data collected by a sampling profiler
-is subject to statistical noise.
+Un generador de perfiles de muestreo (*sampling profiler*) no proporciona una cobertura completa línea por línea, porque las trazas inversas se producen a intervalos (por defecto, 1 ms en sistemas Unix y 10 ms en Windows, aunque la programación real está sujeta a la carga del sistema operativo). Además, como se analiza más adelante, como las muestras se recogen en un subconjunto disperso de todos los puntos de ejecución, los datos recopilados por un generador de perfiles de muestreo están sujetos a ruido estadístico.
 
-Despite these limitations, sampling profilers have substantial strengths:
+A pesar de estas limitaciones, los perfiles de muestreo tienen fortalezas sustanciales:
 
-  * You do not have to make any modifications to your code to take timing measurements (in contrast
-    to the alternative [instrumenting profiler](https://github.com/timholy/IProfile.jl)).
-  * It can profile into Julia's core code and even (optionally) into C and Fortran libraries.
-  * By running "infrequently" there is very little performance overhead; while profiling, your code
-    can run at nearly native speed.
+  * No tiene que hacer ninguna modificación en su código para tomar medidas de temporización (en c
+  ontraste con la alternativa [instrumenting profiler](https://github.com/timholy/IProfile.jl)).  
+  * Puede perfilarse en el código central de Julia e incluso (opcionalmente) en las bibliotecas C y Fortran.
+  * Al ejecutarse "con poca frecuencia", hay muy poca sobrecarga de rendimiento; durante el perfilado, 
+    su código puede ejecutarse a una velocidad casi nativa.
 
-For these reasons, it's recommended that you try using the built-in sampling profiler before considering
-any alternatives.
+Por estas razones, se recomienda que intente utilizar el generador de perfiles de muestreo incorporado antes de considerar cualquier alternativa.
 
-## Basic usage
+## Uso básico
 
-Let's work with a simple test case:
+Trabajemos con un simple caso de test:
 
 ```julia-repl
 julia> function myfunc()
@@ -43,21 +32,19 @@ julia> function myfunc()
        end
 ```
 
-It's a good idea to first run the code you intend to profile at least once (unless you want to
-profile Julia's JIT-compiler):
+Es buena idea ejecutar primero el código que se intenta analizar al menos una vez (a menos que uno quiera analizar el compilardor JIT de Julia):
 
 ```julia-repl
 julia> myfunc() # run once to force compilation
 ```
 
-Now we're ready to profile this function:
+Ahora estamos listos para analizar esta función:
 
 ```julia-repl
 julia> @profile myfunc()
 ```
 
-To see the profiling results, there is a [graphical browser](https://github.com/timholy/ProfileView.jl)
-available, but here we'll use the text-based display that comes with the standard library:
+Para ver los resultados del *profiler* hay disponible un [navegador gráfico](https://github.com/timholy/ProfileView.jl), pero aquí usaremos la pantalla basada en texto que viene con la librería estándar:
 
 ```julia-repl
 julia> Profile.print()
@@ -80,51 +67,31 @@ julia> Profile.print()
         25 ./reduce.jl:428; mapreduce_impl(::Base.#identity, ::Base.#scalarmax, ::Array{F...
 ```
 
-Each line of this display represents a particular spot (line number) in the code. Indentation
-is used to indicate the nested sequence of function calls, with more-indented lines being deeper
-in the sequence of calls. In each line, the first "field" is the number of backtraces
-(samples) taken *at this line or in any functions executed by this line*.
-The second field is the file name and line number and the third field is the function name.
-Note that the specific line numbers may change as Julia's
-code changes; if you want to follow along, it's best to run this example yourself.
+Cada línea de esta pantalla representa un punto particular (número de línea) en el código. La sangría se usa para indicar la secuencia anidada de llamadas a funciones, con líneas más sangradas que son más profundas en la secuencia de llamadas. En cada línea, el primer "campo" es el número de trazas inversas (muestras) tomadas *en esta línea o en cualquier función ejecutada por esta línea*. El segundo campo es el nombre del archivo y el número de línea, y el tercer campo es el nombre de la función.
+Tenga en cuenta que los números de línea específicos pueden cambiar como los cambios de código de Julia; si quieres seguir, es mejor que ejecutes este ejemplo tú mismo.
 
-In this example, we can see that the top level function called is in the file `event.jl`. This is the
-function that runs the REPL when you launch Julia. If you examine line 97 of `REPL.jl`,
-you'll see this is where the function `eval_user_input()` is called. This is the function that evaluates
-what you type at the REPL, and since we're working interactively these functions were invoked
-when we entered `@profile myfunc()`. The next line reflects actions taken in the [`@profile`](@ref)
-macro.
+En este ejemplo, podemos ver que la función de nivel superior llamada está en el archivo `event.jl`. Esta es la función que ejecuta REPL cuando se lanza Julia. Si se examina la línea 97 de `REPL.jl`, verá que aquí es donde se llama a la función `eval_user_input()`. Esta es la función que evalúa lo que escribes en el REPL, y dado que estamos trabajando de forma interactiva estas funciones se invocaron cuando ingresamos `@profile myfunc()`. La siguiente línea refleja las acciones tomadas en la macro [`@ profile`](@ref).
 
-The first line shows that 80 backtraces were taken at line 73 of `event.jl`, but it's not that
-this line was "expensive" on its own: the third line reveals that all 80 of these backtraces
-were actually triggered inside its call to `eval_user_input`, and so on. To find out which operations
-are actually taking the time, we need to look deeper in the call chain.
+La primera línea muestra que se tomaron 80 trazas inversas en la línea 73 de `event.jl`, pero no es que esta línea fuera "costosa" por sí misma: la tercera línea revela que las 80 trazas inversas se desencadenaron dentro de su llamada a `eval_user_input`, y así sucesivamente. Para averiguar qué operaciones se están tomando realmente el tiempo, necesitamos buscar más profundamente en la cadena de llamadas.
 
-The first "important" line in this output is this one:
+La primera línea "importante" en esta salida es esta:
 
 ```
 52 ./REPL[1]:2; myfunc()
 ```
 
-`REPL` refers to the fact that we defined `myfunc` in the REPL, rather than putting it in a file;
-if we had used a file, this would show the file name. The `[1]` shows that the function `myfunc`
-was the first expression evaluated in this REPL session. Line 2 of `myfunc()` contains the call to
-`rand`, and there were 52 (out of 80) backtraces that occurred at this line. Below that, you can
-see a call to `dsfmt_fill_array_close_open!` inside `dSFMT.jl`.
+`REPL` se refiere al hecho de que definimos` myfunc` en REPL, en lugar de ponerlo en un archivo; si hubiéramos usado un archivo, esto mostraría el nombre del archivo. El `[1]` muestra que la función `myfunc` fue la primera expresión evaluada en esta sesión REPL. La línea 2 de `myfunc()` contiene la llamada a `rand`, y hubo 52 (de 80) trazas inversas que ocurrieron en esta línea. Debajo de eso, puede ver una llamada a `dsfmt_fill_array_close_open!` Dentro de `dSFMT.jl`.
 
-A little further down, you see:
+Un poco más abajo, ves:
 
 ```
 28 ./REPL[1]:3; myfunc()
 ```
 
-Line 3 of `myfunc` contains the call to `maximum`, and there were 28 (out of 80) backtraces taken
-here. Below that, you can see the specific places in `base/reduce.jl` that carry out the time-consuming
-operations in the `maximum` function for this type of input data.
 
-Overall, we can tentatively conclude that generating the random numbers is approximately twice as expensive
-as finding the maximum element. We could increase our confidence in this result by
-collecting more samples:
+La línea 3 de `myfunc` contiene la llamada a` maximum`, y hubo 28 (de 80) trazas inversas tomadas aquí. Debajo de eso, puede ver los lugares específicos en `base/reduce.jl` que llevan a cabo las operaciones que consumen mucho tiempo en la función` maximum` para este tipo de datos de entrada.
+
+En general, podemos concluir tentativamente que generar los números aleatorios es aproximadamente el doble de costoso que encontrar el elemento máximo. Podríamos aumentar nuestra confianza en este resultado recopilando más muestras:
 
 ```julia-repl
 julia> @profile (for i = 1:100; myfunc(); end)
@@ -141,14 +108,9 @@ julia> Profile.print()
    [....]
 ```
 
-In general, if you have `N` samples collected at a line, you can expect an uncertainty on the
-order of `sqrt(N)` (barring other sources of noise, like how busy the computer is with other tasks).
-The major exception to this rule is garbage collection, which runs infrequently but tends to be
-quite expensive. (Since Julia's garbage collector is written in C, such events can be detected
-using the `C=true` output mode described below, or by using [ProfileView.jl](https://github.com/timholy/ProfileView.jl).)
+En general, si tiene `N` muestras recopiladas en una línea, puede esperar una incertidumbre en el orden de `sqrt(N)` (excluyendo otras fuentes de ruido, como cuán ocupada está la computadora con otras tareas). La principal excepción a esta regla es la recolección de basura, que se ejecuta con poca frecuencia pero tiende a ser bastante costosa. (Dado que el recolector de basura de Julia está escrito en C, tales eventos pueden ser detectados usando el modo de salida `C = true` descrito a continuación, o usando [ProfileView.jl](https://github.com/timholy/ProfileView.jl).)
 
-This illustrates the default "tree" dump; an alternative is the "flat" dump, which accumulates
-counts independent of their nesting:
+Esto ilustra el volcado de "árbol" predeterminado; una alternativa es el volcado "plano", que acumula conteos independientemente de su anidación:
 
 ```julia-repl
 julia> Profile.print(format=:flat)
@@ -175,16 +137,14 @@ julia> Profile.print(format=:flat)
     43 ./reduce.jl    429 mapreduce_impl(::Base.#identity, ::Base.#scalarma...
 ```
 
-If your code has recursion, one potentially-confusing point is that a line in a "child" function
-can accumulate more counts than there are total backtraces. Consider the following function definitions:
+Si nuestro código tiene recursión, un punto potencialmente confso es que una línea en una función "hija" puede acumular ms cuentas que hay de trazas inversas en total.Considere las siguientes definiciones de función:
 
 ```julia
 dumbsum(n::Integer) = n == 1 ? 1 : 1 + dumbsum(n-1)
 dumbsum3() = dumbsum(3)
 ```
 
-If you were to profile `dumbsum3`, and a backtrace was taken while it was executing `dumbsum(1)`,
-the backtrace would look like this:
+Si tuviéramos que analizar  `dumbsum3`, y una traza inversa fuera tomada mientras estaba ejecutándose `dumbsum(1)`, la traza inversa tendría este aspecto:
 
 ```julia
 dumbsum3
@@ -193,32 +153,28 @@ dumbsum3
             dumbsum(1)
 ```
 
-Consequently, this child function gets 3 counts, even though the parent only gets one. The "tree"
-representation makes this much clearer, and for this reason (among others) is probably the most
-useful way to view the results.
+En consecuencia, esta función hija realiza tres cuentas incluso aunque la padre sólo realiza una. La representación en "árbol" hace esto mucho ms claro, y por esta razón (entre otras) es probablemente la forma más útil de ver los resultados.
 
-## Accumulation and clearing
+## Acumulación y Limpieza
 
-Results from [`@profile`](@ref) accumulate in a buffer; if you run multiple pieces of code under
-[`@profile`](@ref), then [`Profile.print()`](@ref) will show you the combined results. This can
-be very useful, but sometimes you want to start fresh; you can do so with [`Profile.clear()`](@ref).
+Los resultados de [`@profile`](@ref) se acumulan en un buffer; si ejecuta varios fragmentos de código en [`@profile`](@ref), entonces [`Profile.print()`](@ref) le mostrará los resultados combinados. Esto puede ser muy útil, pero a veces desea comenzar de nuevo; puede hacerlo con [`Profile.clear()`](@ref).
 
-## Options for controlling the display of profile results
+## Opciones para controlar la visión de los resultados del análisis
 
-[`Profile.print()`](@ref) has more options than we've described so far. Let's see the full declaration:
+[`Profile.print()`](@ref) tienes más opciones de las que se han descrito hasta ahora. Veamos la declaración completa:
 
 ```julia
 function print(io::IO = STDOUT, data = fetch(); kwargs...)
 ```
 
-Let's first discuss the two positional arguments, and later the keyword arguments:
+Primero discutamos los dos argumentos posicionales, y luego los argumentos *keyword*:
 
-  * `io` -- Allows you to save the results to a buffer, e.g. a file, but the default is to print to `STDOUT`
-    (the console).
-  * `data` -- Contains the data you want to analyze; by default that is obtained from [`Profile.fetch()`](@ref),
-    which pulls out the backtraces from a pre-allocated buffer. For example, if you want to profile
-    the profiler, you could say:
-
+  * `io` -- Le permite guardar los resultados en un búfer, por ejemplo, un archivo, pero el predeterminado es 
+    imprimir en `STDOUT` (la consola)..
+  * `data` -- Contiene los datos que desea analizar; de forma predeterminada, se obtiene de [`Profile.fetch()`](@ref), 
+    que extrae trazas inversas de un búfer preasignado. Por ejemplo, si desea perfilar el generador de perfiles, 
+    podría decir:
+  
     ```julia
     data = copy(Profile.fetch())
     Profile.clear()
@@ -226,32 +182,29 @@ Let's first discuss the two positional arguments, and later the keyword argument
     Profile.print()                      # Prints results from Profile.print()
     ```
 
-The keyword arguments can be any combination of:
+The argumentos *keyword* pueden ser cualquier combinación de:
 
-  * `format` -- Introduced above, determines whether backtraces are printed
-     with (default, `:tree`) or without (`:flat`) indentation indicating tree
-     structure.
-  * `C` -- If `true`, backtraces from C and Fortran code are shown (normally they are excluded). Try running the introductory
-    example with `Profile.print(C = true)`. This can be extremely helpful in deciding whether it's
-    Julia code or C code that is causing a bottleneck; setting `C = true` also improves the interpretability
-    of the nesting, at the cost of longer profile dumps.
-  * `combine` -- Some lines of code contain multiple operations; for example, `s += A[i]` contains both an array
-    reference (`A[i]`) and a sum operation. These correspond to different lines in the generated
-    machine code, and hence there may be two or more different addresses captured during backtraces
-    on this line. `combine = true` lumps them together, and is probably what you typically want, but
-    you can generate an output separately for each unique instruction pointer with `combine = false`.
-  * `maxdepth` -- Limits frames at a depth higher than `maxdepth` in the `:tree` format.
-  * `sortedby` -- Controls the order in `:flat` format. `:filefuncline` (default) sorts by the source
-    line, whereas `:count` sorts in order of number of collected samples.
-  * `noisefloor` -- Limits frames that are below the heuristic noise floor of the sample (only applies to format `:tree`).
-    A suggested value to try for this is 2.0 (the default is 0). This parameter hides samples for which `n <= noisefloor * √N`,
-    where `n` is the number of samples on this line, and `N` is the number of samples for the callee.
-  * `mincount` -- Limits frames with less than `mincount` occurrences.
+  * `format` -- Introducido anteriormente, determina si se imprimen trazas inversas con (por defecto, `: árbol`) 
+    o sin (`: plano`) indentación que indica la estructura en árbol.
+  * `C` -- Si` true`, se muestran trazas inversas de C y Fortran (normalmente están excluidas). Intente ejecutar 
+    el ejemplo introductorio con `Profile.print(C = true)`. Esto puede ser extremadamente útil para decidir si 
+    es el código Julia o el código C lo que está causando un cuello de botella; establecer `C = true` también 
+    mejora la interpretabilidad del anidamiento, a coste de unos listados de perfil más largos. 
+  * `combine` -- Algunas líneas de código contienen múltiples operaciones; por ejemplo, `s + = A [i]` contiene 
+    una referencia de matriz (`A[i]`) y una operación de suma. Estos corresponden a diferentes líneas en el 
+    código máquina generado, y por lo tanto puede haber dos o más direcciones diferentes capturadas durante 
+    las trazas inversas en esta línea. `combine = true` los agrupa, y es probablemente lo que generalmente 
+    desea, pero puede generar un resultado por separado para cada puntero de instrucción con` combine = false`.
+  * `maxdepth` -- Limita los marcos a una profundidad mayor que` maxdepth` en el formato `:tree`.
+  * `sortedby` -- Controla el orden en formato `:flat`. `:filefuncline` (predeterminado) ordena por la línea 
+    de origen, mientras que `:count` se ordena según el número de muestras recolectadas.
+  * `noisefloor` -- Límita los marcos que están debajo del umbral de ruido heurístico de la muestra (solo se aplica
+    al formato`: tree`). Un valor sugerido para intentar esto es 2.0 (el valor predeterminado es 0). Este parámetro 
+    oculta muestras para las cuales `n <= noisefloor * √N`, donde` n` es el número de muestras en esta línea, y 
+    `N` es el número de muestras para el método invocado.
+  * `mincount` -- Limita marcos con menos de `mincount` ocurrencias.
 
-File/function names are sometimes truncated (with `...`), and indentation is truncated with a
-`+n` at the beginning, where `n` is the number of extra spaces that would have been inserted,
-had there been room. If you want a complete profile of deeply-nested code, often a good idea is
-to save to a file using a wide `displaysize` in an [`IOContext`](@ref):
+Los nombres de archivo/función a veces se truncan (con `...`), y la sangría se trunca con un `+n` al principio, donde `n` es el número de espacios adicionales que se habrían insertado, si hubiera habido espacio . Si desea un perfil completo de código profundamente anidado, a menudo una buena idea es guardar en un archivo usando un ancho "tamaño de pantalla" en un [`IOContext`] (@ref):
 
 ```julia
 open("/tmp/prof.txt", "w") do s
@@ -259,54 +212,25 @@ open("/tmp/prof.txt", "w") do s
 end
 ```
 
-## Configuration
+## Configuración
 
-[`@profile`](@ref) just accumulates backtraces, and the analysis happens when you call [`Profile.print()`](@ref).
-For a long-running computation, it's entirely possible that the pre-allocated buffer for storing
-backtraces will be filled. If that happens, the backtraces stop but your computation continues.
-As a consequence, you may miss some important profiling data (you will get a warning when that
-happens).
+[`@ profile`](@ref) solo acumula *backtraces*, y el análisis ocurre cuando usted llama a [`Profile.print()`](@ref). Para un cálculo de larga ejecución, es muy posible que se llene el búfer preasignado para almacenar *backtraces*. Si eso sucede, las trazas inversas se detienen pero su cálculo continúa. Como consecuencia, es posible que omitan algunos datos importantes de generación de perfiles (recibirá una advertencia cuando eso suceda).
 
-You can obtain and configure the relevant parameters this way:
+Puede obtener y configurar los parámetros relevantes de esta manera:
 
 ```julia
 Profile.init() # returns the current settings
 Profile.init(n = 10^7, delay = 0.01)
 ```
 
-`n` is the total number of instruction pointers you can store, with a default value of `10^6`.
-If your typical backtrace is 20 instruction pointers, then you can collect 50000 backtraces, which
-suggests a statistical uncertainty of less than 1%. This may be good enough for most applications.
+`n` es la cantidad total de punteros de instrucción que puede almacenar, con un valor predeterminado de `10 ^ 6`. Si su traza inversa típica es de 20 punteros de instrucción, puede recopilar 50000 trazas inversas, lo que sugiere una incertidumbre estadística de menos del 1%. Esto puede ser lo suficientemente bueno para la mayoría de las aplicaciones.
 
-Consequently, you are more likely to need to modify `delay`, expressed in seconds, which sets
-the amount of time that Julia gets between snapshots to perform the requested computations. A
-very long-running job might not need frequent backtraces. The default setting is `delay = 0.001`.
-Of course, you can decrease the delay as well as increase it; however, the overhead of profiling
-grows once the delay becomes similar to the amount of time needed to take a backtrace (~30 microseconds
-on the author's laptop).
+En consecuencia, es más probable que necesite modificar el `retraso`, expresado en segundos, que establece la cantidad de tiempo que Julia obtiene entre las instantáneas para realizar los cálculos solicitados. Un trabajo de larga duración puede no necesitar trazas frecuentes. La configuración predeterminada es `delay = 0.001`. Por supuesto, puede disminuir la demora y aumentarla; sin embargo, la sobrecarga de los perfiles crece una vez que la demora se vuelve similar a la cantidad de tiempo necesaria para tomar una traza inversa (~ 30 microsegundos en la computadora portátil del autor).
 
-# Memory allocation analysis
+# Análisis de la asignación de memoria
 
-One of the most common techniques to improve performance is to reduce memory allocation. The
-total amount of allocation can be measured with [`@time`](@ref) and [`@allocated`](@ref), and
-specific lines triggering allocation can often be inferred from profiling via the cost of garbage
-collection that these lines incur. However, sometimes it is more efficient to directly measure
-the amount of memory allocated by each line of code.
+Una de las técnicas más comunes para mejorar el rendimiento es reducir la asignación de memoria. La cantidad total de  asignación se puede medir con [`@time`](@ref) y [`@assigned`](@ref), y las líneas específicas que desencadenan la asignación a  pueden a menudo inferirse a partir del perfil a través del costo de la recolección de basura en la que incurren estas líneas. Sin embargo, a veces es más eficiente medir directamente la cantidad de memoria asignada por cada línea de código.
 
-To measure allocation line-by-line, start Julia with the `--track-allocation=<setting>` command-line
-option, for which you can choose `none` (the default, do not measure allocation), `user` (measure
-memory allocation everywhere except Julia's core code), or `all` (measure memory allocation at
-each line of Julia code). Allocation gets measured for each line of compiled code. When you quit
-Julia, the cumulative results are written to text files with `.mem` appended after the file name,
-residing in the same directory as the source file. Each line lists the total number of bytes
-allocated. The [`Coverage` package](https://github.com/JuliaCI/Coverage.jl) contains some elementary
-analysis tools, for example to sort the lines in order of number of bytes allocated.
+Para medir la asignación línea por línea, inicie Julia con la opción de línea de comando `--track-allocation = <setting>`, para la cual puede elegir `none` (el predeterminado, no medir la asignación), `user` (mida la asignación de memoria en todas partes excepto el código central de Julia), o `todo` (mida la asignación de memoria en cada línea del código Julia). La asignación se mide para cada línea de código compilado. Cuando sale de Julia, los resultados acumulativos se escriben en archivos de texto con `.mem` adjunto después del nombre del archivo, que residen en el mismo directorio que el archivo de origen. Cada línea enumera la cantidad total de bytes asignados. El [paquete `Coverage`](https://github.com/JuliaCI/Coverage.jl) contiene algunas herramientas de análisis elementales, por ejemplo, para ordenar las líneas en orden de cantidad de bytes asignados.
 
-In interpreting the results, there are a few important details. Under the `user` setting, the
-first line of any function directly called from the REPL will exhibit allocation due to events
-that happen in the REPL code itself. More significantly, JIT-compilation also adds to allocation
-counts, because much of Julia's compiler is written in Julia (and compilation usually requires
-memory allocation). The recommended procedure is to force compilation by executing all the commands
-you want to analyze, then call [`Profile.clear_malloc_data()`](@ref) to reset all allocation counters.
- Finally, execute the desired commands and quit Julia to trigger the generation of the `.mem`
-files.
+Al interpretar los resultados, hay algunos detalles importantes. Bajo la configuración `user`, la primera línea de cualquier función directamente llamada desde REPL exhibirá asignación debido a eventos que ocurren en el código REPL. Más significativamente, la compilación de JIT también se suma a los recuentos de asignación, porque gran parte del compilador de Julia está escrito en Julia (y la compilación generalmente requiere asignación de memoria). El procedimiento recomendado es forzar la compilación ejecutando todos los comandos que desea analizar, luego llame a [`Profile.clear_malloc_data()`](@ref) para restablecer todos los contadores de asignación. Finalmente, ejecute los comandos deseados y salga de Julia para activar la generación de los archivos `.mem`.
