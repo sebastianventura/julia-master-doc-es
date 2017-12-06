@@ -1,4 +1,4 @@
-# [Constants](@id lib-constants)
+# [Constantes](@id lib-constants)
 
 ```@docs
 Core.nothing
@@ -15,7 +15,7 @@ Base.Sys.ARCH
 Base.Sys.MACHINE
 ```
 
-See also:
+Ver también:
 
   * [`STDIN`](@ref)
   * [`STDOUT`](@ref)
