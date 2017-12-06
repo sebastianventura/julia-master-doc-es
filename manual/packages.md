@@ -40,20 +40,11 @@ Dict{String,VersionNumber} with 4 entries:
 
 ## Añadir y eliminar paquetes
 
-Julia's package manager is a little unusual in that it is declarative rather than imperative. This means that you tell it what you want and it figures out what versions to install (or remove) to satisfy those requirements optimally – and minimally. So rather than installing a package,  you just add it to the list of requirements and then "resolve" what needs to be installed. In particular, this means that if some package had been installed because it was needed by a previous
-version of something you wanted, and a newer version doesn't have that requirement anymore, updating
-will actually remove that package.
+El administrador de paquetes de Julia es un poco inusual ya que es declarativo en lugar de imperativo. Esto significa que uno le dice lo que quiere y el gestor descubre qué versiones instalar (o eliminar) para satisfacer esos requisitos de manera óptima, - y mínimamente. Por tanto, en lugar de instalar un paquete, simplemente lo agrega a la lista de requisitos y luego "resuelve" lo que necesita instalar. En particular, esto significa que si algún paquete se ha instalado porque lo necesitaba una versión anterior de algo que usted quería, y una versión más nueva ya no tiene ese requisito, la actualización realmente eliminará ese paquete.
 
-Your package requirements are in the file `~/.julia/v0.6/REQUIRE`. You can edit this file by hand
-and then call [`Pkg.resolve()`](@ref) to install, upgrade or remove packages to optimally satisfy
-the requirements, or you can do [`Pkg.edit()`](@ref), which will open `REQUIRE` in your editor
-(configured via the `EDITOR` or `VISUAL` environment variables), and then automatically call
-[`Pkg.resolve()`](@ref) afterwards if necessary. If you only want to add or remove the requirement
-for a single package, you can also use the non-interactive [`Pkg.add()`](@ref) and [`Pkg.rm()`](@ref)
-commands, which add or remove a single requirement to `REQUIRE` and then call [`Pkg.resolve()`](@ref).
+Los requisitos de paquetes están en el archivo `~ /.julia/v0.6/REQUIRE`. Este archivo puede ser editado a mano y luego llamarse a [`Pkg.resolve()`](@ref) para instalar, actualizar o eliminar paquetes para satisfacer de manera óptima los requisitos, o puede hacer [`Pkg.edit()`](@ref), que abrirá 'REQUIRE' en su editor (configurado a través de las variables de entorno `EDITOR` o` VISUAL`), y luego llamará automáticamente a [`Pkg.resolve()`](@ref) después si es necesario. Si solo desea agregar o eliminar el requisito para un solo paquete, también puede usar los mandatos no interactivos [`Pkg.add()`](@ref) y [`Pkg.rm()`](@ref), que agregan o eliminan un solo requisito a `REQUIRE` y luego llaman a [`Pkg.resolve ()`](@ref).
 
-You can add a package to the list of requirements with the [`Pkg.add()`](@ref) function, and the
-package and all the packages that it depends on will be installed:
+Puede agregarse un paquete a la lista de requisitos con la función [`Pkg.add()`](@ref), y se instalará el paquete y todos los paquetes de los que depende.
 
 ```julia-repl
 julia> Pkg.status()
@@ -76,17 +67,14 @@ Additional packages:
  - Stats                         0.2.6
 ```
 
-What this is doing is first adding `Distributions` to your `~/.julia/v0.6/REQUIRE` file:
+Lo que está haciendo es primero agregar `Distribuciones` a su archivo `~/.julia/v0.6/REQUIRE`:
 
 ```
 $ cat ~/.julia/v0.6/REQUIRE
 Distributions
 ```
 
-It then runs [`Pkg.resolve()`](@ref) using these new requirements, which leads to the conclusion
-that the `Distributions` package should be installed since it is required but not installed. As
-stated before, you can accomplish the same thing by editing your `~/.julia/v0.6/REQUIRE` file
-by hand and then running [`Pkg.resolve()`](@ref) yourself:
+A continuación, ejecuta [`Pkg.resolve()`](@ref) utilizando estos nuevos requisitos, lo que lleva a la conclusión de que el paquete `Distributions` debe instalarse ya que es obligatorio pero no está instalado. Como se dijo anteriormente, puede lograr lo mismo editando su archivo `~ /.julia/v0.6/REQUIRE` a mano y luego ejecutando [`Pkg.resolve()`](@ref) usted mismo:
 
 ```julia-repl
 $ echo SHA >> ~/.julia/v0.6/REQUIRE
@@ -104,14 +92,9 @@ Additional packages:
  - Stats                         0.2.6
 ```
 
-This is functionally equivalent to calling [`Pkg.add("SHA")`](@ref), except that [`Pkg.add()`](@ref)
-doesn't change `REQUIRE` until *after* installation has completed, so if there are problems,
-`REQUIRE` will be left as it was before calling [`Pkg.add()`](@ref). The format of the `REQUIRE`
-file is described in [Requirements Specification](@ref); it allows, among other things, requiring
-specific ranges of versions of packages.
+Esto es funcionalmente equivalente a llamar a [`Pkg.add("SHA")`](@ref), excepto que [`Pkg.add()`](@ ref) no cambia `REQUIRE` hasta *después* de que la instalación haya finalizado, por lo que si hay problemas, `REQUIRE` quedará como estaba antes de llamar a [`Pkg.add()`](@ref). El formato del archivo `REQUIRE` se describe en [Especificación de requisitos](@ref); permite, entre otras cosas, requerir rangos específicos de versiones de paquetes.
 
-When you decide that you don't want to have a package around any more, you can use [`Pkg.rm()`](@ref)
-to remove the requirement for it from the `REQUIRE` file:
+Cuando decida que no quiere tener un paquete más, puede usar [`Pkg.rm()`](@ref) para eliminar el requisito del archivo `REQUIRE`:
 
 ```julia-repl
 julia> Pkg.rm("Distributions")
@@ -131,63 +114,46 @@ INFO: REQUIRE updated.
 julia> Pkg.status()
 No packages installed.
 ```
+Una vez más, esto es equivalente a editar el archivo `REQUIRE` para eliminar la línea con cada nombre de paquete y ejecutar [`Pkg.resolve()`](@ref) para actualizar el conjunto de paquetes instalados para que coincidan. Mientras que [`Pkg.add()`](@ref) y [`Pkg.rm()`](@ref) son convenientes para agregar y eliminar requisitos para un solo paquete, cuando desea agregar o eliminar paquetes múltiples, puede llamar a [`Pkg.edit()`](@ref) para cambiar manualmente el contenido de `REQUIRE` y luego actualizar sus paquetes en consecuencia. [`Pkg.edit()`](@ref) no retrotrae el contenido de `REQUIRE` si [`Pkg.resolve()`](@ref) falla, sino que debe ejecutar [`Pkg.edit()`](@ ref) otra vez para corregir el contenido de los archivos uno mismo.
 
-Once again, this is equivalent to editing the `REQUIRE` file to remove the line with each package
-name on it then running [`Pkg.resolve()`](@ref) to update the set of installed packages to match.
-While [`Pkg.add()`](@ref) and [`Pkg.rm()`](@ref) are convenient for adding and removing requirements
-for a single package, when you want to add or remove multiple packages, you can call [`Pkg.edit()`](@ref)
-to manually change the contents of `REQUIRE` and then update your packages accordingly. [`Pkg.edit()`](@ref)
-does not roll back the contents of `REQUIRE` if [`Pkg.resolve()`](@ref) fails – rather, you
-have to run [`Pkg.edit()`](@ref) again to fix the files contents yourself.
-
-Because the package manager uses libgit2 internally to manage the package git repositories, users
-may run into protocol issues (if behind a firewall, for example), when running [`Pkg.add()`](@ref).
-By default, all GitHub-hosted packages wil be accessed via 'https'; this default can be modified
-by calling [`Pkg.setprotocol!()`](@ref). The following command can be run from the command line
-in order to tell git to use 'https' instead of the 'git' protocol when cloning all repositories,
-wherever they are hosted:
+Debido a que el administrador de paquetes usa libgit2 internamente para administrar los repositorios git del paquete, los usuarios pueden encontrarse con problemas de protocolo (por ejemplo, si están detrás de un *firewall*) al ejecutar [`Pkg.add()`](@ref). Por defecto, se accederá a todos los paquetes alojados por GitHub a través de 'https'; este valor predeterminado se puede modificar llamando a [`Pkg.setprotocol!()`](@ref). El siguiente comando se puede ejecutar desde la línea de comando para decirle a git que use 'https' en lugar del protocolo 'git' cuando clona todos los repositorios, dondequiera que estén alojados:
 
 ```
 git config --global url."https://".insteadOf git://
 ```
 
-However, this change will be system-wide and thus the use of [`Pkg.setprotocol!()`](@ref) is preferable.
+Sin embargo, este cambio será en todo el sistema y, por lo tanto, es preferible utilizar [`Pkg.setprotocol!()`](@ref).
 
 !!! note
-    The package manager functions also accept the `.jl` suffix on package names, though the suffix is
-    stripped internally. For example:
+    
+    Las funciones del administrador de paquetes también aceptan el sufijo `.jl` sobre los nombres de
+    paquetes, aunque el sufijo sea eliminado internamente. Por ejemplo:
 
     ```julia
     Pkg.add("Distributions.jl")
     Pkg.rm("Distributions.jl")
     ```
 
-## Offline Installation of Packages
+## Instalación de paquetes fuera de línea
 
-For machines with no Internet connection, packages may be installed by copying the package root
-directory (given by [`Pkg.dir()`](@ref)) from a machine with the same operating system and environment.
+Para las máquinas sin conexión a Internet, los paquetes se pueden instalar copiando el directorio raíz del paquete (proporcionado por [`Pkg.dir()`](@ref)) desde una máquina con el mismo sistema operativo y entorno.
 
-[`Pkg.add()`](@ref) does the following within the package root directory:
+[`Pkg.add()`](@ref) hace lo siguiente dentro del directorio raíz del paquete:
 
-1. Adds the name of the package to `REQUIRE`.
-2. Downloads the package to `.cache`, then copies the package to the package root directory.
-3. Recursively performs step 2 against all the packages listed in the package's `REQUIRE` file.
-4. Runs [`Pkg.build()`](@ref)
+1. Agrega el nombre del paquete a `REQUIRE`.
+2. Descarga el paquete en `.cache`, luego copia el paquete en el directorio raíz del paquete.
+3. Realiza recursivamente el paso 2 contra todos los paquetes enumerados en el archivo `REQUIRE` del paquete.
+4. Ejecuta [`Pkg.build()`](@ref)
 
 !!! warning
-    Copying installed packages from a different machine is brittle for packages requiring binary external
-    dependencies. Such packages may break due to differences in operating system versions, build environments,
-    and/or absolute path dependencies.
 
-## Installing Unregistered Packages
+    Copiar paquetes instalados desde una máquina diferente es frágil para paquetes que requieren dependencias 
+    externas binarias. Dichos paquetes pueden romperse debido a diferencias en las versiones del sistema 
+    operativo, entornos de compilación y / o dependencias absolutas de rutas.
 
-Julia packages are simply git repositories, clonable via any of the [protocols](https://www.kernel.org/pub/software/scm/git/docs/git-clone.html#URLS)
-that git supports, and containing Julia code that follows certain layout conventions. Official
-Julia packages are registered in the [METADATA.jl](https://github.com/JuliaLang/METADATA.jl) repository,
-available at a well-known location [^1]. The [`Pkg.add()`](@ref) and [`Pkg.rm()`](@ref) commands
-in the previous section interact with registered packages, but the package manager can install
-and work with unregistered packages too. To install an unregistered package, use [`Pkg.clone(url)`](@ref),
-where `url` is a git URL from which the package can be cloned:
+## Instalar paquietes no registrados
+
+Los paquetes de Julia son simplemente repositorios git, clonables a través de cualquiera de los [protocolos] (https://www.kernel.org/pub/software/scm/git/docs/git-clone.html#URLS) que admite git, y que contienen código Julia que sigue ciertas convenciones de diseño. Los paquetes oficiales de Julia están registrados en el repositorio [METADATA.jl](https://github.com/JuliaLang/METADATA.jl), disponible en una ubicación conocida [^1]. Los mandatos [`Pkg.add()`](@ref) y [`Pkg.rm()`](@ref) de la sección anterior interactúan con los paquetes registrados, pero el administrador de paquetes también puede instalar y trabajar con paquetes no registrados. Para instalar un paquete no registrado, usaremos [`Pkg.clone(url)`](@ref), donde `url` es una URL de git desde la cual se puede clonar el paquete:
 
 ```julia-repl
 julia> Pkg.clone("git://example.com/path/to/Package.jl.git")
@@ -200,24 +166,19 @@ Receiving objects: 100% (22/22), 2.64 KiB, done.
 Resolving deltas: 100% (8/8), done.
 ```
 
-By convention, Julia repository names end with `.jl` (the additional `.git` indicates a "bare"
-git repository), which keeps them from colliding with repositories for other languages, and also
-makes Julia packages easy to find in search engines. When packages are installed in your `.julia/v0.6`
-directory, however, the extension is redundant so we leave it off.
+Por convención, los nombres de los repositorios de Julia terminan con `.jl` (el `.git` adicional indica un repositorio "vacío" de git), lo que evita que colisionen con los repositorios de otros lenguajes, y también hace que los paquetes de Julia sean fáciles de encontrar en los motores de búsqueda. Sin embargo, cuando los paquetes están instalados en su directorio `.julia/v0.6`, la extensión es redundante, por lo que la dejamos fuera.
 
-If unregistered packages contain a `REQUIRE` file at the top of their source tree, that file will
-be used to determine which registered packages the unregistered package depends on, and they will
-automatically be installed. Unregistered packages participate in the same version resolution logic
-as registered packages, so installed package versions will be adjusted as necessary to satisfy
-the requirements of both registered and unregistered packages.
+Si los paquetes no registrados contienen un archivo `REQUIRE` en la parte superior de su árbol fuente, ese archivo se usará para determinar de qué paquetes registrados depende el paquete no registrado, y se instalarán automáticamente. Los paquetes no registrados participan en la misma lógica de resolución de versiones que los paquetes registrados, por lo que las versiones de paquetes instalados se ajustarán según sea necesario para satisfacer los requisitos de los paquetes registrados y no registrados.
 
 [^1]:
-    The official set of packages is at [https://github.com/JuliaLang/METADATA.jl](https://github.com/JuliaLang/METADATA.jl),
-    but individuals and organizations can easily use a different metadata repository. This allows
-    control which packages are available for automatic installation. One can allow only audited and
-    approved package versions, and make private packages or forks available. See [Custom METADATA Repository](@ref)
-    for details.
-
+    El conjunto oficial de paquetes está en     
+    [https://github.com/JuliaLang/METADATA.jl(https://github.com/JuliaLang/METADATA.jl), 
+    pero los individuos y las organizaciones pueden usar fácilmente un repositorio de 
+    metadatos diferente. Esto permite controlar qué paquetes están disponibles para la i
+    nstalación automática. Solo se pueden permitir versiones de paquete auditadas y aprobadas, 
+    y hacer paquetes privados u horquillas disponibles. Ver [Repositorio METADATA personalizado](@ref) 
+    para más detalles.
+    
 ## Updating Packages
 
 When package developers publish new registered versions of packages that you're using, you will,
