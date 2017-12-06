@@ -146,11 +146,11 @@ En este caso `Array{Any}(n)` es mejor. Es también de más ayuda para el compila
 
 Si el nombre de una función requiere varias palabras, considere si podría representar más de un concepto y podría dividirse mejor en partes.
 
-## No use demasiado try-catch
+## No usar demasiado try-catch
 
 Es mejor evitar errores que basarse en atraparlos.
 
-## No meta entre paréntesis las condiciones
+## No meter entre paréntesis las condiciones
 
 Julia no necesita que se rodeen entre paréntesis las condiciones en `if` and `while`. Escriba:
 
@@ -164,13 +164,13 @@ en lugar de:
 if (a == b)
 ```
 
-## No use demasiado `...`
+## No usar demasiado `...`
 
 El uso de `...` en los argumentos de función puede ser adictivo. En lugar de `[a..., b...]`, use `[a; b]`,
 que ya concatena arrays. [`collect(a)`](@ref) es mejor que `[a...]`, pero como `a` ya es iterable suele ser 
 incluso mejor d3jarlo solo, y no convertirlo en array.
 
-## No usse parámetros estáticos innecesarios
+## No usar parámetros estáticos innecesarios
 
 Una signatura de función:
 
@@ -203,13 +203,13 @@ El estilo preferido es usar instancias por defecto, y solo agregue métodos que 
 
 Si un tipo es efectivamente una enumeración, debe definirse como un tipo único (idealmente, `immutable struct` o primitivo), con los valores de enumeración como instancias de este. Los constructores y las conversiones pueden verificar si los valores son válidos. Este diseño es preferible a hacer que la enumeración sea un tipo abstracto, con los "valores" como subtipos.
 
-## Don't abuse de las macros
+## No abusar de las macros
 
 Tenga en cuenta cuando una macro realmente podría ser una función en su lugar.
 
 Llamar a [`eval()`](@ref) dentro de una macro es un signo de advertencia particularmente peligroso; significa que la macro solo funcionará cuando se llame al nivel superior. Si tal macro se escribe como una función en su lugar, naturalmente tendrá acceso a los valores en tiempo de ejecución que necesita.
 
-## Don't exponga operaciones inseguras al nivel de interfaz
+## No exponer operaciones inseguras al nivel de interfaz
 
 Si se tiene un tipo que use un puntero nativo:
 
@@ -230,7 +230,7 @@ El problema es que los usuarios de este tipo pueden escribir `x[i]` sin darse cu
 
 Dicha función debería verificar la operación para asegurarse de que sea segura, o incluir `unsafe` en alguna parte de su nombre para alertar a las personas que la invocan.
 
-## No sobrecargue métodos de tipos de contenedores base
+## No sobrecargar métodos de tipos de contenedores base
 
 Es posible escribir definiciones como la siguiente:
 
@@ -257,7 +257,7 @@ El problema es que ahora cualquier otro módulo que use `Base.*` También verá 
 
 Algunas veces, los paquetes acoplados pueden involucrarse en la piratería de tipos para separar las características de las definiciones, especialmente cuando los paquetes fueron diseñados por autores colaboradores, y cuando las definiciones son reutilizables. Por ejemplo, un paquete puede proporcionar algunos tipos útiles para trabajar con colores; otro paquete podría definir métodos para aquellos tipos que permiten conversiones entre espacios de color. Otro ejemplo podría ser un paquete que actúa como un envoltorio delgado para algún código C, que otro paquete podría piratear para implementar una API de nivel superior compatible con Julia.
 
-## Sea cuidadoso con la igualdad de tipos
+## Ser cuidadoso con la igualdad de tipos
 
 Por lo general, uno desea utilizar [`isa()`](@ref) y [`<:`](@ref) para los tipos de prueba, no `==`. La comprobación de los tipos para la igualdad exacta normalmente solo tiene sentido cuando se compara con un tipo concreto conocido (por ejemplo, `T == Float64`), o si *realmente* uno sabe lo que está haciendo.
 
@@ -269,7 +269,7 @@ Como las funciones de orden superior a menudo se llaman con funciones anónimas,
 
 Si escribe código genérico que maneja números, y que se puede esperar que se ejecute con muchos tipos de argumentos numéricos diferentes, intente utilizar literales de un tipo numérico que afectarán los argumentos lo menos posible mediante la promoción.
 
-For example,
+Por ejemplo,
 
 ```jldoctest
 julia> f(x) = 2.0 * x
