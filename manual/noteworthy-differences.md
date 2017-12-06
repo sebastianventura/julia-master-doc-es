@@ -89,16 +89,16 @@ Uno de los objetivos de Julia es proporcionar un lenguaje efectivo para el anál
 
 ## Diferencias notables con Python
 
-  * Julia requires `end` to end a block. Unlike Python, Julia has no `pass` keyword.
-  * In Julia, indexing of arrays, strings, etc. is 1-based not 0-based.
-  * Julia's slice indexing includes the last element, unlike in Python. `a[2:3]` in Julia is `a[1:3]` in Python.
-  * Julia does not support negative indexes. In particular, the last element of a list or array is indexed with `end` in Julia, not `-1` as in Python.
-  * Julia's `for`, `if`, `while`, etc. blocks are terminated by the `end` keyword. Indentation level is not significant as it is in Python.
-  * Julia has no line continuation syntax: if, at the end of a line, the input so far is a complete expression, it is considered done; otherwise the input continues. One way to force an expression to continue is to wrap it in parentheses.
-  * Julia arrays are column major (Fortran ordered) whereas NumPy arrays are row major (C-ordered) by default. To get optimal performance when looping over arrays, the order of the loops should be reversed in Julia relative to NumPy (see relevant section of [Performance Tips](@ref man-performance-tips)).
-  * Julia's updating operators (e.g. `+=`, `-=`, ...) are *not in-place* whereas NumPy's are. This means `A = ones(4); B = A; B += 3` doesn't change values in `A`, it rather rebinds the name `B` to the result of the right-hand side `B = B + 3`, which is a new array. For in-place operation, use `B .+= 3` (see also [dot operators](@ref man-dot-operators)), explicit loops, or `InplaceOps.jl`.
-  * Julia evaluates default values of function arguments every time the method is invoked, unlike in Python where the default values are evaluated only once when the function is defined. For example, the function `f(x=rand()) = x` returns a new random number every time it is invoked without argument. On the other hand, the function `g(x=[1,2]) = push!(x,3)` returns `[1,2,3]` every time it is called as `g()`.
-  * In Julia `%` is the remainder operator, whereas in Python it is the modulus.
+* Julia requiere `end` para finalizar un bloque. A diferencia de Python, Julia no tiene la palabra clave `pass`.
+* En Julia, la indexación de matrices, cadenas, etc. se basa en 1 y no en 0.
+* La indexación de segmentos de Julia incluye el último elemento, a diferencia de Python. `a[2:3]` en Julia es `a[1:3]` en Python.
+* Julia no admite índices negativos. En particular, el último elemento de una lista o matriz se indexa con `end` en Julia, no` -1` como en Python.
+* Los bloques `for`,` if`, `while`, etc. de Julia terminan con la palabra clave `end`. El nivel de sangría no es significativo ya que está en Python.
+* Julia no tiene sintaxis de continuación de línea: si, al final de una línea, la entrada hasta ahora es una expresión completa, se considera hecho; de lo contrario, la entrada continúa. Una forma de forzar que una expresión continúe es envolverla entre paréntesis.
+* Los arrays de Julia son *column major* (orden de Fortran) mientras que los arrays de NumPy son *row major* (orden de C) por defecto. Para obtener un rendimiento óptimo al alternar sobre matrices, el orden de los bucles debe invertirse en Julia en relación con NumPy (consulte la sección correspondiente de [Sugerencias de rendimiento](@ref man-performance-tips)).
+* Los operadores de actualización de Julia (por ejemplo, `+=`, `-=`, ...) *no están en el lugar* mientras que los de NumPy sí lo están. Esto significa `A = ones(4); B = A; B += 3` no cambia los valores en `A`, sino que vuelve a enlazar el nombre` B` con el resultado del lado derecho `B = B + 3`, que es una nueva matriz. Para la operación in-situ, use `B.+= 3` (vea también [operadores de punto](@ref man-dot-operators)), loops explícitos, o `InplaceOps.jl`.
+* Julia evalúa los valores predeterminados de los argumentos de la función cada vez que se invoca el método, a diferencia de Python, donde los valores predeterminados se evalúan solo una vez cuando se define la función. Por ejemplo, la función `f(x = rand()) = x` devuelve un nuevo número aleatorio cada vez que se invoca sin argumentos. Por otro lado, la función `g (x = [1,2]) = push!(X, 3)` devuelve `[1,2,3]` cada vez que se llama como `g()`.
+* En Julia `%` es el operador restante, mientras que en Python es el módulo.
 
 ## Noteworthy differences from C/C++
 
