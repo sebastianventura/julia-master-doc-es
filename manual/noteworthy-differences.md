@@ -4,9 +4,10 @@
 
 Aunque los usuarios de MATLAB pueden encontrar la sintaxis de Julia familiar, Julia no es un clon de MATLAB. Hay importantes diferencias sintácticas y funcionales. Las siguientes son algunas diferencias notables que pueden hacer tropezar a los usuarios de Julia acostumbrados a MATLAB:
 
-  * Los arrays de Julia están indexados con corchetes, `A[i, j]`.
-  * Los arrays de Julia se asignan por referencia. Después de `A = B`, el cambio de elementos de `B` también modificará `A`.
-  * Los valores de Julia se pasan y se asignan por referencia. Si una función modifica una matriz, los cambios serán visibles en el código que la invoca.
+* Los arrays de Julia están indexados con corchetes, `A[i, j]`.
+* Los arrays de Julia se asignan por referencia. Después de `A = B`, el cambio de elementos de `B` también modificará `A`.
+  
+  * Los valores de Julia se pasan y se asignan por referencia. Si una función modifica una matriz, los cambios serán visibles en el código que la invoca.
   * Julia no genera automáticamente matrices en una declaración de asignación. Mientras que en MATLAB `a(4) = 3.2` puede crear la matriz `a = [0 0 0 3.2]` y `a(5) = 7` puede crecer hasta `a = [0 0 0 3.2 7]`, la declaración correspondiente de Julia `a[5] = 7` arroja un error si la longitud de `a` es menor que 5 o si esta afirmación es el primer uso del identificador `a`. Julia tiene [`push!()`](@ref) y [`append!()`](@ref), que crecen `Vector`s mucho más eficientemente que `a(end + 1) = val` de MATLAB.
   * La unidad imaginaria `sqrt(-1)` se representa en Julia como [`im`](@ref), no como `i` o `j` como en MATLAB.
   * En Julia, los números literales sin un punto decimal (como `42`) crean números enteros en lugar de números de coma flotante. Se admiten literales enteros arbitrariamente grandes. Como resultado, algunas operaciones como `2^-1` arrojarán un error de dominio ya que el resultado no es un número entero (ver [la entrada de preguntas frecuentes sobre errores de dominio] (@ref faq-domain-errors) para más detalles).
