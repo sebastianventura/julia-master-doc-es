@@ -1,6 +1,6 @@
-# [Dates and Time](@id stdlib-dates)
+# [Fecha y Tiempo](@id stdlib-dates)
 
-## Dates and Time Types
+## Tipos para Fechas y Tiempo
 
 ```@docs
 Base.Dates.Period
@@ -13,13 +13,9 @@ Base.Dates.Date
 Base.Dates.Time
 ```
 
-## Dates Functions
+## Funciones para Fechas
 
-All Dates functions are defined in the `Dates` module; note that only the `Date`, `DateTime`,
-and `now` functions are exported; to use all other `Dates` functions, you'll need to prefix each
-function call with an explicit `Dates.`, e.g. `Dates.dayofweek(dt)`. Alternatively, you can write
-`using Base.Dates` to bring all exported functions into `Main` to be used without the `Dates.`
-prefix.
+Todas las funciones para fechas están definidas en el módulo `Dates`; nótese que sólo se han exportado las funciones `Date`, `DateTime` y `now`; para usar todas las dems funciones de `Dates`, es necesario prefijar cada llamada a funcion con `Dates.`, por ejemplo,`Dates.dayofweek(dt)`. Alternativamente, uno puede escribir `using Base.Dates` para llevar todas las funciones exportadas en `Main` para ser usadas sin el prefijo `Dates.`
 
 ```@docs
 Base.Dates.DateTime(::Int64, ::Int64, ::Int64, ::Int64, ::Int64, ::Int64, ::Int64)
@@ -46,7 +42,7 @@ Base.Dates.now(::Type{Base.Dates.UTC})
 Base.eps
 ```
 
-### Accessor Functions
+### Funciones Accesoras
 
 ```@docs
 Base.Dates.year
@@ -74,7 +70,7 @@ Base.Dates.monthday
 Base.Dates.yearmonthday
 ```
 
-### Query Functions
+### Funciones de Consulta
 
 ```@docs
 Base.Dates.dayname
@@ -93,7 +89,7 @@ Base.Dates.quarterofyear
 Base.Dates.dayofquarter
 ```
 
-### Adjuster Functions
+### Funciones de Ajuste
 
 ```@docs
 Base.trunc(::Base.Dates.TimeType, ::Type{Base.Dates.Period})
@@ -113,7 +109,7 @@ Base.Dates.tonext(::Function, ::Base.Dates.TimeType)
 Base.Dates.toprev(::Function, ::Base.Dates.TimeType)
 ```
 
-### Periods
+### Periodos
 
 ```@docs
 Base.Dates.Period(::Any)
@@ -121,7 +117,7 @@ Base.Dates.CompoundPeriod(::Vector{<:Base.Dates.Period})
 Base.Dates.default
 ```
 
-### Rounding Functions
+### Funciones de Redondeo
 
 `Date` and `DateTime` values can be rounded to a specified resolution (e.g., 1 month or 15 minutes)
 with `floor`, `ceil`, or `round`.
@@ -132,7 +128,7 @@ Base.ceil(::Base.Dates.TimeType, ::Base.Dates.Period)
 Base.round(::Base.Dates.TimeType, ::Base.Dates.Period, ::RoundingMode{:NearestTiesUp})
 ```
 
-The following functions are not exported:
+Las siguientes funciones no son exportadas:
 
 ```@docs
 Base.Dates.floorceil
@@ -142,7 +138,7 @@ Base.Dates.date2epochdays
 Base.Dates.datetime2epochms
 ```
 
-### Conversion Functions
+### Funciones de Conversión
 
 ```@docs
 Base.Dates.today
@@ -154,9 +150,9 @@ Base.Dates.rata2datetime
 Base.Dates.datetime2rata
 ```
 
-### Constants
+### Constantes
 
-Days of the Week:
+Días de la semana:
 
 | Variable    | Abbr. | Value (Int) |
 |:----------- |:----- |:----------- |
@@ -168,7 +164,7 @@ Days of the Week:
 | `Saturday`  | `Sat` | 6           |
 | `Sunday`    | `Sun` | 7           |
 
-Months of the Year:
+Meses del año:
 
 | Variable    | Abbr. | Value (Int) |
 |:----------- |:----- |:----------- |
