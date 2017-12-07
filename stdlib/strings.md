@@ -1,4 +1,4 @@
-# [Strings](@id lib-strings)
+# [Cadenas](@id lib-strings)
 
 ```@docs
 Base.length(::AbstractString)
