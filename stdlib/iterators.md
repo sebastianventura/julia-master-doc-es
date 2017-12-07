@@ -1,4 +1,4 @@
-# Iteration utilities
+# Utilidades para iteración
 
 ```@docs
 Base.Iterators.zip
