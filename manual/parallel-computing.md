@@ -269,19 +269,9 @@ julia> fetch(a)+fetch(b)
 100001564
 ```
 
-This example demonstrates a powerful and often-used parallel programming pattern. Many iterations
-run independently over several processes, and then their results are combined using some function.
-The combination process is called a *reduction*, since it is generally tensor-rank-reducing: a
-vector of numbers is reduced to a single number, or a matrix is reduced to a single row or column,
-etc. In code, this typically looks like the pattern `x = f(x,v[i])`, where `x` is the accumulator,
-`f` is the reduction function, and the `v[i]` are the elements being reduced. It is desirable
-for `f` to be associative, so that it does not matter what order the operations are performed
-in.
+Este ejemplo demouestra un patrn de programación paralela potente y frecuentemente usado. Muchas iteraciones se ejecutan independientemente sobre varios porocesos, y entonces sus resultados se combinan usando alguna función. El proceso de combinación se denomina *reducción* ya que suele ser la reduccin de rango de un tensor: un vector de números es reducido a un solo número o una matriz es reducida a una sola fila o columna, etc. En código esto suele tener el aspecto del patrón `x = f(x,v[i])`, donde `x` es el acumulador, `f` es la funcin de reducción, y los `v[i]` son los elementos que se reducirán. Es deseable que `f` sea asociativa, para que no importe el orden en el que se realizan las operaciones.
 
-Notice that our use of this pattern with `count_heads` can be generalized. We used two explicit
-[`@spawn`](@ref) statements, which limits the parallelism to two processes. To run on any number
-of processes, we can use a *parallel for loop*, which can be written in Julia using [`@parallel`](@ref)
-like this:
+Notese que nuestro uso de este patrón con `count_heads` puede ser generalizado. Se utilizaron dos instrucciones [`@spawn`](@ref) explícitas, que limitan el paralelismo a dos procesos. Para ejecutar sobre cualquier número de procesos, se puede usar el *bucle for paralelo* que puede escribirse en Julia usando la macro [`@parallel`](@ref) como en este ejemplo:
 
 ```julia
 nheads = @parallel (+) for i = 1:200000000
@@ -289,15 +279,11 @@ nheads = @parallel (+) for i = 1:200000000
 end
 ```
 
-This construct implements the pattern of assigning iterations to multiple processes, and combining
-them with a specified reduction (in this case `(+)`). The result of each iteration is taken as
-the value of the last expression inside the loop. The whole parallel loop expression itself evaluates
-to the final answer.
+Esta construccin implementa el patrón de asignar iteraciones a múltiples procesos, y combinarlos con una reducción especificada (en este caso `(+)`). El resultado de cada iteración es tomado como el valor de la última expresión dentro del bucle. La expresión total del bucle paralelo en sí misma se evalúa a la respuesta final.
 
-Note that although parallel for loops look like serial for loops, their behavior is dramatically
-different. In particular, the iterations do not happen in a specified order, and writes to variables
-or arrays will not be globally visible since iterations run on different processes. Any variables
-used inside the parallel loop will be copied and broadcast to each process.
+Debe notar que, aunque los bucles for paralelos tienen un aspecto muy parecido al de los bucles for seriales, su comportamiento es dramaticamente diferente. En particular, las iteraciones no tiene lugar en un orden especificado, y l escritura a variables o arrays no será globalmente visible ya que las iteraciones se ejecutan sobre procesos distintos. Cualquier variable usada dentro del bucle paralelo será copiada y retransmitida a cada proceso.
+
+
 
 For example, the following code will not work as intended:
 
