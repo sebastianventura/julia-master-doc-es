@@ -404,19 +404,13 @@ Un canal se puede visualizar como un conducto, es decir, tiene un extremo de esc
         @schedule foo()
     end
     ```
-  * Channels are created via the `Channel{T}(sz)` constructor. The channel will only hold objects
-    of type `T`. If the type is not specified, the channel can hold objects of any type. `sz` refers
-    to the maximum number of elements that can be held in the channel at any time. For example, `Channel(32)`
-    creates a channel that can hold a maximum of 32 objects of any type. A `Channel{MyType}(64)` can
-    hold up to 64 objects of `MyType` at any time.
-  * If a [`Channel`](@ref) is empty, readers (on a [`take!()`](@ref) call) will block until data is available.
-  * If a [`Channel`](@ref) is full, writers (on a [`put!()`](@ref) call) will block until space becomes available.
-  * [`isready()`](@ref) tests for the presence of any object in the channel, while [`wait()`](@ref)
-    waits for an object to become available.
-  * A [`Channel`](@ref) is in an open state initially. This means that it can be read from and written to
-    freely via [`take!()`](@ref) and [`put!()`](@ref) calls. [`close()`](@ref) closes a [`Channel`](@ref).
-    On a closed [`Channel`](@ref), [`put!()`](@ref) will fail. For example:
-
+ 
+   * Los canales se crean a través del constructor `Channel{T}(sz)`. El canal solo tendrá objetos de tipo `T`. Si no se especifica el tipo, el canal puede contener objetos de cualquier tipo. `sz` se refiere a la cantidad máxima de elementos que pueden mantenerse en el canal en cualquier momento. Por ejemplo, `Channel(32)` crea un canal que puede contener un máximo de 32 objetos de cualquier tipo. Un `Channel{MyType}(64)` puede contener hasta 64 objetos de `MyType` en cualquier momento.
+   * Si un [`Channel`](@ref) está vacío, los lectores (en una llamada [`take!()`](@ref)) se bloquearán hasta que los datos estén disponibles.
+   * Si un [`Channel`](@ref) está lleno, los escritores (en una llamada [`put!()`](@ref)) se bloquearán hasta que haya espacio disponible.
+   * [`isready()`](@ref) comprueba la presencia de cualquier objeto en el canal, mientras que [`wait()`](@ref) espera a que un objeto esté disponible.
+   * Un [`Channel`](@ref) está inicialmente en un estado abierto. Esto significa que puede leerse y escribirse libremente a través de llamadas [`take!()`](@ref) y [`put!()`](@ref). [`close()`](@ref) cierra un [`Channel`](@ref). En un [`Channel`](@ref) cerrado, la función [`put!()`](@ref) fallará. Por ejemplo:
+  
 ```julia-repl
 julia> c = Channel(2);
 
@@ -430,8 +424,7 @@ ERROR: InvalidStateException("Channel is closed.",:closed)
 [...]
 ```
 
-  * [`take!()`](@ref) and [`fetch()`](@ref) (which retrieves but does not remove the value) on a closed
-    channel successfully return any existing values until it is emptied. Continuing the above example:
+* [`take!()`](@ref) y [`fetch()`](@ref) (que recupera pero no elimina el valor) en un canal cerrado devuelve con éxito cualquier valor existente hasta que se vacíe. Continuando con el ejemplo anterior:
 
 ```julia-repl
 julia> fetch(c) # Any number of `fetch` calls succeed.
@@ -448,11 +441,9 @@ ERROR: InvalidStateException("Channel is closed.",:closed)
 [...]
 ```
 
-A `Channel` can be used as an iterable object in a `for` loop, in which case the loop runs as
-long as the `Channel` has data or is open. The loop variable takes on all values added to the
-`Channel`. The `for` loop is terminated once the `Channel` is closed and emptied.
+Un canal se puede usar como un objeto iterable en un bucle `for`, en cuyo caso el bucle se ejecuta mientras el canal tenga datos o esté abierto. La variable del bucle toma todos los valores agregados al canal. El bucle `for` finaliza una vez que el canal se cierra y se vacía.
 
-For example, the following would cause the `for` loop to wait for more data:
+Por ejemplo, lo siguiente haría que el bucle `for` esperara más datos:
 
 ```julia-repl
 julia> c = Channel{Int}(10);
@@ -462,7 +453,7 @@ julia> foreach(i->put!(c, i), 1:3) # add a few entries
 julia> data = [i for i in c]
 ```
 
-while this will return after reading all data:
+mientras que esto retornará después de leer todos los datos:
 
 ```julia-repl
 julia> c = Channel{Int}(10);
@@ -478,11 +469,8 @@ julia> data = [i for i in c]
  3
 ```
 
-Consider a simple example using channels for inter-task communication. We start 4 tasks to process
-data from a single `jobs` channel. Jobs, identified by an id (`job_id`), are written to the channel.
-Each task in this simulation reads a `job_id`, waits for a random amout of time and writes back
-a tuple of `job_id` and the simulated time to the results channel. Finally all the `results` are
-printed out.
+Consideremos un ejemplo simple utilizando canales para la comunicación entre tareas. Comenzamos 4 tareas para procesar los datos de un solo canal `jobs`. Los trabajos, identificados por un identificador (`job_id`), se escriben en el canal. Cada tarea en esta simulación lee un `job_id`, espera una cantidad aleatoria de tiempo y escribe una tupla de `job_id` y el tiempo simulado en el canal de resultados. Finalmente todos los `resultados` se imprimen.
+
 
 ```julia-repl
 julia> const jobs = Channel{Int}(32);
@@ -532,37 +520,23 @@ julia> @elapsed while n > 0 # print out results
 0.029772311
 ```
 
-The current version of Julia multiplexes all tasks onto a single OS thread. Thus, while tasks
-involving I/O operations benefit from parallel execution, compute bound tasks are effectively
-executed sequentially on a single OS thread. Future versions of Julia may support scheduling of
-tasks on multiple threads, in which case compute bound tasks will see benefits of parallel execution
-too.
+La versión actual de Julia multiplexa todas las tareas en un solo hilo del sistema operativo. Por lo tanto, aunque las tareas que implican operaciones de E/S se benefician de la ejecución en paralelo, las tareas vinculadas a la computación se ejecutan efectivamente de forma secuencial en un solo hilo del sistema operativo. Las versiones futuras de Julia pueden soportar la planificación de tareas en múltiples subprocesos, en cuyo caso las tareas vínculadas al cálculo  también verán los beneficios de la ejecución en paralelo.
 
-## Remote References and AbstractChannels
+## Referencias remotas y AbstractChannels
 
-Remote references always refer to an implementation of an `AbstractChannel`.
+Las referencias remotas siempre se refieren a una implementación de un `AbstractChannel`.
 
-A concrete implementation of an `AbstractChannel` (like `Channel`), is required to implement
-[`put!()`](@ref), [`take!()`](@ref), [`fetch()`](@ref), [`isready()`](@ref) and [`wait()`](@ref).
-The remote object referred to by a [`Future`](@ref) is stored in a `Channel{Any}(1)`, i.e., a
-`Channel` of size 1 capable of holding objects of `Any` type.
+Se requiere una implementación concreta de un `AbstractChannel` (como `Channel`) para implementar [`put!()`](@ref), [`take!()`](@ref), [`fetch()`](@ref), [`isready()`](@ref) y [`wait()`](@ref). El objeto remoto al que se hace referencia con un [`Future`](@ref) se almacena en `Channel{Any}(1) `, es decir, un` Channel` de tamaño 1 capaz de contener objetos del tipo `Any`.
 
-[`RemoteChannel`](@ref), which is rewritable, can point to any type and size of channels, or any
-other implementation of an `AbstractChannel`.
+[`RemoteChannel`](@ref), que es reescribible, puede señalar cualquier tipo y tamaño de canales, o cualquier otra implementación de `AbstractChannel`.
 
-The constructor `RemoteChannel(f::Function, pid)()` allows us to construct references to channels
-holding more than one value of a specific type. `f()` is a function executed on `pid` and it must
-return an `AbstractChannel`.
+El constructor `RemoteChannel(f::Function, pid)()` permite construir referencias a canales que contienen más de un valor de un tipo específico. `f()` es una función ejecutada en un `pid` y debe devolver un `AbstractChannel`.
 
-For example, `RemoteChannel(()->Channel{Int}(10), pid)`, will return a reference to a channel
-of type `Int` and size 10. The channel exists on worker `pid`.
+Por ejemplo, `RemoteChannel(()->Channel{Int}(10), pid)`, devolverá una referencia a un canal de tipo `Int` y tamaño 10. El canal existe sobre el *worker* `pid`.
 
-Methods [`put!()`](@ref), [`take!()`](@ref), [`fetch()`](@ref), [`isready()`](@ref) and [`wait()`](@ref)
-on a [`RemoteChannel`](@ref) are proxied onto the backing store on the remote process.
+Los métodos [`put!()`](@ref), [`take!()`](@ref), [`fetch()`](@ref), [`isready()`](@ref) y [`wait()`](@ref) de un [`RemoteChannel`](@ref) son proxys en el backing store en el proceso remoto.
 
-[`RemoteChannel`](@ref) can thus be used to refer to user implemented `AbstractChannel` objects.
-A simple example of this is provided in `examples/dictchannel.jl` which uses a dictionary as its
-remote store.
+[`RemoteChannel`](@ref) se puede usar para referirse a los objetos `AbstractChannel` implementados por el usuario. Un ejemplo simple de esto se proporciona en `examples/dictchannel.jl que usa un diccionario como su almacén remoto.
 
 ## Channels and RemoteChannels
 
@@ -1264,28 +1238,14 @@ Note that [`Threads.@threads`](@ref) does not have an optional reduction paramet
 
 ## @threadcall (Experimental)
 
-All I/O tasks, timers, REPL commands, etc are multiplexed onto a single OS thread via an event
-loop. A patched version of libuv ([http://docs.libuv.org/en/v1.x/](http://docs.libuv.org/en/v1.x/))
-provides this functionality. Yield points provide for co-operatively scheduling multiple tasks
-onto the same OS thread. I/O tasks and timers yield implicitly while waiting for the event to
-occur. Calling [`yield()`](@ref) explicitly allows for other tasks to be scheduled.
+All I/O tasks, timers, REPL commands, etc are multiplexed onto a single OS thread via an event loop. A patched version of libuv ([http://docs.libuv.org/en/v1.x/](http://docs.libuv.org/en/v1.x/)) provides this functionality. Yield points provide for co-operatively scheduling multiple tasks onto the same OS thread. I/O tasks and timers yield implicitly while waiting for the event to occur. Calling [`yield()`](@ref) explicitly allows for other tasks to be scheduled.
 
-Thus, a task executing a [`ccall`](@ref) effectively prevents the Julia scheduler from executing any other
-tasks till the call returns. This is true for all calls into external libraries. Exceptions are
-calls into custom C code that call back into Julia (which may then yield) or C code that calls
-`jl_yield()` (C equivalent of [`yield()`](@ref)).
+Thus, a task executing a [`ccall`](@ref) effectively prevents the Julia scheduler from executing any other tasks till the call returns. This is true for all calls into external libraries. Exceptions are calls into custom C code that call back into Julia (which may then yield) or C code that calls `jl_yield()` (C equivalent of [`yield()`](@ref)).
 
-Note that while Julia code runs on a single thread (by default), libraries used by Julia may launch
-their own internal threads. For example, the BLAS library may start as many threads as there are
-cores on a machine.
+Note that while Julia code runs on a single thread (by default), libraries used by Julia may launch their own internal threads. For example, the BLAS library may start as many threads as there are cores on a machine.
 
-The `@threadcall` macro addresses scenarios where we do not want a `ccall` to block the main Julia
-event loop. It schedules a C function for execution in a separate thread. A threadpool with a
-default size of 4 is used for this. The size of the threadpool is controlled via environment variable
-`UV_THREADPOOL_SIZE`. While waiting for a free thread, and during function execution once a thread
-is available, the requesting task (on the main Julia event loop) yields to other tasks. Note that
-`@threadcall` does not return till the execution is complete. From a user point of view, it is
-therefore a blocking call like other Julia APIs.
+The `@threadcall` macro addresses scenarios where we do not want a `ccall` to block the main Julia event loop. It schedules a C function for execution in a separate thread. A threadpool with a default size of 4 is used for this. The size of the threadpool is controlled via environment variable `UV_THREADPOOL_SIZE`. While waiting for a free thread, and during function execution once a thread is available, the requesting task (on the main Julia event loop) yields to other tasks. Note that
+`@threadcall` does not return till the execution is complete. From a user point of view, it is therefore a blocking call like other Julia APIs.
 
 It is very important that the called function does not call back into Julia.
 
