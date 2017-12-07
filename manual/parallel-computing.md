@@ -536,32 +536,20 @@ Por ejemplo, `RemoteChannel(()->Channel{Int}(10), pid)`, devolverá una referenc
 
 Los métodos [`put!()`](@ref), [`take!()`](@ref), [`fetch()`](@ref), [`isready()`](@ref) y [`wait()`](@ref) de un [`RemoteChannel`](@ref) son proxys en el backing store en el proceso remoto.
 
-[`RemoteChannel`](@ref) se puede usar para referirse a los objetos `AbstractChannel` implementados por el usuario. Un ejemplo simple de esto se proporciona en `examples/dictchannel.jl que usa un diccionario como su almacén remoto.
+[`RemoteChannel`](@ref) se puede usar para referirse a los objetos `AbstractChannel` implementados por el usuario. Un ejemplo simple de esto se proporciona en `examples/dictchannel.jl` que usa un diccionario como su almacén remoto.
 
-## Channels and RemoteChannels
+## `Channel`s y `RemoteChannel`s
 
-  * A [`Channel`](@ref) is local to a process. Worker 2 cannot directly refer to a `Channel` on worker 3 and
-    vice-versa. A [`RemoteChannel`](@ref), however, can put and take values across workers.
-  * A [`RemoteChannel`](@ref) can be thought of as a *handle* to a `Channel`.
-  * The process id, `pid`, associated with a [`RemoteChannel`](@ref) identifies the process where
-    the backing store, i.e., the backing `Channel` exists.
-  * Any process with a reference to a [`RemoteChannel`](@ref) can put and take items from the channel.
-    Data is automatically sent to (or retrieved from) the process a [`RemoteChannel`](@ref) is associated
-    with.
-  * Serializing  a `Channel` also serializes any data present in the channel. Deserializing it therefore
-    effectively makes a copy of the original object.
-  * On the other hand, serializing a [`RemoteChannel`](@ref) only involves the serialization of an
-    identifier that identifies the location and instance of `Channel` referred to by the handle. A
-    deserialized [`RemoteChannel`](@ref) object (on any worker), therefore also points to the same
-    backing store as the original.
+* Un objeto [`Channel`](@ref) es local a un proceso. El *worker* 2 no puede referirse directamente a un `Channel` sobre el *worker* 3 y viceversa. Un [`RemoteChannel`](@ref), sin embargo, puedo poner y tomar valores entre *worker*s.
+* Un [`RemoteChannel`](@ref) se puede considerar como un *manejador* para un `Channel`.
+* La identificación del proceso, `pid`, asociada con un [`RemoteChannel`](@ref) identifica el proceso donde el almacén de respaldo, es decir, el `Channel`  de respaldo existe.
+* Cualquier proceso con una referencia a [`RemoteChannel`](@ref) puede poner y tomar elementos del canal. Los datos se envían automáticamente a (o se recuperan de) el proceso al que está asociado [`RemoteChannel`](@ref).
+* Serializar un `Channel` también serializa cualquier dato presente en el canal. Deserializarlo, por lo tanto, efectivamente hace una copia del objeto original.
+* Por otro lado, serializar un [`RemoteChannel`](@ref) solo implica la serialización de un identificador que identifica la ubicación y la instancia del `Channel` al que hace referencia el manejador. Un objeto [`RemoteChannel`](@ref) deserializado  (en cualquier *worker*), por lo tanto, también apunta al mismo almacén de respaldo que el original.
 
-The channels example from above can be modified for interprocess communication,
-as shown below.
+El ejemplo de canales anterior puede modificarse para la comunicación entre procesos, como se muestra a continuación.
 
-We start 4 workers to process a single `jobs` remote channel. Jobs, identified by an id (`job_id`),
-are written to the channel. Each remotely executing task in this simulation reads a `job_id`,
-waits for a random amount of time and writes back a tuple of `job_id`, time taken and its own
-`pid` to the results channel. Finally all the `results` are printed out on the master process.
+Comenzamos 4 trabajadores para procesar un solo canal remoto `jobs`. Los trabajos, identificados por una identificación (`job_id`), se escriben en el canal. Cada tarea de ejecución remota en esta simulación lee un `job_id`, espera una cantidad aleatoria de tiempo y escribe una tupla de` job_id`, tiempo tomado y su propio `pid` en el canal de resultados. Finalmente todos los `resultados` se imprimen en el proceso maestro.
 
 ```julia-repl
 julia> addprocs(4); # add worker processes
@@ -613,59 +601,32 @@ julia> @elapsed while n > 0 # print out results
 0.055971741
 ```
 
-## Remote References and Distributed Garbage Collection
+## Referencias Remotas y Recolección de Basura Distribuida
 
-Objects referred to by remote references can be freed only when *all* held references
-in the cluster are deleted.
+Los objetos a los que se refieren las referencias remotas se pueden liberar solo cuando se eliminan *todas* las referencias retenidas en el clúster.
 
-The node where the value is stored keeps track of which of the workers have a reference to it.
-Every time a [`RemoteChannel`](@ref) or a (unfetched) [`Future`](@ref) is serialized to a worker,
-the node pointed to by the reference is notified. And every time a [`RemoteChannel`](@ref) or
-a (unfetched) [`Future`](@ref) is garbage collected locally, the node owning the value is again
-notified. This is implemented in an internal cluster aware serializer. Remote references are only
-valid in the context of a running cluster. Serializing and deserializing references to and from
-regular `IO` objects is not supported.
+El nodo donde se almacena el valor realiza un seguimiento de cuáles de los trabajadores tienen una referencia. Cada vez que un [`RemoteChannel`](@ref) o un (unfetched) [`Future`](@ref) se serializa a un *worker*, se notifica el nodo al que apunta la referencia. Y cada vez que un [`RemoteChannel`](@ref) o un (unfetched) [`Future`](@ref) es sometido a recolección de basura localmente, el nodo que posee el valor es nuevamente notificado. Esto se implementa en un serializador interno de cluster. Las referencias remotas solo son válidas en el contexto de un clúster en ejecución. La serialización y deserialización de referencias hacia y desde objetos `IO` regulares no están soportadas.
 
-The notifications are done via sending of "tracking" messages--an "add reference" message when
-a reference is serialized to a different process and a "delete reference" message when a reference
-is locally garbage collected.
+Las notificaciones se realizan a través del envío de mensajes de "seguimiento": un mensaje de "agregar referencia" cuando una referencia se serializa a un proceso diferente y un mensaje de "eliminación de referencia" cuando una referencia se recolecta localmente.
 
-Since [`Future`](@ref)s are write-once and cached locally, the act of [`fetch()`](@ref)ing a
-[`Future`](@ref) also updates reference tracking information on the node owning the value.
+Como los [`Future`](@ref)s son de escritura única y se almacenan en caché localmete, el acto de [`fetch()`](@ref)ing un [`Future`](@ref) también actualiza la información de seguimiento de referencia en el nodo que posee el valor.
 
-The node which owns the value frees it once all references to it are cleared.
+El nodo que posee el valor lo libera una vez que se borran todas las referencias a él.
 
-With [`Future`](@ref)s, serializing an already fetched [`Future`](@ref) to a different node also
-sends the value since the original remote store may have collected the value by this time.
+Con [`Future`](@ref)s, la serialización de un [`Future`](@ref) ya obtenido  a un nodo diferente también envía el valor ya que el almacén remoto original puede haber recolectado el valor en ese momento.
 
-It is important to note that *when* an object is locally garbage collected depends on the size
-of the object and the current memory pressure in the system.
+Es importante tener en cuenta que *cuando* un objeto se recolecta basura localmente depende del tamaño del objeto y la presión de la memoria actual en el sistema.
 
-In case of remote references, the size of the local reference object is quite small, while the
-value stored on the remote node may be quite large. Since the local object may not be collected
-immediately, it is a good practice to explicitly call [`finalize()`](@ref) on local instances
-of a [`RemoteChannel`](@ref), or on unfetched [`Future`](@ref)s. Since calling [`fetch()`](@ref)
-on a [`Future`](@ref) also removes its reference from the remote store, this is not required on
-fetched [`Future`](@ref)s. Explicitly calling [`finalize()`](@ref) results in an immediate message
-sent to the remote node to go ahead and remove its reference to the value.
+En el caso de referencias remotas, el tamaño del objeto de referencia local es bastante pequeño, mientras que el valor almacenado en el nodo remoto puede ser bastante grande. Dado que el objeto local puede no receolectarse inmediatamente, es una buena práctica llamar explícitamente a [`finalize()`](@ref) en instancias locales de un [`RemoteChannel`](@ref), o en unfetched [`Future`](@ref)s. Como llamar a [`fetch()`](@ref) sobre un [`Future`](@ref) también elimina su referencia del almacén remoto, esto no es necesario en fetched [`Future`](@ref)s. Llamar explícitamente a [`finalize()`](@ref) da como resultado un mensaje inmediato enviado al nodo remoto para continuar y eliminar su referencia al valor.
 
-Once finalized, a reference becomes invalid and cannot be used in any further calls.
+Una vez finalizado, una referencia deja de ser válida y no se puede usar en ninguna otra llamada.
 
-## [Shared Arrays](@id man-shared-arrays)
+## [Arrays Compartidos](@id man-shared-arrays)
 
-Shared Arrays use system shared memory to map the same array across many processes. While there
-are some similarities to a [`DArray`](https://github.com/JuliaParallel/DistributedArrays.jl), the
-behavior of a [`SharedArray`](@ref) is quite different. In a [`DArray`](https://github.com/JuliaParallel/DistributedArrays.jl),
-each process has local access to just a chunk of the data, and no two processes share the same
-chunk; in contrast, in a [`SharedArray`](@ref) each "participating" process has access to the
-entire array.  A [`SharedArray`](@ref) is a good choice when you want to have a large amount of
+Shared Arrays use system shared memory to map the same array across many processes. While there are some similarities to a [`DArray`](https://github.com/JuliaParallel/DistributedArrays.jl), the behavior of a [`SharedArray`](@ref) is quite different. In a [`DArray`](https://github.com/JuliaParallel/DistributedArrays.jl), each process has local access to just a chunk of the data, and no two processes share the same chunk; in contrast, in a [`SharedArray`](@ref) each "participating" process has access to the entire array.  A [`SharedArray`](@ref) is a good choice when you want to have a large amount of
 data jointly accessible to two or more processes on the same machine.
 
-[`SharedArray`](@ref) indexing (assignment and accessing values) works just as with regular arrays,
-and is efficient because the underlying memory is available to the local process. Therefore,
-most algorithms work naturally on [`SharedArray`](@ref)s, albeit in single-process mode. In cases
-where an algorithm insists on an [`Array`](@ref) input, the underlying array can be retrieved
-from a [`SharedArray`](@ref) by calling [`sdata()`](@ref). For other `AbstractArray` types, [`sdata()`](@ref)
+[`SharedArray`](@ref) indexing (assignment and accessing values) works just as with regular arrays, and is efficient because the underlying memory is available to the local process. Therefore, most algorithms work naturally on [`SharedArray`](@ref)s, albeit in single-process mode. In cases where an algorithm insists on an [`Array`](@ref) input, the underlying array can be retrieved from a [`SharedArray`](@ref) by calling [`sdata()`](@ref). For other `AbstractArray` types, [`sdata()`](@ref)
 just returns the object itself, so it's safe to use [`sdata()`](@ref) on any `Array`-type object.
 
 The constructor for a shared array is of the form:
@@ -674,14 +635,9 @@ The constructor for a shared array is of the form:
 SharedArray{T,N}(dims::NTuple; init=false, pids=Int[])
 ```
 
-which creates an `N`-dimensional shared array of a bits type `T` and size `dims` across the processes specified
-by `pids`. Unlike distributed arrays, a shared array is accessible only from those participating
-workers specified by the `pids` named argument (and the creating process too, if it is on the
-same host).
+which creates an `N`-dimensional shared array of a bits type `T` and size `dims` across the processes specified by `pids`. Unlike distributed arrays, a shared array is accessible only from those participating workers specified by the `pids` named argument (and the creating process too, if it is on the same host).
 
-If an `init` function, of signature `initfn(S::SharedArray)`, is specified, it is called on all
-the participating workers. You can specify that each worker runs the `init` function on a distinct
-portion of the array, thereby parallelizing initialization.
+If an `init` function, of signature `initfn(S::SharedArray)`, is specified, it is called on all the participating workers. You can specify that each worker runs the `init` function on a distinct  portion of the array, thereby parallelizing initialization.
 
 Here's a brief example:
 
@@ -708,9 +664,7 @@ julia> S
  2  7  4  4
 ```
 
-[`Base.localindexes()`](@ref) provides disjoint one-dimensional ranges of indexes, and is sometimes
-convenient for splitting up tasks among processes. You can, of course, divide the work any way
-you wish:
+[`Base.localindexes()`](@ref) provides disjoint one-dimensional ranges of indexes, and is sometimes convenient for splitting up tasks among processes. You can, of course, divide the work any way you wish:
 
 ```julia-repl
 julia> S = SharedArray{Int,2}((3,4), init = S -> S[indexpids(S):length(procs(S)):length(S)] = myid())
@@ -720,8 +674,7 @@ julia> S = SharedArray{Int,2}((3,4), init = S -> S[indexpids(S):length(procs(S))
  4  4  4  4
 ```
 
-Since all processes have access to the underlying data, you do have to be careful not to set up
-conflicts. For example:
+Since all processes have access to the underlying data, you do have to be careful not to set up conflicts. For example:
 
 ```julia
 @sync begin
@@ -733,9 +686,7 @@ conflicts. For example:
 end
 ```
 
-would result in undefined behavior. Because each process fills the *entire* array with its own
-`pid`, whichever process is the last to execute (for any particular element of `S`) will have
-its `pid` retained.
+would result in undefined behavior. Because each process fills the *entire* array with its own `pid`, whichever process is the last to execute (for any particular element of `S`) will have its `pid` retained.
 
 As a more extended and complex example, consider running the following "kernel" in parallel:
 
@@ -743,12 +694,7 @@ As a more extended and complex example, consider running the following "kernel" 
 q[i,j,t+1] = q[i,j,t] + u[i,j,t]
 ```
 
-In this case, if we try to split up the work using a one-dimensional index, we are likely to run
-into trouble: if `q[i,j,t]` is near the end of the block assigned to one worker and `q[i,j,t+1]`
-is near the beginning of the block assigned to another, it's very likely that `q[i,j,t]` will
-not be ready at the time it's needed for computing `q[i,j,t+1]`. In such cases, one is better
-off chunking the array manually. Let's split along the second dimension.
-Define a function that returns the `(irange, jrange)` indexes assigned to this worker:
+In this case, if we try to split up the work using a one-dimensional index, we are likely to run into trouble: if `q[i,j,t]` is near the end of the block assigned to one worker and `q[i,j,t+1]` is near the beginning of the block assigned to another, it's very likely that `q[i,j,t]` will not be ready at the time it's needed for computing `q[i,j,t+1]`. In such cases, one is better off chunking the array manually. Let's split along the second dimension. Define a function that returns the `(irange, jrange)` indexes assigned to this worker:
 
 ```julia-repl
 julia> @everywhere function myrange(q::SharedArray)
@@ -846,15 +792,11 @@ each to compute for an extended time on the assigned piece.
 
 ## Shared Arrays and Distributed Garbage Collection
 
-Like remote references, shared arrays are also dependent on garbage collection on the creating
-node to release references from all participating workers. Code which creates many short lived
-shared array objects would benefit from explicitly finalizing these objects as soon as possible.
-This results in both memory and file handles mapping the shared segment being released sooner.
+Like remote references, shared arrays are also dependent on garbage collection on the creating node to release references from all participating workers. Code which creates many short lived shared array objects would benefit from explicitly finalizing these objects as soon as possible. This results in both memory and file handles mapping the shared segment being released sooner.
 
 ## ClusterManagers
 
-The launching, management and networking of Julia processes into a logical cluster is done via
-cluster managers. A `ClusterManager` is responsible for
+The launching, management and networking of Julia processes into a logical cluster is done via cluster managers. A `ClusterManager` is responsible for
 
   * launching worker processes in a cluster environment
   * managing events during the lifetime of each worker
@@ -866,23 +808,19 @@ A Julia cluster has the following characteristics:
   * Only the `master` process can add or remove worker processes.
   * All processes can directly communicate with each other.
 
-Connections between workers (using the in-built TCP/IP transport) is established in the following
-manner:
+Connections between workers (using the in-built TCP/IP transport) is established in the following manner:
 
   * [`addprocs()`](@ref) is called on the master process with a `ClusterManager` object.
-  * [`addprocs()`](@ref) calls the appropriate [`launch()`](@ref) method which spawns required number
-    of worker processes on appropriate machines.
+  * [`addprocs()`](@ref) calls the appropriate [`launch()`](@ref) method which spawns required number of worker processes on appropriate machines.
   * Each worker starts listening on a free port and writes out its host and port information to [`STDOUT`](@ref).
-  * The cluster manager captures the [`STDOUT`](@ref) of each worker and makes it available to the
-    master process.
+  * The cluster manager captures the [`STDOUT`](@ref) of each worker and makes it available to the master process.
   * The master process parses this information and sets up TCP/IP connections to each worker.
   * Every worker is also notified of other workers in the cluster.
   * Each worker connects to all workers whose `id` is less than the worker's own `id`.
   * In this way a mesh network is established, wherein every worker is directly connected with every
     other worker.
 
-While the default transport layer uses plain `TCPSocket`, it is possible for a Julia cluster to
-provide its own transport.
+While the default transport layer uses plain `TCPSocket`, it is possible for a Julia cluster to provide its own transport.
 
 Julia provides two in-built cluster managers:
 
@@ -896,8 +834,7 @@ Thus, a minimal cluster manager would need to:
 
   * be a subtype of the abstract `ClusterManager`
   * implement [`launch()`](@ref), a method responsible for launching new workers
-  * implement [`manage()`](@ref), which is called at various events during a worker's lifetime (for
-    example, sending an interrupt signal)
+  * implement [`manage()`](@ref), which is called at various events during a worker's lifetime (for example, sending an interrupt signal)
 
 [`addprocs(manager::FooManager)`](@ref addprocs) requires `FooManager` to implement:
 
@@ -911,8 +848,7 @@ function manage(manager::FooManager, id::Integer, config::WorkerConfig, op::Symb
 end
 ```
 
-As an example let us see how the `LocalManager`, the manager responsible for starting workers
-on the same host, is implemented:
+As an example let us see how the `LocalManager`, the manager responsible for starting workers on the same host, is implemented:
 
 ```julia
 struct LocalManager <: ClusterManager
@@ -935,29 +871,17 @@ The [`launch()`](@ref) method takes the following arguments:
   * `launched::Array`: the array to append one or more `WorkerConfig` objects to
   * `c::Condition`: the condition variable to be notified as and when workers are launched
 
-The [`launch()`](@ref) method is called asynchronously in a separate task. The termination of
-this task signals that all requested workers have been launched. Hence the [`launch()`](@ref)
-function MUST exit as soon as all the requested workers have been launched.
+The [`launch()`](@ref) method is called asynchronously in a separate task. The termination of this task signals that all requested workers have been launched. Hence the [`launch()`](@ref) function MUST exit as soon as all the requested workers have been launched.
 
-Newly launched workers are connected to each other and the master process in an all-to-all manner.
-Specifying the command line argument `--worker[=<cookie>]` results in the launched processes
-initializing themselves as workers and connections being set up via TCP/IP sockets.
+Newly launched workers are connected to each other and the master process in an all-to-all manner. Specifying the command line argument `--worker[=<cookie>]` results in the launched processes initializing themselves as workers and connections being set up via TCP/IP sockets.
 
-All workers in a cluster share the same [cookie](#cluster-cookie) as the master. When the cookie is
-unspecified, i.e, with the `--worker` option, the worker tries to read it from its standard input.
- `LocalManager` and `SSHManager` both pass the cookie to newly launched workers via their
- standard inputs.
+All workers in a cluster share the same [cookie](#cluster-cookie) as the master. When the cookie is unspecified, i.e, with the `--worker` option, the worker tries to read it from its standard input. `LocalManager` and `SSHManager` both pass the cookie to newly launched workers via their standard inputs.
 
-By default a worker will listen on a free port at the address returned by a call to `getipaddr()`.
-A specific address to listen on may be specified by optional argument `--bind-to bind_addr[:port]`.
-This is useful for multi-homed hosts.
+By default a worker will listen on a free port at the address returned by a call to `getipaddr()`. A specific address to listen on may be specified by optional argument `--bind-to bind_addr[:port]`. This is useful for multi-homed hosts.
 
-As an example of a non-TCP/IP transport, an implementation may choose to use MPI, in which case
-`--worker` must NOT be specified. Instead, newly launched workers should call `init_worker(cookie)`
-before using any of the parallel constructs.
+As an example of a non-TCP/IP transport, an implementation may choose to use MPI, in which case `--worker` must NOT be specified. Instead, newly launched workers should call `init_worker(cookie)` before using any of the parallel constructs.
 
-For every worker launched, the [`launch()`](@ref) method must add a `WorkerConfig` object (with
-appropriate fields initialized) to `launched`
+For every worker launched, the [`launch()`](@ref) method must add a `WorkerConfig` object (with appropriate fields initialized) to `launched`
 
 ```julia
 mutable struct WorkerConfig
