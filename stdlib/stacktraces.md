@@ -1,4 +1,4 @@
-# StackTraces
+# *StackTraces*
 
 ```@docs
 Base.StackTraces.StackFrame
@@ -7,8 +7,7 @@ Base.StackTraces.stacktrace
 Base.StackTraces.catch_stacktrace
 ```
 
-The following methods and types in `Base.StackTraces` are not exported and need to be called e.g.
-as `StackTraces.lookup(ptr)`.
+Los siguientes métodos y tipos de `Base.StackTraces` no son exportados y, por tanto, deben ser prefijados en sus invocaciones. Por ejemplo, `StackTraces.lookup(ptr)`.
 
 ```@docs
 Base.StackTraces.lookup
