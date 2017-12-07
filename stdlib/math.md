@@ -1,6 +1,6 @@
 # Mathematics
 
-## [Mathematical Operators](@id math-ops)
+## [Operadores Matemáticos](@id math-ops)
 
 ```@docs
 Base.:-(::Any)
@@ -53,7 +53,7 @@ Base.:(!)
 ||
 ```
 
-## Mathematical Functions
+## Funciones Matemáticas
 
 ```@docs
 Base.isapprox
@@ -185,7 +185,7 @@ Base.Math.@evalpoly
 Base.FastMath.@fastmath
 ```
 
-## Statistics
+## Estadísticos
 
 ```@docs
 Base.mean
