@@ -324,22 +324,15 @@ julia> pmap(svd, M);
 
 La función [`pmap()`](@ref) de Julia está diseñada para el caso de que cada llamada a función realice una gran cantidad de trabajo. En contraste `@parallel for` puede manejar situaciones donde cada iteración es pequeña, quizás incluso sumar dos números. Tanto las funciones [`pmap()`](@ref) como `@parallel for` usan exclusivamente procesos *worker* para la computación paralela. En el caso de `@parallel for`, la reducción final se realiza sobre el proceso principal.
 
-## Synchronization With Remote References
+## Sincronización con Referencias Remotas
 
-## Scheduling
+## Planificación
 
-Julia's parallel programming platform uses [Tasks (aka Coroutines)](@ref man-tasks) to switch among multiple
-computations. Whenever code performs a communication operation like [`fetch()`](@ref) or [`wait()`](@ref),
-the current task is suspended and a scheduler picks another task to run. A task is restarted when
-the event it is waiting for completes.
+La plataforma de programación paralela de Julia usa [Tareas (también conocidas como Coroutinas)](@ref man-tasks) para alternar entre múltiples cálculos. Cada vez que el código realiza una operación de comunicación como [`fetch()`](@ref) o [`wait()`](@ref), la tarea actual se suspende y un planificador elige otra tarea para ejecutar. Una tarea se reinicia cuando finaliza el evento que está esperando.
 
-For many problems, it is not necessary to think about tasks directly. However, they can be used
-to wait for multiple events at the same time, which provides for *dynamic scheduling*. In dynamic
-scheduling, a program decides what to compute or where to compute it based on when other jobs
-finish. This is needed for unpredictable or unbalanced workloads, where we want to assign more
-work to processes only when they finish their current tasks.
+Para muchos problemas, no es necesario pensar en las tareas directamente. Sin embargo, pueden usarse para esperar múltiples eventos al mismo tiempo, lo que proporciona una *planificación dinámica*. En la planificación dinámica, un programa decide qué calcular o dónde calcularlo en función de cuándo finalizan otros trabajos. Esto es necesario para cargas de trabajo impredecibles o desequilibradas, donde queremos asignar más trabajo a los procesos solo cuando finalizan sus tareas actuales.
 
-As an example, consider computing the singular values of matrices of different sizes:
+Como ejemplo, considere calcular los valores singulares de matrices de diferentes tamaños:
 
 ```julia-repl
 julia> M = Matrix{Float64}[rand(800,800), rand(600,600), rand(800,800), rand(600,600)];
@@ -347,10 +340,7 @@ julia> M = Matrix{Float64}[rand(800,800), rand(600,600), rand(800,800), rand(600
 julia> pmap(svd, M);
 ```
 
-If one process handles both 800×800 matrices and another handles both 600×600 matrices, we will
-not get as much scalability as we could. The solution is to make a local task to "feed" work to
-each process when it completes its current task. For example, consider a simple [`pmap()`](@ref)
-implementation:
+Si un proceso maneja la dos matrices de 800 × 800 y otro maneja las dos matrices de 600 × 600, no obtendremos la mayor escalabilidad posible. La solución es hacer una tarea local para "alimentar" el trabajo a cada proceso cuando completa su tarea actual. Por ejemplo, considere una implementación simple [`pmap()`](@ref):
 
 ```julia
 function pmap(f, lst)
@@ -380,33 +370,19 @@ function pmap(f, lst)
 end
 ```
 
-[`@async`](@ref) is similar to [`@spawn`](@ref), but only runs tasks on the local process. We
-use it to create a "feeder" task for each process. Each task picks the next index that needs to
-be computed, then waits for its process to finish, then repeats until we run out of indexes. Note
-that the feeder tasks do not begin to execute until the main task reaches the end of the [`@sync`](@ref)
-block, at which point it surrenders control and waits for all the local tasks to complete before
-returning from the function. The feeder tasks are able to share state via `nextidx()` because
-they all run on the same process. No locking is required, since the threads are scheduled cooperatively
-and not preemptively. This means context switches only occur at well-defined points: in this case,
-when [`remotecall_fetch()`](@ref) is called.
+[`@async`](@ref) es similar a [`@spawn`](@ref), pero solo ejecuta tareas en el proceso local. Lo usamos para crear una tarea   "alimentador" para cada proceso. Cada tarea selecciona el siguiente índice que debe calcularse, luego espera a que termine su proceso, y luego se repite hasta que nos quedemos sin índices. Tenga en cuenta que las tareas "alimentadoras no" comienzan a ejecutarse hasta que la tarea principal llega al final del bloque [`@sync`](@ref), momento en el cual se somete al control y espera a que se completen todas las tareas locales antes de regresar de la función. Las tareas del "alimentador" pueden compartir el estado a través de `nextidx()` porque todas se ejecutan en el mismo proceso. No se requiere bloqueo, ya que los hilos están programados de forma cooperativa y no apropiativa. Esto significa que los cambios de contexto solo ocurren en puntos bien definidos: en este caso, cuando se llama a [`remotecall_fetch()`](@ref).
 
-## Channels
+## Canales
 
-The section on [`Task`](@ref)s in [Control Flow](@ref) discussed the execution of multiple functions in
-a co-operative manner. [`Channel`](@ref)s can be quite useful to pass data between running tasks, particularly
-those involving I/O operations.
+La sección sobre tareas ([`Task`](@ref)) en [Control de flujo](@ref) discutió la ejecución de múltiples funciones de forma cooperativa. Los canales ([`Channel`](@ref)) pueden ser bastante útiles para pasar datos entre tareas en ejecución, particularmente aquellas que involucran operaciones de E/S.
 
-Examples of operations involving I/O include reading/writing to files, accessing web services,
-executing external programs, etc. In all these cases, overall execution time can be improved if
-other tasks can be run while a file is being read, or while waiting for an external service/program
-to complete.
+Ejemplos de operaciones que implican E/S incluyen la lectura/escritura en archivos, acceso a servicios web, ejecución de programas externos, etc. En todos estos casos, el tiempo de ejecución general puede mejorarse si se pueden ejecutar otras tareas mientras se lee un archivo, o mientras se espera a que se complete un servicio o programa externo.
 
-A channel can be visualized as a pipe, i.e., it has a write end and read end.
+Un canal se puede visualizar como un conducto, es decir, tiene un extremo de escritura y un extremo de lectura.
 
-  * Multiple writers in different tasks can write to the same channel concurrently via [`put!()`](@ref)
-    calls.
-  * Multiple readers in different tasks can read data concurrently via [`take!()`](@ref) calls.
-  * As an example:
+   * Varios escritores en diferentes tareas pueden escribir en el mismo canal concurrentemente a través de llamadas [`put!()`](@ref).
+   * Varios lectores en diferentes tareas pueden leer datos simultáneamente a través de llamadas [`take!()`](@ref).
+   * Como ejemplo:
 
     ```julia
     # Given Channels c1 and c2,
