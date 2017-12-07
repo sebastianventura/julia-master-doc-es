@@ -128,43 +128,32 @@ julia> remotecall_fetch(()->id, 2)
 2
 ```
 
-A file can also be preloaded on multiple processes at startup, and a driver script can be used
-to drive the computation:
+Un fichero puede también ser precargado sobre múltiples procesos al inicio, y puede usarse un *driver* para llevar a cabo ese cómputo:
 
 ```
 julia -p <n> -L file1.jl -L file2.jl driver.jl
 ```
 
-The Julia process running the driver script in the example above has an `id` equal to 1, just
-like a process providing an interactive prompt.
+El proceso Julia que corre el programa *driver* del ejemplo anterior tiene un `id` igual a 1, justo como un proceso que proporciona un prompt interactivo.
 
-The base Julia installation has in-built support for two types of clusters:
+La instalación base de Julia tiene soporte intríseco para dos tipos de clusters:
 
-  * A local cluster specified with the `-p` option as shown above.
-  * A cluster spanning machines using the `--machinefile` option. This uses a passwordless `ssh` login
-    to start Julia worker processes (from the same path as the current host) on the specified machines.
+  * Un clúster local especificado con la opción `-p`, como se mostró anteriormente.
+  * Un clúster que abarca máquinas utilizando la opción `--machinefile`. Esto utiliza un inicio de 
+    sesión `ssh` sin contraseña para iniciar los procesos de trabajo de Julia (desde la misma ruta 
+    que el servidor actual) en las máquinas especificadas.
+  
+Las funciones [`addprocs()`](@ref), [`rmprocs()`](@ref), [`workers()`](@ref), y otras están disponibles como una forma programática de añadir, borrar y consultar los procesos en un cluster.
 
-Functions [`addprocs()`](@ref), [`rmprocs()`](@ref), [`workers()`](@ref), and others are available
-as a programmatic means of adding, removing and querying the processes in a cluster.
+Note que los *workers* no ejecutan un script `.juliarc.jl` de inicio, ni sincronizan su estado global (tal como variables globales, nuevas definiciones de métodos y módulos cargados) con cualquiera de los procesos que están ejecutando.
 
-Note that workers do not run a `.juliarc.jl` startup script, nor do they synchronize their global
-state (such as global variables, new method definitions, and loaded modules) with any of the other
-running processes.
+Pueden soportarse otros tipos de clústers escribiendo nuestro porpio `ClusterManager`, como se describe después en la sección [ClusterManagers](@ref) section.
 
-Other types of clusters can be supported by writing your own custom `ClusterManager`, as described
-below in the [ClusterManagers](@ref) section.
+## Movimiento de Datos
 
-## Data Movement
+Enviar mensaje y mover datos constituye la mayor parte de la sobrecarga de un programa paralelo. Reducir el número de mensajes y la cantidad de datos enviados es crítico para conseguir rendimiento y escalabilidad. Para este fin, es importante comprender el movimiento de datos realizado por varias construcciones de programación paralela de Julia.
 
-Sending messages and moving data constitute most of the overhead in a parallel program. Reducing
-the number of messages and the amount of data sent is critical to achieving performance and scalability.
-To this end, it is important to understand the data movement performed by Julia's various parallel
-programming constructs.
-
-[`fetch()`](@ref) can be considered an explicit data movement operation, since it directly asks
-that an object be moved to the local machine. [`@spawn`](@ref) (and a few related constructs)
-also moves data, but this is not as obvious, hence it can be called an implicit data movement
-operation. Consider these two approaches to constructing and squaring a random matrix:
+[`fetch()`](@ref) puede considerarse una operación explícita de movimiento de datos, ya que directamente pide que un objeto sea movido a la máquina local. [`@spawn`](@ref) (y unas pocas construcciones relacionadas) también mueve datos, pero esto no es tan obvio, por lo tanto, puede denominarse una operación implícita de movimiento de datos. Considere estos dos enfoques para construir y cuadrar una matriz aleatoria:
 
 Method 1:
 
@@ -188,47 +177,29 @@ julia> Bref = @spawn rand(1000,1000)^2;
 julia> fetch(Bref);
 ```
 
-The difference seems trivial, but in fact is quite significant due to the behavior of [`@spawn`](@ref).
-In the first method, a random matrix is constructed locally, then sent to another process where
-it is squared. In the second method, a random matrix is both constructed and squared on another
-process. Therefore the second method sends much less data than the first.
+La diferencia parece trivial, pero de hecho es bastante significativa debido al comportamiento de [`@spawn`](@ref). En el primer método, se construye localmente una matriz aleatoria, y después se manda a otro proceso que la eleva al cuadrado. En el segundo método, una matriz aleatoria es construida y elevada al cuadrado (ambas operaciones) sobre otro proceso. Por tanto, el segundo método envía muchos menos datos que el primero. 
 
-In this toy example, the two methods are easy to distinguish and choose from. However, in a real
-program designing data movement might require more thought and likely some measurement. For example,
-if the first process needs matrix `A` then the first method might be better. Or, if computing
-`A` is expensive and only the current process has it, then moving it to another process might
-be unavoidable. Or, if the current process has very little to do between the [`@spawn`](@ref)
-and `fetch(Bref)`, it might be better to eliminate the parallelism altogether. Or imagine `rand(1000,1000)`
-is replaced with a more expensive operation. Then it might make sense to add another [`@spawn`](@ref)
-statement just for this step.
+En este ejemplo de juquete, los dos métodos son fáciles de distinguir y elegir. Sin embargo, en un programa real dieseñar movimiento de datos puede requerir ms reflexin y, probablemente, alguna medida. Por ejemplo, si el primero proceso necesita la matriz `A`, entonces el primer método sera mejor. O, si calcular `A` es costoso y sólo el proceso actual tiene que hacerlo, entonces mover la matriz al otro proceso puede ser inevitable. o, si el proceso actual tiene muy poco que hacer entre las instrucciones [`@spawn`](@ref) y `fetch(Bref)`, podría ser mejor eliminar el paralelismo por completo. O imagine que `rand(1000,1000)` es reemplazado con un a operación más costosa. Entonces podría tener sentido añadir ora instrucción  [`@spawn`](@ref) sólo para este paso.
 
-# Global variables
-Expressions executed remotely via `@spawn`, or closures specified for remote execution using
-`remotecall` may refer to global variables. Global bindings under module `Main` are treated
-a little differently compared to global bindings in other modules. Consider the following code
-snippet:
+# Variables Globales
+
+Las expresiones ejecutadas remotamente vía `@spawn`, o los cierres especificados para ejecucin remota usando `remotecall` pueden referirse a variables globales. Las vinculaciones globales en el módulo `Main` son tratadas de un modo un poco diferente comparados a las vinculaciones globales en otros módulos. Considere el siguiente trozo de código:
 
 ```julia-repl
 A = rand(10,10)
 remotecall_fetch(()->norm(A), 2)
 ```
 
-In this case [`norm`](@ref) is a function that takes 2D array as a parameter, and MUST be defined in
-the remote process.  You could use any function other than `norm` as long as it is defined in the remote
-process and accepts the appropriate parameter.
+En este caso [`norm`](@ref) es una función que toma un array 2D como parámetro, y DEVE estar definido en el proceso remoto. Uno podría usar cualquier función distinta de `norm` siempre que ella esté definida en el proceso remoto y acepte el parámetro apropiado.
 
-Note that `A` is a global variable defined in the local workspace. Worker 2 does not have a variable called
-`A` under `Main`. The act of shipping the closure `()->norm(A)` to worker 2 results in `Main.A` being defined
-on 2. `Main.A` continues to exist on worker 2 even after the call `remotecall_fetch` returns. Remote calls
-with embedded global references (under `Main` module only) manage globals as follows:
+Tenga en cuenta que `A` es una variable global definida en el espacio de trabajo local. El *worker* 2 no tiene una variable llamada `A` dentro de ` Main`. Por tantom el acto de enviar el cierre `() -> norma (A)` al *worker* 2 da como resultado que `Main.A` se defina en 2. `Main.A` sigue existiendo en el worker 2 incluso después de que la llamada `remotecall_fetch` retorne. Las llamadas remotas con referencias globales integradas (solo bajo el módulo `Main`) administran los datos globales de la siguiente manera:
 
-- New global bindings are created on destination workers if they are referenced as part of a remote call.
 
-- Global constants are declared as constants on remote nodes too.
+- Se crean nuevos enlaces globales en los trabajadores de destino si se hace referencia a ellos como parte de una llamada remota.
 
-- Globals are re-sent to a destination worker only in the context of a remote call, and then only
-  if its value has changed. Also, the cluster does not synchronize global bindings across nodes.
-  For example:
+- Las constantes globales se declaran también como constantes en los nodos remotos.
+
+- Globales se reenvían a un *worker* de destino solo en el contexto de una llamada remota, y solo si su valor ha cambiado. Además, el clúster no sincroniza las asignaciones globales entre nodos. Por ejemplo:
 
   ```julia
   A = rand(10,10)
@@ -238,17 +209,12 @@ with embedded global references (under `Main` module only) manage globals as fol
   A = nothing
   ```
 
-  Executing the above snippet results in `Main.A` on worker 2 having a different value from
-  `Main.A` on worker 3, while the value of `Main.A` on node 1 is set to `nothing`.
+  Ejecutar este trozo de código da como resultado que `Main.A` del *worker* 2 tenga un valor diferente del que tiene en 
+  `Main.A` del *worker* 3, mientras que el valor de `Main.A` en el nodo 1 se fija a `nothing`.
 
-As you may have realized, while memory associated with globals may be collected when they are reassigned
-on the master, no such action is taken on the workers as the bindings continue to be valid.
-[`clear!`](@ref) can be used to manually reassign specific globals on remote nodes to `nothing` once
-they are no longer required. This will release any memory associated with them as part of a regular garbage
-collection cycle.
+Como se habrá dado cuenta, aunque la memoria asociada con los globales se puede recopilar cuando se reasignan en el maestro, dicha acción no se toma en los *workers* ya que los enlaces siguen siendo válidos. [`clear!`](@ref) se puede usar para reasignar manualmente globales específicos en nodos remotos a `nothing` una vez que ya no sean necesarios. Esto liberará cualquier memoria asociada con ellos como parte de un ciclo de recolección de basura regular.
 
-Thus programs should be careful referencing globals in remote calls. In fact, it is preferable to avoid them
-altogether if possible. If you must reference globals, consider using `let` blocks to localize global variables.
+Por lo tanto, los programas deben ser cuidadosos al hacer referencia a los globales en las llamadas remotas. De hecho, es preferible evitarlos por completo si es posible. Si hay que hacer referencia a globales, considere usar bloques `let` para localizar variables globales.
 
 For example:
 
@@ -271,16 +237,12 @@ julia>  From worker 2:                               A    800 bytes  10×10 Arra
         From worker 2:                            Main               Module
 ```
 
-As can be seen, global variable `A` is defined on worker 2, but `B` is captured as a local variable
-and hence a binding for `B` does not exist on worker 2.
+Como puede verse, la variable global `A` es definidia en el *worker* 2, pero `B` es capturada como una variable local y por tanto no existe una asignacin para `B` en *worker* 2.
 
 
-## Parallel Map and Loops
+## Map y Bucles Paralelos
 
-Fortunately, many useful parallel computations do not require data movement. A common example
-is a Monte Carlo simulation, where multiple processes can handle independent simulation trials
-simultaneously. We can use [`@spawn`](@ref) to flip coins on two processes. First, write the following
-function in `count_heads.jl`:
+Afortunadamente, muchos cálculos paralelos no requieren movimiento de datos. Un ejemplo común es las simulaciones Monte Carlo, donde muchos procesos pueden manejar simultáneamente pruebas de simulación independientes. Podemos usar [`@spawn`](@ref) para lanzar monedas sobre dos procesos. Primero, se escribiría la siguiente función en `count_heads.jl`:
 
 ```julia
 function count_heads(n)
@@ -292,8 +254,7 @@ function count_heads(n)
 end
 ```
 
-The function `count_heads` simply adds together `n` random bits. Here is how we can perform some
-trials on two machines, and add together the results:
+La función `count_heads` simplemente añade juntos `n` bits aleatorios. He aqui cónmo pueden realizarse algunas pruebas sobre dos máquinas, y añadir juntos los resultados:
 
 ```julia-repl
 julia> @everywhere include_string(Main, $(read("count_heads.jl", String)), "count_heads.jl")
