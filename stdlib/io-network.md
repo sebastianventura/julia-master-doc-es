@@ -1,6 +1,6 @@
-# I/O and Network
+# E/S y Redes
 
-## General I/O
+## E/S General
 
 ```@docs
 Base.STDOUT
@@ -54,7 +54,7 @@ Base.IOContext(::IO, ::Pair)
 Base.IOContext(::IO, ::IOContext)
 ```
 
-## Text I/O
+## E/S Texto
 
 ```@docs
 Base.show(::Any)
@@ -91,22 +91,15 @@ Base.Base64.base64decode
 Base.displaysize
 ```
 
-## Multimedia I/O
+## E/S Multimedia
 
-Just as text output is performed by [`print`](@ref) and user-defined types can indicate their textual
-representation by overloading [`show`](@ref), Julia provides a standardized mechanism for rich multimedia
-output (such as images, formatted text, or even audio and video), consisting of three parts:
+Del mismo modo que la salida de texto se realiza mediante [`print`](@ref) y los tipos definidos por el usuario pueden indicar su representación textual sobrecargando [`show`](@ref), Julia proporciona un mecanismo estandarizado para una salida multimedia enriquecida (como imágenes, texto formateado, o incluso audio y video) que consta de tres partes:
 
-  * A function [`display(x)`](@ref) to request the richest available multimedia display of a Julia object
-    `x` (with a plain-text fallback).
-  * Overloading [`show`](@ref) allows one to indicate arbitrary multimedia representations (keyed by standard
-    MIME types) of user-defined types.
-  * Multimedia-capable display backends may be registered by subclassing a generic `Display` type
-    and pushing them onto a stack of display backends via [`pushdisplay`](@ref).
+* Una función [`display(x)`](@ref) para solicitar la visualización multimedia más completa disponible de un objeto Julia `x` (con una reserva de texto sin formato).
+* Sobrecargar [`show`](@ref) permite indicar representaciones multimedia arbitrarias (codificadas mediante tipos MIME estándar) de tipos definidos por el usuario.
+* Los backends de visualización con capacidad multimedia pueden registrarse subclasificando un tipo genérico de `Display` y empujándolos a una pila de backends de visualización mediante [`pushdisplay`](@ref).
 
-The base Julia runtime provides only plain-text display, but richer displays may be enabled by
-loading external modules or by using graphical Julia environments (such as the IPython-based IJulia
-notebook).
+El tiempo de ejecución base de Julia proporciona solo visualización de texto sin formato, pero las pantallas más ricas pueden habilitarse cargando módulos externos o utilizando entornos gráficos de Julia (como el *notebook* IJulia, basado en IPython).
 
 ```@docs
 Base.Multimedia.display
@@ -118,23 +111,9 @@ Base.Multimedia.reprmime
 Base.Multimedia.stringmime
 ```
 
-As mentioned above, one can also define new display backends. For example, a module that can display
-PNG images in a window can register this capability with Julia, so that calling [`display(x)`](@ref) on
-types with PNG representations will automatically display the image using the module's window.
+Como se mencionó anteriormente, también se pueden definir nuevos backends de pantalla. Por ejemplo, un módulo que puede mostrar imágenes PNG en una ventana puede registrar esta capacidad con Julia, de modo que llamar a [`display(x)`](@ref) en tipos con representaciones PNG mostrará automáticamente la imagen usando la ventana del módulo.
 
-In order to define a new display backend, one should first create a subtype `D` of the abstract
-class `Display`.  Then, for each MIME type (`mime` string) that can be displayed on `D`, one should
-define a function `display(d::D, ::MIME"mime", x) = ...` that displays `x` as that MIME type,
-usually by calling [`reprmime(mime, x)`](@ref).  A `MethodError` should be thrown if `x` cannot be displayed
-as that MIME type; this is automatic if one calls [`reprmime`](@ref). Finally, one should define a function
-`display(d::D, x)` that queries [`mimewritable(mime, x)`](@ref) for the `mime` types supported by `D`
-and displays the "best" one; a `MethodError` should be thrown if no supported MIME types are found
-for `x`.  Similarly, some subtypes may wish to override [`redisplay(d::D, ...)`](@ref Base.Multimedia.redisplay). (Again, one should
-`import Base.display` to add new methods to `display`.) The return values of these functions are
-up to the implementation (since in some cases it may be useful to return a display "handle" of
-some type).  The display functions for `D` can then be called directly, but they can also be invoked
-automatically from [`display(x)`](@ref) simply by pushing a new display onto the display-backend stack
-with:
+Para definir un nuevo backend de pantalla, primero se debe crear un subtipo `D` de la clase abstracta `Display`. Luego, para cada tipo MIME (cadena `mime`) que se puede mostrar en `D`, uno debe definir una función `display(d::D, ::MIME"mime", x) = ...` que muestra `x` como ese tipo MIME, generalmente llamando a [`reprmime(mime, x)`](@ref). Se debe lanzar `MethodError` si `x` no se puede mostrar como ese tipo MIME; esto es automático si uno llama [`reprmime`](@ref). Finalmente, se debe definir una función `display(d::D, x)` que consulte [`mimewritable(mime,x)`](@ref) para los tipos `mime` soportados por `D` y muestre el "mejor"; debe lanzarse un `MethodError` si no se encuentran tipos MIME compatibles para `x`. Del mismo modo, algunos subtipos pueden anular [`redisplay(d::D, ...)`](@ref Base.Multimedia.redisplay). (De nuevo, uno debe hacer `import Base.display` para agregar nuevos métodos a `display`.) Los valores de retorno de estas funciones dependen de la implementación (ya que en algunos casos puede ser útil devolver un "manejador" *handle* de visualización de algunos tipo). Las funciones de visualización para `D` se pueden llamar directamente, pero también se pueden invocar automáticamente desde [`display(x)`](@ref) simplemente presionando una nueva pantalla en la pila display-backend con:
 
 ```@docs
 Base.Multimedia.pushdisplay
@@ -143,7 +122,7 @@ Base.Multimedia.TextDisplay
 Base.Multimedia.istextmime
 ```
 
-## Memory-mapped I/O
+## E/S Mapeada en Memoria
 
 ```@docs
 Base.Mmap.Anonymous
@@ -152,7 +131,7 @@ Base.Mmap.mmap(::Any, ::BitArray, ::Any, ::Any)
 Base.Mmap.sync!
 ```
 
-## Network I/O
+## E/S por Red
 
 ```@docs
 Base.connect(::TCPSocket, ::Integer)
