@@ -1,9 +1,8 @@
-# Linear Algebra
+# Álgebra Lineal
 
-## Standard Functions
+## Funciones Estándar
 
-Linear algebra functions in Julia are largely implemented by calling functions from [LAPACK](http://www.netlib.org/lapack/).
- Sparse factorizations call functions from [SuiteSparse](http://faculty.cse.tamu.edu/davis/suitesparse.html).
+Las funciones de álgebra lineal en Julia está ampliamente implementadas llamando a funciones de [LAPACK](http://www.netlib.org/lapack/). Las factorizaciones *sparse* llaman a funciones de [SuiteSparse](http://faculty.cse.tamu.edu/davis/suitesparse.html).
 
 ```@docs
 Base.:*(::AbstractArray, ::AbstractArray)
@@ -117,16 +116,11 @@ Base.LinAlg.svds
 Base.LinAlg.peakflops
 ```
 
-## Low-level matrix operations
+## Operaciones matriciales de bajo nivel
 
-Matrix operations involving transpositions operations like `A' \ B` are converted by the Julia
-parser into calls to specially named functions like [`Ac_ldiv_B`](@ref). If you want to overload these
-operations for your own types, then it is useful to know the names of these functions.
+Las operaciones de matrices que involucran operaciones de transposición como `A' \ B` son convertidas por el analizador de Julia en llamadas a funciones especialmente nombradas como [`Ac_ldiv_B`](@ref). Si desea sobrecargar estas operaciones para sus propios tipos, será útil conocer los nombres de estas funciones.
 
-Also, in many cases there are in-place versions of matrix operations that allow you to supply
-a pre-allocated output vector or matrix.  This is useful when optimizing critical code in order
-to avoid the overhead of repeated allocations. These in-place operations are suffixed with `!`
-below (e.g. [`A_mul_B!`](@ref)) according to the usual Julia convention.
+Además, en muchos casos, hay versiones in situ de operaciones matriciales que le permiten suministrar un vector o matriz de salida preasignada. Esto es útil cuando se optimiza código crítico para evitar la sobrecarga de las asignaciones repetidas. Estas operaciones in situ tienen el sufijo `!` a continuación (por ejemplo, [`A_mul_B!`](@ref)) de acuerdo con la convención habitual de Julia.
 
 ```@docs
 Base.LinAlg.A_ldiv_B!
@@ -153,49 +147,39 @@ Base.At_rdiv_B
 Base.At_rdiv_Bt
 ```
 
-## BLAS Functions
+## Funciones BLAS
 
-In Julia (as in much of scientific computation), dense linear-algebra operations are based on
-the [LAPACK library](http://www.netlib.org/lapack/), which in turn is built on top of basic linear-algebra
-building-blocks known as the [BLAS](http://www.netlib.org/blas/). There are highly optimized
-implementations of BLAS available for every computer architecture, and sometimes in high-performance
-linear algebra routines it is useful to call the BLAS functions directly.
+En Julia (como en gran parte de la computación científica), las operaciones  de álgebra lineal densa se basan en la [biblioteca LAPACK](http://www.netlib.org/lapack/), que a su vez se construye sobre bloques de construcción básicos de álgebra lineal conocidos como [BLAS](http://www.netlib.org/blas/). Hay implementaciones altamente optimizadas de BLAS disponibles para cada arquitectura de computadora, y algunas veces en rutinas de álgebra lineal de alto rendimiento, es útil llamar directamente a las funciones de BLAS.
 
-`Base.LinAlg.BLAS` provides wrappers for some of the BLAS functions. Those BLAS functions
-that overwrite one of the input arrays have names ending in `'!'`.  Usually, a BLAS function has
-four methods defined, for [`Float64`](@ref), [`Float32`](@ref), `Complex128`, and `Complex64` arrays.
+`Base.LinAlg.BLAS` proporciona envoltorios para algunas de las funciones de BLAS. Esas funciones de BLAS que sobrescriben una de las matrices de entrada tienen nombres que terminan en `'!'`. Normalmente, una función BLAS tiene cuatro métodos definidos, para las arrays [`Float64`](@ref), [`Float32`](@ref), `Complex128` y` Complex64`.
 
 ### [BLAS Character Arguments](@id stdlib-blas-chars)
-Many BLAS functions accept arguments that determine whether to transpose an argument (`trans`),
-which triangle of a matrix to reference (`uplo` or `ul`),
-whether the diagonal of a triangular matrix can be assumed to
-be all ones (`dA`) or which side of a matrix multiplication
-the input argument belongs on (`side`). The possiblities are:
+Muchas funciones BLAS aceptan argumentos que determinan si se debe transponer un argumento (`trans`), qué triángulo de una matriz referenciar (` uplo` o `ul`), si se puede suponer que la diagonal de una matriz triangular está formada por unos (`dA`) o a qué lado de una multiplicación de matrices pertenece el argumento de entrada (`side`). Las posibilidades son:
 
-#### [Multplication Order](@id stdlib-blas-side)
+#### [Orden de Multiplicación](@id stdlib-blas-side)
 | `side` | Meaning                                                             |
 |:-------|:--------------------------------------------------------------------|
-| `'L'`  | The argument goes on the *left* side of a matrix-matrix operation.  |
-| `'R'`  | The argument goes on the *right* side of a matrix-matrix operation. |
+| `'L'`  | El argumento va al lado *izquierdo* de una operación matriz-matriz. |
+| `'R'`  | El argumento va al lado *derecho* de una operación matriz-matriz.   |
 
-#### [Triangle Referencing](@id stdlib-blas-uplo)
+#### [Referencia sobre el Triángulo](@id stdlib-blas-uplo)
 | `uplo`/`ul` | Meaning                                               |
 |:------------|:------------------------------------------------------|
-| `'U'`       | Only the *upper* triangle of the matrix will be used. |
-| `'L'`       | Only the *lower* triangle of the matrix will be used. |
+| `'U'`       | Sólo se usará el triángulo *superior* de la matriz.   |
+| `'L'`       | Sólo se usará el triángulo *inferior* de la matriz. |
 
-#### [Transposition Operation](@id stdlib-blas-trans)
-| `trans`/`tX` | Meaning                                                 |
-|:-------------|:--------------------------------------------------------|
-| `'N'`        | The input matrix `X` is not transposed or conjugated.   |
-| `'T'`        | The input matrix `X` will be transposed.                |
-| `'C'`        | The input matrix `X` will be conjugated and transposed. |
+#### [Operación de Transposición](@id stdlib-blas-trans)
+| `trans`/`tX` | Meaning                                                  |
+|:-------------|:---------------------------------------------------------|
+| `'N'`        | La matriz de entrada `X` no es transpuesta ni conjugada. |
+| `'T'`        | La matriz de entrada `X` será transpuesta.               |
+| `'C'`        | La matriz de entrada `X` será conjugada y transpuesta.   |
 
-#### [Unit Diagonal](@id stdlib-blas-diag)
-| `diag`/`dX` | Meaning                                                   |
-|:------------|:----------------------------------------------------------|
-| `'N'`       | The diagonal values of the matrix `X` will be read.       |
-| `'U'`       | The diagonal of the matrix `X` is assumed to be all ones. |
+#### [Unidades en la Diagonal](@id stdlib-blas-diag)
+| `diag`/`dX` | Meaning                                                                     |
+|:------------|:----------------------------------------------------------------------------|
+| `'N'`       | Los valores diagonales de la matriz `X`serán leídos.                        |
+| `'U'`       | Se supone que los elementos de la diagonal de la matriz `X` son todos unos. |
 
 ```@docs
 Base.LinAlg.BLAS.dotu
@@ -244,15 +228,11 @@ Base.LinAlg.I
 
 ## LAPACK Functions
 
-`Base.LinAlg.LAPACK` provides wrappers for some of the LAPACK functions for linear algebra.
- Those functions that overwrite one of the input arrays have names ending in `'!'`.
+`Base.LinAlg.LAPACK` proporciona *wrappers* para algunas de las funciones LAPACK para álgebra lineal. Las funciones que sobrescriben una de las matrices de entrada tienen nombres que terminan en `'!'`.
 
-Usually a function has 4 methods defined, one each for [`Float64`](@ref), [`Float32`](@ref),
-`Complex128` and `Complex64` arrays.
+Por lo general, una función tiene 4 métodos definidos, uno para las arrays [`Float64`](@ref), [`Float32`](@ref), `Complex128` y `Complex64`.
 
-Note that the LAPACK API provided by Julia can and will change in the future. Since this API is
-not user-facing, there is no commitment to support/deprecate this specific set of functions in
-future releases.
+Tenga en cuenta que la API LAPACK proporcionada por Julia puede y va a cambiar en el futuro. Dado que esta API no está orientada al usuario, no existe el compromiso de admitir/desaprobar este conjunto específico de funciones en futuras versiones.
 
 ```@docs
 Base.LinAlg.LAPACK.gbtrf!
