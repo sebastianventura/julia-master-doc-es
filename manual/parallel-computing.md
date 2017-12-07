@@ -269,7 +269,7 @@ julia> fetch(a)+fetch(b)
 100001564
 ```
 
-Este ejemplo demouestra un patrn de programación paralela potente y frecuentemente usado. Muchas iteraciones se ejecutan independientemente sobre varios porocesos, y entonces sus resultados se combinan usando alguna función. El proceso de combinación se denomina *reducción* ya que suele ser la reduccin de rango de un tensor: un vector de números es reducido a un solo número o una matriz es reducida a una sola fila o columna, etc. En código esto suele tener el aspecto del patrón `x = f(x,v[i])`, donde `x` es el acumulador, `f` es la funcin de reducción, y los `v[i]` son los elementos que se reducirán. Es deseable que `f` sea asociativa, para que no importe el orden en el que se realizan las operaciones.
+Este ejemplo demuestra un patrón de programación paralela potente y frecuentemente usado. Muchas iteraciones se ejecutan independientemente sobre varios porocesos, y entonces sus resultados se combinan usando alguna función. El proceso de combinación se denomina *reducción* ya que suele ser la reduccin de rango de un tensor: un vector de números es reducido a un solo número o una matriz es reducida a una sola fila o columna, etc. En código esto suele tener el aspecto del patrón `x = f(x,v[i])`, donde `x` es el acumulador, `f` es la funcin de reducción, y los `v[i]` son los elementos que se reducirán. Es deseable que `f` sea asociativa, para que no importe el orden en el que se realizan las operaciones.
 
 Notese que nuestro uso de este patrón con `count_heads` puede ser generalizado. Se utilizaron dos instrucciones [`@spawn`](@ref) explícitas, que limitan el paralelismo a dos procesos. Para ejecutar sobre cualquier número de procesos, se puede usar el *bucle for paralelo* que puede escribirse en Julia usando la macro [`@parallel`](@ref) como en este ejemplo:
 
@@ -279,13 +279,11 @@ nheads = @parallel (+) for i = 1:200000000
 end
 ```
 
-Esta construccin implementa el patrón de asignar iteraciones a múltiples procesos, y combinarlos con una reducción especificada (en este caso `(+)`). El resultado de cada iteración es tomado como el valor de la última expresión dentro del bucle. La expresión total del bucle paralelo en sí misma se evalúa a la respuesta final.
+Esta construcción implementa el patrón de asignar iteraciones a múltiples procesos, y combinarlos con una reducción especificada (en este caso `(+)`). El resultado de cada iteración es tomado como el valor de la última expresión dentro del bucle. La expresión total del bucle paralelo en sí misma se evalúa a la respuesta final.
 
 Debe notar que, aunque los bucles for paralelos tienen un aspecto muy parecido al de los bucles for seriales, su comportamiento es dramaticamente diferente. En particular, las iteraciones no tiene lugar en un orden especificado, y l escritura a variables o arrays no será globalmente visible ya que las iteraciones se ejecutan sobre procesos distintos. Cualquier variable usada dentro del bucle paralelo será copiada y retransmitida a cada proceso.
 
-
-
-For example, the following code will not work as intended:
+Por ejemplo, el siguiente código no trabajará como se esperaba:
 
 ```julia
 a = zeros(100000)
@@ -294,9 +292,7 @@ a = zeros(100000)
 end
 ```
 
-This code will not initialize all of `a`, since each process will have a separate copy of it.
-Parallel for loops like these must be avoided. Fortunately, [Shared Arrays](@ref man-shared-arrays) can be used
-to get around this limitation:
+Este código no inicializará todo `a`, ya que cada proceso tendrá una copia separada de él. Los bucles for paralelos como éste deben ser evitados. Afortunadamente, podemos usar los [arrays compartidos](@ref man-shared-arrays) para sortear esta limitación:
 
 ```julia
 a = SharedArray{Float64}(10)
@@ -305,7 +301,7 @@ a = SharedArray{Float64}(10)
 end
 ```
 
-Using "outside" variables in parallel loops is perfectly reasonable if the variables are read-only:
+Usar variables "forasteras" en los bucles paralelos es perfectamente razonable si las variables son de sólo lectura:
 
 ```julia
 a = randn(1000)
@@ -314,18 +310,11 @@ a = randn(1000)
 end
 ```
 
-Here each iteration applies `f` to a randomly-chosen sample from a vector `a` shared by all processes.
+En este ejemplo, cada iteración aplica `f` a una muestra elegida aleatoriamente de un vector `a` compartido por todos los procesos.
 
-As you could see, the reduction operator can be omitted if it is not needed. In that case, the
-loop executes asynchronously, i.e. it spawns independent tasks on all available workers and returns
-an array of [`Future`](@ref) immediately without waiting for completion. The caller can wait for
-the [`Future`](@ref) completions at a later point by calling [`fetch()`](@ref) on them, or wait
-for completion at the end of the loop by prefixing it with [`@sync`](@ref), like `@sync @parallel for`.
+Como podía ver, el operador de reducción puede ser omitido si no se necesita En este caso, el bucle se ejecuta de forma asíncrona, es decir, engendra tareas independientes sobre todos los *workers* disponibles y devuelve un array de objetos [`Future`](@ref) inmediatamente sin esperar a su terminación. El código invocador puede esperar a la terminación de los [`Future`](@ref) en un punto posterior mediante una llamada a [`fetch()`](@ref) sobre ellos, o esperar la terminancin al final del bucle prefijándolo con [`@sync`](@ref), como `@sync @parallel for`.
 
-In some cases no reduction operator is needed, and we merely wish to apply a function to all integers
-in some range (or, more generally, to all elements in some collection). This is another useful
-operation called *parallel map*, implemented in Julia as the [`pmap()`](@ref) function. For example,
-we could compute the singular values of several large random matrices in parallel as follows:
+En algunos casos no se necesita un operador de reducción, y simplemente deseamos aplicar una funcin a todos los enteros en algún rango (o, de forma más general, a todos los elementos de una colección). Esta es otra operación útil llamada *parallel map*, implementada en con la función [`pmap()`](@ref). Por ejemplo, podríamos computar los valores singularees de varias matrices aleatorias en paralelo de la siguiente forma:
 
 ```julia-repl
 julia> M = Matrix{Float64}[rand(1000,1000) for i = 1:10];
@@ -333,11 +322,7 @@ julia> M = Matrix{Float64}[rand(1000,1000) for i = 1:10];
 julia> pmap(svd, M);
 ```
 
-Julia's [`pmap()`](@ref) is designed for the case where each function call does a large amount
-of work. In contrast, `@parallel for` can handle situations where each iteration is tiny, perhaps
-merely summing two numbers. Only worker processes are used by both [`pmap()`](@ref) and `@parallel for`
-for the parallel computation. In case of `@parallel for`, the final reduction is done on the calling
-process.
+La función [`pmap()`](@ref) de Julia está diseñada para el caso de que cada llamada a función realice una gran cantidad de trabajo. En contraste `@parallel for` puede manejar situaciones donde cada iteración es pequeña, quizás incluso sumar dos números. Tanto las funciones [`pmap()`](@ref) como `@parallel for` usan exclusivamente procesos *worker* para la computación paralela. En el caso de `@parallel for`, la reducción final se realiza sobre el proceso principal.
 
 ## Synchronization With Remote References
 
