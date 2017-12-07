@@ -66,10 +66,9 @@ Note que usamos `1 .+ fetch(r)` en lugar de `1 .+ r`. Esto es debido a que no sa
 
 Una importante cosa a recordar es que, una vez traída, un [`Future`](@ref) cacheará su valor localmente. Las llamadas adicionales a [`fetch()`](@ref) calls no implican un salto de red. Una vez que todos los [`Future`](@ref)s que referencian ha sido recuperados, el valor remoto almacenado es borrado.
 
-## Code Availability and Loading Packages
+## Disponibiliad de Código y Carga de Paquetes
 
-Your code must be available on any process that runs it. For example, type the following into
-the Julia prompt:
+Nuestro código debe estar disponible sobre cualquir proceso que lo ejecuta. Por ejemplo, escriba esto en el *prompt* de Julia:
 
 ```julia-repl
 julia> function rand2(dims...)
@@ -86,11 +85,9 @@ ERROR: RemoteException(2, CapturedException(UndefVarError(Symbol("#rand2"))
 [...]
 ```
 
-Process 1 knew about the function `rand2`, but process 2 did not.
+El proceso 1 sabe dónde se encuentra la función `rand2`, pero el proceso 2 no.
 
-Most commonly you'll be loading code from files or packages, and you have a considerable amount
-of flexibility in controlling which processes load code. Consider a file, `DummyModule.jl`,
-containing the following code:
+Ms comunmente uno estará cargando código desde ficheros o paquetes, y tendrá una considerable flexibilidad para controlar qué procesos cargan código. Considere un fichero `DummyModule.jl`, que contenga el siguiente código:
 
 ```julia
 module DummyModule
@@ -108,24 +105,21 @@ println("loaded")
 end
 ```
 
-Starting Julia with `julia -p 2`, you can use this to verify the following:
+Si se arranca Julia con `julia -p 2`, se puede usar esto para verificar lo siguiente:
 
-  * `include("DummyModule.jl")` loads the file on just a single process
-    (whichever one executes the statement).
-  * `using DummyModule` causes the module to be loaded on all processes; however, the module is brought
-    into scope only on the one executing the statement.
-  * As long as `DummyModule` is loaded on process 2, commands like
+  * `include("DummyModule.jl")` carga elfichero sólo sobre un proceso (el que ejecuta la instrucción).
+  * `using DummyModule` causa que el módulo sea cargado sobre todos los procesos; sin embargo, el módulo es llevado al ámbito sólo por el que ejecuta la instrucción.
+  * En cuanto `DummyModule` sea cargado sobre el proceso 2, mandatos como
 
     ```julia
     rr = RemoteChannel(2)
     put!(rr, MyType(7))
     ```
 
-    allow you to store an object of type `MyType` on process 2 even if `DummyModule` is not in scope
-    on process 2.
+    permiten almacenar un objeto de tipo `MyType` sobre el proceso 2 incluso aunque `DummyModule` no esté en 
+    el ámbito del proceso 2.
 
-You can force a command to run on all processes using the [`@everywhere`](@ref) macro. For example, `@everywhere`
-can also be used to directly define a function on all processes:
+Uno puede forzar que un mandato se ejecute sobre todos los procesos usando la macro [`@everywhere`](@ref). Por ejemplo, `@everywhere` puede también ser usado para definir directamente una función sobre todos los procesos:
 
 ```julia-repl
 julia> @everywhere id = myid()
