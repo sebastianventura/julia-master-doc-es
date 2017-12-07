@@ -1,11 +1,11 @@
 # La Librería Estándar de Julia
 
-  * [Essentials](@ref)
-  * [Colecciones y Estructuras de datos](@ref)
-  * [Mathemáticas](@ref)
-  * [Números](@ref lib-numbers)
-  * [Cadenas](@ref lib-strings)
-  * [Arrays](@ref lib-arrays)
+* [Essentials](@ref)
+* [Colecciones y Estructuras de datos](@ref)
+* [Mathemáticas](@ref)
+* [Números](@ref lib-numbers)
+* [Cadenas](@ref lib-strings)
+* [Arrays](@ref lib-arrays)
   * [Tareas y Computación Paralela](@ref)
   * [Álgebra Lineal](@ref)
   * [Constantes](@ref lib-constants)
