@@ -1,8 +1,8 @@
-# Punctuation
+# Puntuación
 
-Extended documentation for mathematical symbols & functions is [here](@ref math-ops).
+Puede encontrar documentación extendida sobre símbolos y funciones matemáticas [here](@ref math-ops).
 
-| symbol      | meaning                                                                                     |
+| Símbolo     | Significado                                                                                     |
 |:----------- |:------------------------------------------------------------------------------------------- |
 | `@m`        | invoke macro `m`; followed by space-separated expressions                                   |
 | `!`         | prefix "not" operator                                                                       |
