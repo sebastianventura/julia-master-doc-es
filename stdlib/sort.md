@@ -1,7 +1,6 @@
-# Sorting and Related Functions
+# Ordenación y Funciones Relacionadas
 
-Julia has an extensive, flexible API for sorting and interacting with already-sorted arrays of
-values. By default, Julia picks reasonable algorithms and sorts in standard ascending order:
+Julia tiene una API amplia y flexible para ordenar e interactuar con matrices de valores ya ordenados. Por defecto, Julia selecciona algoritmos y ordenaciones razonables en orden ascendente estándar:
 
 ```jldoctest
 julia> sort([2,3,1])
@@ -11,7 +10,7 @@ julia> sort([2,3,1])
  3
 ```
 
-You can easily sort in reverse order as well:
+Uno también puede ordenar en orden inverso:
 
 ```jldoctest
 julia> sort([2,3,1], rev=true)
@@ -21,7 +20,7 @@ julia> sort([2,3,1], rev=true)
  1
 ```
 
-To sort an array in-place, use the "bang" version of the sort function:
+Para ordenar un array en el lugar, use la versión con admiración de la función de ordenación:
 
 ```jldoctest
 julia> a = [2,3,1];
@@ -35,8 +34,7 @@ julia> a
  3
 ```
 
-Instead of directly sorting an array, you can compute a permutation of the array's indices that
-puts the array into sorted order:
+En lugar de ordenar un array directamente, podemos computar una preemutación de los índices del array que ponen el array en un orden determinado:
 
 ```julia-repl
 julia> v = randn(5)
@@ -64,7 +62,7 @@ julia> v[p]
   0.382396
 ```
 
-Arrays can easily be sorted according to an arbitrary transformation of their values:
+Los arrays pueden ser ordenados fácilmente de acuerdo a una transformacin arbitraria de sus valores:
 
 ```julia-repl
 julia> sort(v, by=abs)
@@ -76,7 +74,7 @@ julia> sort(v, by=abs)
  -0.839027
 ```
 
-Or in reverse order by a transformation:
+O en orden reverso mediante una transformación
 
 ```julia-repl
 julia> sort(v, by=abs, rev=true)
@@ -88,7 +86,7 @@ julia> sort(v, by=abs, rev=true)
  -0.0104452
 ```
 
-If needed, the sorting algorithm can be chosen:
+Si es necesario, puede elegirse el algoritmo de ordenación:
 
 ```julia-repl
 julia> sort(v, alg=InsertionSort)
@@ -100,11 +98,9 @@ julia> sort(v, alg=InsertionSort)
   0.382396
 ```
 
-All the sorting and order related functions rely on a "less than" relation defining a total order
-on the values to be manipulated. The `isless` function is invoked by default, but the relation
-can be specified via the `lt` keyword.
+Todas las funciones de ordenación y relacionadas con orden se basan en una relación "menor que" que define un orden total sobre los valores que van a manipularse. La función `isless` es la invocada por defecto, pero la relación puede ser especificada mediante la palabra clave `lt`.
 
-## Sorting Functions
+## Funciones de Ordenación
 
 ```@docs
 Base.sort!
@@ -115,7 +111,7 @@ Base.Sort.sortrows
 Base.Sort.sortcols
 ```
 
-## Order-Related Functions
+## Funciones relacionadas con Orden
 
 ```@docs
 Base.issorted
@@ -128,25 +124,21 @@ Base.Sort.selectperm
 Base.Sort.selectperm!
 ```
 
-## Sorting Algorithms
+## Algoritmos de Ordenación
 
-There are currently four sorting algorithms available in base Julia:
+Actualmente hay cuatro algoritmos de ordenación disponibles en Julia base:
 
   * `InsertionSort`
   * `QuickSort`
   * `PartialQuickSort(k)`
   * `MergeSort`
 
-`InsertionSort` is an O(n^2) stable sorting algorithm. It is efficient for very small `n`, and
-is used internally by `QuickSort`.
+`InsertionSort` es un algoritmo de ordenación estable cuyo coste es O(n^2). Es eficiente para `n` muy pequeños, y es usado internamente por `QuickSort`.
 
-`QuickSort` is an O(n log n) sorting algorithm which is in-place, very fast, but not stable –
-i.e. elements which are considered equal will not remain in the same order in which they originally
-appeared in the array to be sorted. `QuickSort` is the default algorithm for numeric values, including
-integers and floats.
+`QuickSort` es un algoritmo de ordenación que es *in-place* muy rápido pero no estable (es decir, los elementos que son considerados iguales no permanecerán en el mismo orden en que se encontraban originalmente en el array antes de ser ordenados. Su coste computacional es O(n log n). `QuickSort` es el algoritmo por defecto para valores numéricos, incluyendo enteros y punto flotante.
 
-`PartialQuickSort(k)` is similar to `QuickSort`, but the output array is only sorted up to index
-`k` if `k` is an integer, or in the range of `k` if `k` is an `OrdinalRange`. For example:
+`PartialQuickSort(k)` es similar a `QuickSort`, pero el array de salida es sólo ordenado hasta el índice 
+`k` si `k` es un entero, o en el rango de `k` si `k` es un `OrdinalRange`. Por ejemplo:
 
 ```julia
 x = rand(1:500, 100)
@@ -162,15 +154,11 @@ s[1:k] == ps[1:k]                      # => true
 s[k2] == qs[k2]                        # => true
 ```
 
-`MergeSort` is an O(n log n) stable sorting algorithm but is not in-place – it requires a temporary
-array of half the size of the input array – and is typically not quite as fast as `QuickSort`.
-It is the default algorithm for non-numeric data.
+`MergeSort` es un algoritmo de ordenación estable, pero no *in-place* (requiere un array temporal de la mitad del tamaño del array de entrada), de coste O(n log n) y no suele ser tan rapido como `QuickSort`. Es el algoritmo por defecto para datos no numéricos.
 
-The default sorting algorithms are chosen on the basis that they are fast and stable, or *appear*
-to be so. For numeric types indeed, `QuickSort` is selected as it is faster and indistinguishable
-in this case from a stable sort (unless the array records its mutations in some way). The stability
-property comes at a non-negligible cost, so if you don't need it, you may want to explicitly specify
-your preferred algorithm, e.g. `sort!(v, alg=QuickSort)`.
+Los algoritmos de clasificación por defecto se eligen sobre la base de que son rápidos y estables, o *parezcan* serlo. Para los tipos numéricos, de hecho, se selecciona `QuickSort` ya que es más rápido e indistinguible en este caso de un tipo estable (a menos que la matriz registre sus mutaciones de alguna manera). La propiedad de estabilidad tiene un costo no despreciable, por lo que si no la necesita, puede especificar explícitamente su algoritmo preferido, p. `sort!(v, alg=QuickSort)`.
+
+El mecanismo por el cual Julia selecciona los algoritmos de clasificación predeterminados se implementa a través de la función `Base.Sort.defalg`. Permite que un algoritmo particular se registre como el predeterminado en todas las funciones de ordenación para arrays específicos. Por ejemplo, aquí están los dos métodos predeterminados de [`sort.jl`] (https://github.com/JuliaLang/julia/blob/master/base/sort.jl):
 
 The mechanism by which Julia picks default sorting algorithms is implemented via the `Base.Sort.defalg`
 function. It allows a particular algorithm to be registered as the default in all sorting functions
@@ -181,6 +169,4 @@ defalg(v::AbstractArray) = MergeSort
 defalg(v::AbstractArray{<:Number}) = QuickSort
 ```
 
-As for numeric arrays, choosing a non-stable default algorithm for array types for which the notion
-of a stable sort is meaningless (i.e. when two values comparing equal can not be distinguished)
-may make sense.
+En cuanto a los arrays numéricos, la elección de un algoritmo predeterminado no estable para los tipos de array para los cuales la noción de ordenación estable no tiene sentido (es decir, cuando dos valores que comparan iguales no se pueden distinguir) puede tener sentido.
