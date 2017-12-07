@@ -1,6 +1,6 @@
-# Tasks and Parallel Computing
+# Tareas y Computación Paralela
 
-## Tasks
+## Tareas
 
 ```@docs
 Core.Task
@@ -29,7 +29,7 @@ Base.asyncmap
 Base.asyncmap!
 ```
 
-## General Parallel Computing Support
+## Soporte General a la Computación Paralela
 
 ```@docs
 Base.addprocs
@@ -83,7 +83,7 @@ Base.cluster_cookie()
 Base.cluster_cookie(::Any)
 ```
 
-## Shared Arrays
+## Arrays Compartidos
 
 ```@docs
 Base.SharedArray
@@ -95,8 +95,7 @@ Base.localindexes
 
 ## Multi-Threading
 
-This experimental interface supports Julia's multi-threading capabilities. Types and functions
-described here might (and likely will) change in the future.
+Este interfaz experimental soporta las capacidades multi-hilo de Julia. Los tipos y funciones descritos aquí pueden cambiar en el futuro (y probablemente lo harán).
 
 ```@docs
 Base.Threads.threadid
@@ -122,7 +121,7 @@ Base.Threads.atomic_fence
 Base.@threadcall
 ```
 
-## Synchronization Primitives
+## Primitivas de Sincronización
 
 ```@docs
 Base.Threads.AbstractLock
@@ -139,12 +138,9 @@ Base.acquire
 Base.release
 ```
 
-## Cluster Manager Interface
+## Interfaz de Administración de Cluster
 
-This interface provides a mechanism to launch and manage Julia workers on different cluster environments.
-There are two types of managers present in Base: `LocalManager`, for launching additional workers on the
-same host, and `SSHManager`, for launching on remote hosts via `ssh`. TCP/IP sockets are used to connect
-and transport messages between processes. It is possible for Cluster Managers to provide a different transport.
+Esta interfaz proporciona un mecanismo para lanzar y gestionar *workers* Julia sobre diferentes entornos cluster. Hay dos tipos de administrafores presentes en Base: `LocalManager`, para lanzar *workers* adicionales sobre el mismo host, y `SSHManager`, para lanzarlos sobre hosts remotos vía `ssh`. Para conectar y transportar mensajes entre procesos se usan los sockets TCP/IP. Es posible que los administradores de clusters proporcionen un transporte diferente.
 
 ```@docs
 Base.launch
