@@ -1,10 +1,10 @@
-# [Profiling](@id lib-profiling)
+# [*Profiling*](@id lib-profiling)
 
 ```@docs
 Base.Profile.@profile
 ```
 
-The methods in `Base.Profile` are not exported and need to be called e.g. as `Profile.print()`.
+Los métodos en `Base.Profile` no son expeortados y, por tanto, necesitan ser llamados con `Profile.` como prefijo. Por ejemplo, `Profile.print()`.
 
 ```@docs
 Base.Profile.clear
