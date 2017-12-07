@@ -1,8 +1,8 @@
-# [Numbers](@id lib-numbers)
+# [Números](@id lib-numbers)
 
-## Standard Numeric Types
+## Tipos Numéricos Estándar
 
-### Abstract number types
+### Tipos Numéricos Abstractos
 
 ```@docs
 Core.Number
@@ -13,7 +13,7 @@ Core.Signed
 Core.Unsigned
 ```
 
-### Concrete number types
+### Tipos Numéricos Concretos
 
 ```@docs
 Core.Float16
@@ -37,7 +37,7 @@ Base.Rational
 Base.Irrational
 ```
 
-## Data Formats
+## Formatos de Datos
 
 ```@docs
 Base.bin
@@ -64,7 +64,7 @@ Base.hex2bytes
 Base.bytes2hex
 ```
 
-## General Number Functions and Constants
+## Constantes y Funciones de Números Generales
 
 ```@docs
 Base.one
@@ -103,7 +103,7 @@ Base.Rounding.get_zero_subnormals
 Base.Rounding.set_zero_subnormals
 ```
 
-### Integers
+### Enteros
 
 ```@docs
 Base.count_ones
@@ -118,8 +118,7 @@ Base.iseven
 
 ## BigFloats
 
-The [`BigFloat`](@ref) type implements arbitrary-precision floating-point arithmetic using
-the [GNU MPFR library](http://www.mpfr.org/).
+El tipo [`BigFloat`](@ref) implementa el punto flotante de precisión arbitraria usando la librería [GNU MPFR library](http://www.mpfr.org/).
 
 ```@docs
 Base.precision
@@ -131,26 +130,14 @@ Base.MPFR.BigFloat(x, prec::Int, rounding::RoundingMode)
 Base.MPFR.BigFloat(x::String)
 ```
 
-## Random Numbers
+## Números Aleatorios
 
-Random number generation in Julia uses the [Mersenne Twister library](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/#dSFMT)
-via `MersenneTwister` objects. Julia has a global RNG, which is used by default. Other RNG types
-can be plugged in by inheriting the `AbstractRNG` type; they can then be used to have multiple
-streams of random numbers. Besides `MersenneTwister`, Julia also provides the `RandomDevice` RNG
-type, which is a wrapper over the OS provided entropy.
+La generación de números aleatorios en Julia utiliza la [librería Mersenne Twister](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/#dSFMT) a través de objetos `MersenneTwister`. Julia tiene un RNG global que es usado por defecto. Pueden conectarse otros tipos RNG heredando del tipo `AbstractRNG`; ellos pueden ser usados entonces para tener multiples flujos de numeros aleatorios. Ademas de `MersenneTwister`, Julia proporciona el tipo RNG `RandomDevice` que es un *wrapper* sobre la entropía proporcionada por el SO.
 
-Most functions related to random generation accept an optional `AbstractRNG` as the first argument,
-`rng` , which defaults to the global one if not provided. Morever, some of them accept optionally
-dimension specifications `dims...` (which can be given as a tuple) to generate arrays of random
-values.
+La mayoría de las funciones relacionadas con la generación aleatoria aceptan un `AbstractRNG` opcional como primer argumento,`rng`, que se predetermina al global si no se proporciona. Además, algunos de ellos aceptan opcionalmente especificaciones de dimensión `dims ...` (que pueden darse como una tupla) para generar matrices de valores aleatorios.
 
-A `MersenneTwister` or `RandomDevice` RNG can generate random numbers of the following types:
-[`Float16`](@ref), [`Float32`](@ref), [`Float64`](@ref), [`Bool`](@ref), [`Int8`](@ref),
-[`UInt8`](@ref), [`Int16`](@ref), [`UInt16`](@ref), [`Int32`](@ref), [`UInt32`](@ref),
-[`Int64`](@ref), [`UInt64`](@ref), [`Int128`](@ref), [`UInt128`](@ref), [`BigInt`](@ref)
-(or complex numbers of those types). Random floating point numbers are generated uniformly
-in ``[0, 1)``. As `BigInt` represents unbounded integers, the interval must be specified
-(e.g. `rand(big(1:6))`).
+Un RNG de tipo `MersenneTwister` o `RandomDevice` puede generar números aleatorios de los siguientes tipos: [`Float16`](@ref), [`Float32`](@ref), [`Float64`](@ref), [`Bool`](@ref), [`Int8`](@ref), [`UInt8`](@ref), [`Int16`](@ref), [`UInt16`](@ref), [`Int32`](@ref), [`UInt32`](@ref), [`Int64`](@ref), [`UInt64`](@ref), [`Int128`](@ref), [`UInt128`](@ref), [`BigInt`](@ref)
+(o números complejos de estos tipos). Los números aleatorio en punto flotante son generados uniformemente en ``[0, 1)``. Como `BigInt` representa números sin límite, el intervalo debe ser especificado (por ejemplo, `rand(big(1:6))`).
 
 ```@docs
 Base.Random.srand
