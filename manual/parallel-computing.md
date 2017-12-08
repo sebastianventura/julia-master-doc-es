@@ -623,23 +623,21 @@ Una vez finalizado, una referencia deja de ser válida y no se puede usar en nin
 
 ## [Arrays Compartidos](@id man-shared-arrays)
 
-Shared Arrays use system shared memory to map the same array across many processes. While there are some similarities to a [`DArray`](https://github.com/JuliaParallel/DistributedArrays.jl), the behavior of a [`SharedArray`](@ref) is quite different. In a [`DArray`](https://github.com/JuliaParallel/DistributedArrays.jl), each process has local access to just a chunk of the data, and no two processes share the same chunk; in contrast, in a [`SharedArray`](@ref) each "participating" process has access to the entire array.  A [`SharedArray`](@ref) is a good choice when you want to have a large amount of
-data jointly accessible to two or more processes on the same machine.
+Los arrays compartidos usan memoria compartida del sistema para hacer corresponder el mismo array a través de muchos procesos. Aunque hay algunas similaridades a un [`DArray`](https://github.com/JuliaParallel/DistributedArrays.jl), el comportamiento de un [`SharedArray`](@ref) es bastante diferente. En un [`SharedArray`](@ref), cada proceso tiene acceso local justo a un trozo de los datos, y do hay dos procesos que compartan el mismo trozo; en contraste, en un [`SharedArray`](@ref) cada proceso "participante" tiene acceso al array completo. Un [`SharedArray`](@ref) es una buena elección cuando uno quiere tener una gran cantidad de datos conjuntamente accesibles a dos o más procesos sobre la misma máquina.
 
-[`SharedArray`](@ref) indexing (assignment and accessing values) works just as with regular arrays, and is efficient because the underlying memory is available to the local process. Therefore, most algorithms work naturally on [`SharedArray`](@ref)s, albeit in single-process mode. In cases where an algorithm insists on an [`Array`](@ref) input, the underlying array can be retrieved from a [`SharedArray`](@ref) by calling [`sdata()`](@ref). For other `AbstractArray` types, [`sdata()`](@ref)
-just returns the object itself, so it's safe to use [`sdata()`](@ref) on any `Array`-type object.
+La indexación de los [`SharedArray`](@ref)s funciona justo como con los arrays regulares, y es eficiente debido a que la memoria subyacente está disponible al proceso local. Por tanto, la mayoría de los algoritmos trabajan de forma natural sobre los [`SharedArray`](@ref)s, aunque en modo uniproceso. En casos donde un algoritmo insiste sobre una entrada [`Array`](@ref), el array subyacente se puede recuperar desde un [`SharedArray`](@ref) llamando a [`sdata()`](@ref). Para otros tipos de `AbstractArray`, [`sdata()`](@ref) simplemente devuelve el objeto, por lo que es seguro usar [`sdata()`](@ref) en cualquier objeto de tipo` Array`.
 
-The constructor for a shared array is of the form:
+El constructor par aun array compartido es de la forma:
 
 ```julia
 SharedArray{T,N}(dims::NTuple; init=false, pids=Int[])
 ```
 
-which creates an `N`-dimensional shared array of a bits type `T` and size `dims` across the processes specified by `pids`. Unlike distributed arrays, a shared array is accessible only from those participating workers specified by the `pids` named argument (and the creating process too, if it is on the same host).
+que crea un array compartido `N`-dimensional de un tipo de bits `T` y `dims` de tamaño en los procesos especificados por `pids`. A diferencia de los arrays distribuidos, a un array compartido solo se puede acceder desde los *workers* participantes especificados por el argumento denominado `pids` (y el proceso de creación también, si está en el mismo host).
 
-If an `init` function, of signature `initfn(S::SharedArray)`, is specified, it is called on all the participating workers. You can specify that each worker runs the `init` function on a distinct  portion of the array, thereby parallelizing initialization.
+Si se especifica una función `init`, con signatura `initfn(S::SharedArray)`, se llama a todos los trabajadores participantes. Puede especificar que cada trabajador ejecute la función `init` en una parte distinta de la matriz, paralelizando así la inicialización.
 
-Here's a brief example:
+He aquí un breve ejemplo:
 
 ```julia-repl
 julia> addprocs(3)
@@ -664,7 +662,7 @@ julia> S
  2  7  4  4
 ```
 
-[`Base.localindexes()`](@ref) provides disjoint one-dimensional ranges of indexes, and is sometimes convenient for splitting up tasks among processes. You can, of course, divide the work any way you wish:
+[`Base.localindexes()`](@ref) proporciona rangos unidimensionales disjuntos de índices, y a veces es conveniente para dividir tareas entre procesos. Uno puede, por supuesto, dividir el trabajo de la manera que desee:
 
 ```julia-repl
 julia> S = SharedArray{Int,2}((3,4), init = S -> S[indexpids(S):length(procs(S)):length(S)] = myid())
@@ -674,7 +672,7 @@ julia> S = SharedArray{Int,2}((3,4), init = S -> S[indexpids(S):length(procs(S))
  4  4  4  4
 ```
 
-Since all processes have access to the underlying data, you do have to be careful not to set up conflicts. For example:
+Como todos los procesos tienen acceso a los datos subyacentes, uno tiene que tener cuidado de no generar conflictos. Por ejemplo:
 
 ```julia
 @sync begin
@@ -686,15 +684,15 @@ Since all processes have access to the underlying data, you do have to be carefu
 end
 ```
 
-would result in undefined behavior. Because each process fills the *entire* array with its own `pid`, whichever process is the last to execute (for any particular element of `S`) will have its `pid` retained.
+daría como resultado un comportamiento indefinido. Debido a que cada proceso llena la matriz *entera* con su propio `pid`, el proceso que sea el último en ejecutarse (para cualquier elemento en particular de` S`) tendrá su `pid` retenido.
 
-As a more extended and complex example, consider running the following "kernel" in parallel:
+Como un ejemplo más extenso y complejo, considere ejecutar el siguiente "kernel" en paralelo:
 
 ```julia
 q[i,j,t+1] = q[i,j,t] + u[i,j,t]
 ```
 
-In this case, if we try to split up the work using a one-dimensional index, we are likely to run into trouble: if `q[i,j,t]` is near the end of the block assigned to one worker and `q[i,j,t+1]` is near the beginning of the block assigned to another, it's very likely that `q[i,j,t]` will not be ready at the time it's needed for computing `q[i,j,t+1]`. In such cases, one is better off chunking the array manually. Let's split along the second dimension. Define a function that returns the `(irange, jrange)` indexes assigned to this worker:
+En este caso, si tratamos de dividir el trabajo utilizando un índice unidimensional, es probable que tengamos problemas: si `q[i,j,t]` está cerca del final del bloque asignado a un *worker* y `q [i,j,t+1]` está cerca del comienzo del bloque asignado a otro, es muy probable que `q[i,j,t]` no esté listo en el momento en que se necesita para computar `q [i,j,t+1] `. En tales casos, es mejor dividir manualmente la matriz. Vamos a dividirnos a lo largo de la segunda dimensión. Defina una función que devuelve los índices `(irange, jrange)` asignados a este *worker*:
 
 ```julia-repl
 julia> @everywhere function myrange(q::SharedArray)
@@ -708,7 +706,7 @@ julia> @everywhere function myrange(q::SharedArray)
        end
 ```
 
-Next, define the kernel:
+A continuación, se define el kernel:
 
 ```julia-repl
 julia> @everywhere function advection_chunk!(q, u, irange, jrange, trange)
@@ -720,20 +718,20 @@ julia> @everywhere function advection_chunk!(q, u, irange, jrange, trange)
        end
 ```
 
-We also define a convenience wrapper for a `SharedArray` implementation
+Podemos también definir un *wrapper* de conveniencia para una implementación de `SharedArray` 
 
 ```julia-repl
 julia> @everywhere advection_shared_chunk!(q, u) =
            advection_chunk!(q, u, myrange(q)..., 1:size(q,3)-1)
 ```
 
-Now let's compare three different versions, one that runs in a single process:
+Ahora comparemos las tres versiones diferentes, una que ejecuta en un solo proceso:
 
 ```julia-repl
 julia> advection_serial!(q, u) = advection_chunk!(q, u, 1:size(q,1), 1:size(q,2), 1:size(q,3)-1);
 ```
 
-one that uses [`@parallel`](@ref):
+una que usa [`@parallel`](@ref):
 
 ```julia-repl
 julia> function advection_parallel!(q, u)
@@ -748,7 +746,7 @@ julia> function advection_parallel!(q, u)
        end;
 ```
 
-and one that delegates in chunks:
+y una que delega en trozos:
 
 ```julia-repl
 julia> function advection_shared!(q, u)
@@ -761,7 +759,7 @@ julia> function advection_shared!(q, u)
        end;
 ```
 
-If we create `SharedArray`s and time these functions, we get the following results (with `julia -p 4`):
+Si creamos un `SharedArray`s y controlamos el tiempo de estas funciones, obtendremos sl siguiente resultado (con `julia -p 4`):
 
 ```julia-repl
 julia> q = SharedArray{Float64,3}((500,500,500));
@@ -769,7 +767,7 @@ julia> q = SharedArray{Float64,3}((500,500,500));
 julia> u = SharedArray{Float64,3}((500,500,500));
 ```
 
-Run the functions once to JIT-compile and [`@time`](@ref) them on the second run:
+Ejecutemos las funciones una vez para tenga lugar la compilación JIT y [`@time`](@ref), y pasemos después a una segunda ejecución:
 
 ```julia-repl
 julia> @time advection_serial!(q, u);
@@ -787,10 +785,9 @@ julia> @time advection_shared!(q,u);
  238.119 milliseconds (2264 allocations: 169 KB)
 ```
 
-The biggest advantage of `advection_shared!` is that it minimizes traffic among the workers, allowing
-each to compute for an extended time on the assigned piece.
+La mayor ventaja de `advection_shared!` es que minimiza el tráfico entre los *workers* permitiendo que cada uno compute para un tiempo extendido sobre la pieiza asignada.
 
-## Shared Arrays and Distributed Garbage Collection
+## Arrays Compartidos y Recolección de Basura Distribuida
 
 Like remote references, shared arrays are also dependent on garbage collection on the creating node to release references from all participating workers. Code which creates many short lived shared array objects would benefit from explicitly finalizing these objects as soon as possible. This results in both memory and file handles mapping the shared segment being released sooner.
 
@@ -1162,18 +1159,17 @@ Note that [`Threads.@threads`](@ref) does not have an optional reduction paramet
 
 ## @threadcall (Experimental)
 
-All I/O tasks, timers, REPL commands, etc are multiplexed onto a single OS thread via an event loop. A patched version of libuv ([http://docs.libuv.org/en/v1.x/](http://docs.libuv.org/en/v1.x/)) provides this functionality. Yield points provide for co-operatively scheduling multiple tasks onto the same OS thread. I/O tasks and timers yield implicitly while waiting for the event to occur. Calling [`yield()`](@ref) explicitly allows for other tasks to be scheduled.
+Todas las tareas de E/S, temporizadores, comandos REPL, etc. se multiplexan en una sola cadena del sistema operativo mediante un bucle de eventos. Una versión parcheada de libuv ([http://docs.libuv.org/en/v1.x/](http://docs.libuv.org/en/v1.x/)] proporciona esta funcionalidad. Los puntos de rendimiento proporcionan la planificación cooperativa de tareas múltiples en el mismo hilo del sistema operativo. Las tareas de E/S y los temporizadores se producen implícitamente mientras se espera que ocurra el evento. Llamar a [`yield()`](@ref) explícitamente permite planificar otras tareas.
 
-Thus, a task executing a [`ccall`](@ref) effectively prevents the Julia scheduler from executing any other tasks till the call returns. This is true for all calls into external libraries. Exceptions are calls into custom C code that call back into Julia (which may then yield) or C code that calls `jl_yield()` (C equivalent of [`yield()`](@ref)).
+Por lo tanto, una tarea que ejecuta un [`ccall`](@ref) evita efectivamente que el planificador Julia ejecute otras tareas hasta que la llamada regrese. Esto es cierto para todas las llamadas a bibliotecas externas. Las excepciones son llamadas al código C personalizado que devuelve la llamada a Julia (que luego puede ceder) o al código C que llama a `jl_yield()` (C equivalente a [`yield ()`](@ref)).
 
 Note that while Julia code runs on a single thread (by default), libraries used by Julia may launch their own internal threads. For example, the BLAS library may start as many threads as there are cores on a machine.
 
-The `@threadcall` macro addresses scenarios where we do not want a `ccall` to block the main Julia event loop. It schedules a C function for execution in a separate thread. A threadpool with a default size of 4 is used for this. The size of the threadpool is controlled via environment variable `UV_THREADPOOL_SIZE`. While waiting for a free thread, and during function execution once a thread is available, the requesting task (on the main Julia event loop) yields to other tasks. Note that
-`@threadcall` does not return till the execution is complete. From a user point of view, it is therefore a blocking call like other Julia APIs.
+La macro `@ threadcall` trata los escenarios donde no queremos que un `ccall` bloquee el ciclo principal de eventos de Julia. Planifica una función C para su ejecución en un hilo separado. Para esto, se usa un pool de hilos con un tamaño predeterminado de 4. El tamaño del pool de hilos se controla mediante la variable de entorno `UV_THREADPOOL_SIZE`. Mientras espera un hilo libre, y durante la ejecución de la función una vez que un hilo está disponible, la tarea solicitante (en el ciclo de eventos principal de Julia) cede a otras tareas. Tenga en cuenta que `@threadcall` no regresa hasta que se completa la ejecución. Desde el punto de vista del usuario, es por lo tanto una llamada de bloqueo como otras API de Julia.
 
-It is very important that the called function does not call back into Julia.
+Es muy importante que la función llamada no vuelva a llamar a Julia.
 
-`@threadcall` may be removed/changed in future versions of Julia.
+`@threadcall` puede ser eliminada / cambiada en futuras versiones de Julia.
 
 [^1]:
     In this context, MPI refers to the MPI-1 standard. Beginning with MPI-2, the MPI standards committee
