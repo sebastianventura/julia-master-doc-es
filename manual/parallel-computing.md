@@ -789,51 +789,51 @@ La mayor ventaja de `advection_shared!` es que minimiza el tráfico entre los *w
 
 ## Arrays Compartidos y Recolección de Basura Distribuida
 
-Like remote references, shared arrays are also dependent on garbage collection on the creating node to release references from all participating workers. Code which creates many short lived shared array objects would benefit from explicitly finalizing these objects as soon as possible. This results in both memory and file handles mapping the shared segment being released sooner.
+Al igual que las referencias remotas, las matrices compartidas también dependen de la recolección de basura en el nodo de creación para liberar referencias de todos los *workers* participantes. El código que crea muchos arrays compartidas de vida corta se beneficiaría de finalizar explícitamente estos objetos tan pronto como sea posible. Esto da como resultado que tanto la memoria como los manejadores de archivos mapeen el segmento compartido que se libera antes.
 
 ## ClusterManagers
 
-The launching, management and networking of Julia processes into a logical cluster is done via cluster managers. A `ClusterManager` is responsible for
+El lanzamiento, la administración y la comunicación en red de los procesos de Julia en un clúster lógico se realiza a través de los administradores del clúster. Un `ClusterManager` es responsable de
 
-  * launching worker processes in a cluster environment
-  * managing events during the lifetime of each worker
-  * optionally, providing data transport
+  * Lanzar procesos *worker* en un entorno clúster
+  * gestión de eventos durante la vida de cada *worker*
+  * opcionalmente, proporcionar transporte de datos
+  
+Un clúster Julia tiene las siguientes características:
 
-A Julia cluster has the following characteristics:
+  * El proceso inicial de Julia, también llamado `master`, es especial y tiene un` id` de 1.
+  * Solo el proceso `master` puede agregar o eliminar procesos de trabajo.
+  * Todos los procesos pueden comunicarse directamente entre ellos.
 
-  * The initial Julia process, also called the `master`, is special and has an `id` of 1.
-  * Only the `master` process can add or remove worker processes.
-  * All processes can directly communicate with each other.
+Las conexiones entre los *workers* (utilizando el transporte integrado de TCP/IP) se establecen de la siguiente manera:
 
-Connections between workers (using the in-built TCP/IP transport) is established in the following manner:
+  * [`addprocs()`](@ref) se invoca en el proceso maestro con un objeto `ClusterManager`.
+  * [`addprocs()`](@ref) llama al método apropiado [`launch()`](@ref) que engendra el número requerido de procesos de trabajo en las máquinas apropiadas.
+  * Cada *worker* comienza a escuchar en un puerto libre y escribe su información de host y puerto en [`STDOUT`](@ref).
+  * El administrador del clúster captura el [`STDOUT`](@ref) de cada *worker* y lo pone a disposición del proceso maestro.
+  * El proceso maestro analiza esta información y configura conexiones TCP/IP para cada *worker*.
+  * Todos los *workers* también reciben notificaciones de otros trabajadores en el clúster.
+  * Cada *worker* se conecta con todos los *worker* cuyo `id` es menor que su propio` id`.
+  * De esta forma se establece una red de malla, en la que cada *worker* está directamente conectado con cada
+    otro *worker*.
+    
+Aunque la capa de transporte predeterminada usa el `TCPSocket` simple, es posible que un clúster Julia proporcione su propio transporte.
 
-  * [`addprocs()`](@ref) is called on the master process with a `ClusterManager` object.
-  * [`addprocs()`](@ref) calls the appropriate [`launch()`](@ref) method which spawns required number of worker processes on appropriate machines.
-  * Each worker starts listening on a free port and writes out its host and port information to [`STDOUT`](@ref).
-  * The cluster manager captures the [`STDOUT`](@ref) of each worker and makes it available to the master process.
-  * The master process parses this information and sets up TCP/IP connections to each worker.
-  * Every worker is also notified of other workers in the cluster.
-  * Each worker connects to all workers whose `id` is less than the worker's own `id`.
-  * In this way a mesh network is established, wherein every worker is directly connected with every
-    other worker.
+Julia proporciona dos administradores de clúster integrados:
 
-While the default transport layer uses plain `TCPSocket`, it is possible for a Julia cluster to provide its own transport.
+  * `LocalManager`, usado cuando se llama a [`addprocs()`](@ref) o a [`addprocs(np::Integer)`](@ref)
+  * `SSHManager`, utilizado cuando se llama a [`addprocs(hostnames::Array)`](@ref con una lista de nombres de host
+  
+`LocalManager` se utiliza para iniciar *workers* adicionales en el mismo host, aprovechando de ese modo los núcleos múltiples
+y el hardware multiprocesador.
 
-Julia provides two in-built cluster managers:
+Por lo tanto, un administrador de clúster mínimo necesitaría:
 
-  * `LocalManager`, used when [`addprocs()`](@ref) or [`addprocs(np::Integer)`](@ref) are called
-  * `SSHManager`, used when [`addprocs(hostnames::Array)`](@ref) is called with a list of hostnames
+  * ser un subtipo del resumen `ClusterManager`
+  * implementar [`launch()`](@ref), un método responsable del lanzamiento de nuevos *workers*
+  * implementar [`manage()`](@ref), que se invoca en varios eventos durante la vida de un *worker* (por ejemplo, enviando una señal de interrupción)
 
-`LocalManager` is used to launch additional workers on the same host, thereby leveraging multi-core
-and multi-processor hardware.
-
-Thus, a minimal cluster manager would need to:
-
-  * be a subtype of the abstract `ClusterManager`
-  * implement [`launch()`](@ref), a method responsible for launching new workers
-  * implement [`manage()`](@ref), which is called at various events during a worker's lifetime (for example, sending an interrupt signal)
-
-[`addprocs(manager::FooManager)`](@ref addprocs) requires `FooManager` to implement:
+[`addprocs(manager::FooManager)`](@ref addprocs) requiere `FooManager` para implementar:
 
 ```julia
 function launch(manager::FooManager, params::Dict, launched::Array, c::Condition)
@@ -845,7 +845,7 @@ function manage(manager::FooManager, id::Integer, config::WorkerConfig, op::Symb
 end
 ```
 
-As an example let us see how the `LocalManager`, the manager responsible for starting workers on the same host, is implemented:
+Como ejemplo, veamos cómo se implementa el `LocalManager`, el administrador responsable de iniciar los *workers* en el mismo host:
 
 ```julia
 struct LocalManager <: ClusterManager
@@ -861,24 +861,24 @@ function manage(manager::LocalManager, id::Integer, config::WorkerConfig, op::Sy
 end
 ```
 
-The [`launch()`](@ref) method takes the following arguments:
+El método [`launch()`](@ref) toma los siguientes argumentos:
 
-  * `manager::ClusterManager`: the cluster manager that [`addprocs()`](@ref) is called with
-  * `params::Dict`: all the keyword arguments passed to [`addprocs()`](@ref)
-  * `launched::Array`: the array to append one or more `WorkerConfig` objects to
-  * `c::Condition`: the condition variable to be notified as and when workers are launched
+  * `manager::ClusterManager`: el administrador de clúster al que se llama con [`addprocs()`](@ref)
+  * `params::Dict`: todos los argumentos palabra clave pasados ​​a [`addprocs()`](@ref)
+  * `launched::Array`: el array al que agregar uno o más objetos `WorkerConfig`
+  * `c::Condition`:la variable de condición que se notificará cuando se inicien los trabajadores
 
-The [`launch()`](@ref) method is called asynchronously in a separate task. The termination of this task signals that all requested workers have been launched. Hence the [`launch()`](@ref) function MUST exit as soon as all the requested workers have been launched.
+El método [`launch()`](@ref) se llama asincrónicamente en una tarea separada. La finalización de esta tarea indica que se han lanzado todos los *workers* solicitados. Por lo tanto, la función [`launch()`](@ref) DEBE salir tan pronto como se hayan lanzado todos los *workers* solicitados.
 
-Newly launched workers are connected to each other and the master process in an all-to-all manner. Specifying the command line argument `--worker[=<cookie>]` results in the launched processes initializing themselves as workers and connections being set up via TCP/IP sockets.
+Los trabajadores recién lanzados están conectados entre sí y el proceso maestro de una manera integral. Al especificar el argumento de la línea de comando `--worker[=<cookie>]` los procesos iniciados se inicializan a sí mismos como trabajadores y las conexiones se configuran a través de sockets TCP / IP.
 
-All workers in a cluster share the same [cookie](#cluster-cookie) as the master. When the cookie is unspecified, i.e, with the `--worker` option, the worker tries to read it from its standard input. `LocalManager` and `SSHManager` both pass the cookie to newly launched workers via their standard inputs.
+Todos los trabajadores de un clúster comparten la misma [cookie](#cluster-cookie) que el maestro. Cuando la cookie no está especificada, es decir, con la opción `-worker`, el trabajador intenta leerla desde su entrada estándar. `LocalManager` y` SSHManager` pasan la cookie a los trabajadores recién lanzados a través de sus entradas estándar.
 
-By default a worker will listen on a free port at the address returned by a call to `getipaddr()`. A specific address to listen on may be specified by optional argument `--bind-to bind_addr[:port]`. This is useful for multi-homed hosts.
+Por defecto, un trabajador escuchará en un puerto libre en la dirección devuelta por una llamada a `getipaddr()`. Una dirección específica para escuchar puede ser especificada por el argumento opcional `--bind-to bind_addr[:port]`. Esto es útil para hosts multi-homed.
 
-As an example of a non-TCP/IP transport, an implementation may choose to use MPI, in which case `--worker` must NOT be specified. Instead, newly launched workers should call `init_worker(cookie)` before using any of the parallel constructs.
+Como ejemplo de transporte no TCP / IP, una implementación puede optar por utilizar MPI, en cuyo caso `-worker` NO se debe especificar. En cambio, los trabajadores recién lanzados deberían llamar `init_worker (cookie)` antes de usar cualquiera de las construcciones paralelas.
 
-For every worker launched, the [`launch()`](@ref) method must add a `WorkerConfig` object (with appropriate fields initialized) to `launched`
+Para cada trabajador puesto en marcha, el método [`launch ()`] (@ ref) debe agregar un objeto `WorkerConfig` (con los campos apropiados inicializados) al `launched`
 
 ```julia
 mutable struct WorkerConfig
@@ -908,32 +908,24 @@ mutable struct WorkerConfig
 end
 ```
 
-Most of the fields in `WorkerConfig` are used by the inbuilt managers. Custom cluster managers
-would typically specify only `io` or `host` / `port`:
+La mayoría de los campos en `WorkerConfig` son utilizados por los administradores incorporados. Gestores de cluster personalizados normalmente especificarían solo `io` o` host` / `port`:
 
-  * If `io` is specified, it is used to read host/port information. A Julia worker prints out its
-    bind address and port at startup. This allows Julia workers to listen on any free port available
-    instead of requiring worker ports to be configured manually.
-  * If `io` is not specified, `host` and `port` are used to connect.
-  * `count`, `exename` and `exeflags` are relevant for launching additional workers from a worker.
-    For example, a cluster manager may launch a single worker per node, and use that to launch additional
-    workers.
+   * Si se especifica `io`, se usa para leer información de host / puerto. Un *worker* Julia imprime su dirección y puerto de enlace al inicio. Esto permite a los *workers* Julia escuchar en cualquier puerto libre disponible en lugar de requerir que los puertos de los trabajadores se configuren manualmente.
+   * Si `io` no está especificado,` host` y `port` se utilizan para conectarse.
+   * `count`,` exename` y `exeflags` son relevantes para el lanzamiento de trabajadores adicionales de un trabajador. Por ejemplo, un administrador de clúster puede iniciar un solo trabajador por nodo y usarlo para iniciar trabajadores adicionales.
 
-      * `count` with an integer value `n` will launch a total of `n` workers.
-      * `count` with a value of `:auto` will launch as many workers as the number of cores on that machine.
-      * `exename` is the name of the `julia` executable including the full path.
-      * `exeflags` should be set to the required command line arguments for new workers.
-  * `tunnel`, `bind_addr`, `sshflags` and `max_parallel` are used when a ssh tunnel is required to
-    connect to the workers from the master process.
-  * `userdata` is provided for custom cluster managers to store their own worker-specific information.
+      * `count` con un valor entero` n` lanzará un total de `n` *workers*.
+      * `count` con un valor de`: auto` lanzará tantos trabajadores como la cantidad de núcleos en esa máquina.
+      * `exename` es el nombre del ejecutable` julia` que incluye la ruta completa.
+      * `exeflags` debe establecerse en los argumentos de línea de comando necesarios para los nuevos *workers*.
+   * `tunnel`,` bind_addr`, `sshflags` y` max_parallel` se usan cuando se requiere un túnel ssh para conectarse con los *workers* del proceso maestro.
+   * `userdata` se proporciona para que los administradores de clúster personalizados almacenen su propia información específica del *worker*.
 
-`manage(manager::FooManager, id::Integer, config::WorkerConfig, op::Symbol)` is called at different
-times during the worker's lifetime with appropriate `op` values:
+`manage (manager :: FooManager, id :: Integer, config :: WorkerConfig, op :: Symbol)` se llama en diferentes momentos durante la vida del trabajador con valores `op` apropiados:
 
-  * with `:register`/`:deregister` when a worker is added / removed from the Julia worker pool.
-  * with `:interrupt` when `interrupt(workers)` is called. The `ClusterManager` should signal the
-    appropriate worker with an interrupt signal.
-  * with `:finalize` for cleanup purposes.
+   * con `: register` /`: deregister` cuando un trabajador se agrega / elimina del grupo de *workers* de Julia.
+   * con `: interrupt` cuando se invoca `interrupt(workers)`. El `ClusterManager` debe señalar al *worker* apropiado con una señal de interrupción.
+   * con `: finalize` para fines de limpieza.
 
 ## Cluster Managers with Custom Transports
 
