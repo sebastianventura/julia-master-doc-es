@@ -963,9 +963,25 @@ Al usar transportes personalizados:
 `examples/clustermanager/simple` es un ejemplo que muestra una implementación simple usando el dominio UNIX
 enchufes para la configuración del clúster.
 
-## Network Requirements for LocalManager and SSHManager
+## Requisitos de Red para LocalManager y SSHManager
 
-Julia clusters are designed to be executed on already secured environments on infrastructure such
+Los clústeres de Julia están diseñados para ejecutarse en entornos ya protegidos en infraestructura, como laptops locales, clusters departamentales o incluso en la nube. Esta sección cubre los requisitos de seguridad de red para los `LocalManager` y` SSHManager` incorporados:
+
+  * El proceso maestro no escucha en ningún puerto. Solo se conecta con los trabajadores.
+  * Cada trabajador se une a solo una de las interfaces locales y escucha en un número de puerto efímero asignado por el sistema operativo.
+  * `LocalManager`, usado por` addprocs (N) `, por defecto se une solo a la interfaz loopback. Esto significa que los trabajadores que comenzaron más adelante en los hosts remotos (o por cualquier persona con intenciones maliciosas) no pueden conectarse al clúster. Un `addprocs (4)` seguido de un `addprocs ([" remote_host "])` fallará.
+    Algunos usuarios pueden necesitar crear un clúster que comprenda su sistema local y algunos sistemas remotos.
+    Esto se puede hacer solicitando explícitamente que `LocalManager` se vincule a una interfaz de red externa mediante el argumento de la palabra clave` restrict`: `addprocs (4; restrict = false)`.
+  * `SSHManager`, utilizado por` addprocs (list_of_remote_hosts) `, inicia trabajadores en hosts remotos a través de SSH.
+    Por defecto, SSH solo se usa para iniciar los trabajadores de Julia. Las conexiones subsiguientes de maestro-trabajador y trabajador-trabajador usan conectores TCP / IP sin cifrar. Los hosts remotos deben tener habilitado el inicio de sesión sin contraseña. Se pueden especificar indicadores o credenciales SSH adicionales a través del argumento de palabra clave `sshflags`.
+  * `addprocs (list_of_remote_hosts; tunnel = true, sshflags = <ssh keys y otros flags>)` es útil cuando deseamos usar conexiones SSH para el maestro trabajador también. Un escenario típico para esto es una computadora portátil local que ejecuta el REPL de Julia (es decir, el maestro) con el resto del clúster en la nube, por ejemplo en Amazon EC2. En este caso, solo se debe abrir el puerto 22 en el clúster remoto junto con el cliente SSH autenticado a través de la infraestructura de clave pública (PKI). Las credenciales de autenticación se pueden suministrar a través de `sshflags`, por ejemplo` `` sshflags = `-e <keyfile>` `` `.
+
+    En una topología general (el valor predeterminado), todos los trabajadores se conectan entre sí a través de sockets TCP simples.
+    La política de seguridad en los nodos del clúster debe garantizar la conectividad gratuita entre los trabajadores para el rango de puertos efímeros (varía según el sistema operativo).
+
+    Asegurar y encriptar todo el tráfico de trabajador-trabajador (a través de SSH) o encriptar mensajes individuales se puede hacer a través de un ClusterManager personalizado.
+    
+    Julia clusters are designed to be executed on already secured environments on infrastructure such
 as local laptops, departmental clusters, or even the cloud. This section covers network security
 requirements for the inbuilt `LocalManager` and `SSHManager`:
 
@@ -998,6 +1014,16 @@ requirements for the inbuilt `LocalManager` and `SSHManager`:
 
 ## Cluster Cookie
 
+Todos los procesos en un clúster comparten la misma cookie que, de forma predeterminada, es una cadena generada aleatoriamente en el proceso maestro:
+
+  * [`Base.cluster_cookie ()`] (@ ref) devuelve la cookie, mientras `Base.cluster_cookie (cookie) ()` lo configura y devuelve la nueva cookie.
+  * Todas las conexiones están autenticadas en ambos lados para garantizar que solo los trabajadores iniciados por el maestro puedan conectarse entre sí.
+  * La cookie se puede pasar a los trabajadores al inicio mediante el argumento `--worker = <cookie>`. Si el argumento `--worker` se especifica sin la cookie, el trabajador intenta leer la cookie desde su entrada estándar (STDIN). STDIN se cierra inmediatamente después de recuperar la cookie.
+  * Los ClusterManagers pueden recuperar la cookie en el maestro llamando a [`Base.cluster_cookie ()`] (@ ref).
+    Los administradores de clusters que no usan el transporte TCP / IP predeterminado (y por lo tanto no especifican `-worker`) deben llamar` init_worker (cookie, manager) `con la misma cookie que en el maestro.
+
+Tenga en cuenta que los entornos que requieren mayores niveles de seguridad pueden implementar esto a través de un `ClusterManager` personalizado. Por ejemplo, las cookies se pueden compartir previamente y, por lo tanto, no se especifican como un argumento de inicio.
+
 All processes in a cluster share the same cookie which, by default, is a randomly generated string
 on the master process:
 
@@ -1016,6 +1042,18 @@ Note that environments requiring higher levels of security can implement this vi
 For example, cookies can be pre-shared and hence not specified as a startup argument.
 
 ## Specifying Network Topology (Experimental)
+
+El argumento de palabra clave `topología 'pasado a` addprocs` se usa para especificar cómo los trabajadores deben estar conectados entre sí:
+
+  * `: all_to_all`, el valor predeterminado: todos los trabajadores están conectados entre sí.
+  * `: master_slave`: solo el proceso del controlador, es decir,` pid` 1, tiene conexiones con los trabajadores.
+  * `: custom`: el método` launch` del administrador del clúster especifica la topología de conexión a través del
+    campos `ident` y` connect_idents` en `WorkerConfig`. Un trabajador con un cluster-manager-provided
+    identidad `ident` se conectará a todos los trabajadores especificados en` connect_idents`.
+
+El argumento de palabra clave `lazy = true | false` solo afecta a la opción` topology` `: all_to_all`. Si es 'verdadero', el clúster comienza con el maestro conectado a todos los trabajadores. Las conexiones específicas trabajador-trabajador se establecen en la primera invocación remota entre dos trabajadores. Esto ayuda a reducir los recursos iniciales asignados a la comunicación dentro del clúster. Las conexiones se configuran según los requisitos de tiempo de ejecución de un programa paralelo. El valor predeterminado para `lazy` es` true`.
+
+Actualmente, enviar un mensaje entre trabajadores desconectados genera un error. Este comportamiento, al igual que la funcionalidad y la interfaz, debe considerarse de naturaleza experimental y puede cambiar en versiones futuras.
 
 The keyword argument `topology` passed to `addprocs` is used to specify how the workers must be
 connected to each other:
@@ -1038,48 +1076,42 @@ in future releases.
 
 ## Multi-Threading (Experimental)
 
-In addition to tasks, remote calls, and remote references, Julia from `v0.5` forwards will natively
-support multi-threading. Note that this section is experimental and the interfaces may change
-in the future.
+Además de las tareas, llamadas remotas y referencias remotas, Julia desde la `v0.5` hacia delante admitirá de forma nativa soporte para multi-hilo. Tenga en cuenta que esta sección es experimental y las interfaces pueden cambiar en el futuro.
 
 ### Setup
 
-By default, Julia starts up with a single thread of execution. This can be verified by using the
-command [`Threads.nthreads()`](@ref):
+Por defecto, Julia se inicia con un único hilo de ejecución. Esto se puede verificar utilizando el mandato [`Threads.nthreads ()`](@ref):
 
 ```julia-repl
 julia> Threads.nthreads()
 1
 ```
 
-The number of threads Julia starts up with is controlled by an environment variable called `JULIA_NUM_THREADS`.
-Now, let's start up Julia with 4 threads:
+El número de hilos con los que arranca Julia está controlado por una variable de entorno llamada `JULIA_NUM_THREADS`. Ahora, comencemos Julia con 4 hilos:
 
 ```bash
 export JULIA_NUM_THREADS=4
 ```
 
-(The above command works on bourne shells on Linux and OSX. Note that if you're using a C shell
-on these platforms, you should use the keyword `set` instead of `export`. If you're on Windows,
-start up the command line in the location of `julia.exe` and use `set` instead of `export`.)
+(El mandato anterior funciona en shells de Bourne shells de Linux y OSX. Tenga en cuenta que si usa un C shell en estas plataformas, debe usar la palabra clave `set` en lugar de` export`. Si está en Windows, inicie la línea de órdenes en la ubicación de `julia.exe` y use `set` en lugar de `export`.)
 
-Let's verify there are 4 threads at our disposal.
+Verifiquemos que hay 4 hilos a nuestra disposición.
 
 ```julia-repl
 julia> Threads.nthreads()
 4
 ```
 
-But we are currently on the master thread. To check, we use the command [`Threads.threadid()`](@ref)
+Pero actualmente estamos en el hilo maestro. Para verificar, usamos el mandato [`Threads.threadid()`](@ref)
 
 ```julia-repl
 julia> Threads.threadid()
 1
 ```
 
-### The `@threads` Macro
+### La Macro `@threads` 
 
-Let's work a simple example using our native threads. Let us create an array of zeros:
+Vamos a trabajar un ejemplo simple usando nuestros hilos nativos. Creemos un array de ceros:
 
 ```jldoctest
 julia> a = zeros(10)
@@ -1096,11 +1128,9 @@ julia> a = zeros(10)
  0.0
 ```
 
-Let us operate on this array simultaneously using 4 threads. We'll have each thread write its
-thread ID into each location.
+Operemos sobre este array de forma simultánea utilizando 4 hilos. Haremos que cada hilo escriba su ID de hilo en cada ubicación.
 
-Julia supports parallel loops using the [`Threads.@threads`](@ref) macro. This macro is affixed
-in front of a `for` loop to indicate to Julia that the loop is a multi-threaded region:
+Julia soporta bucles paralelos utilizando la macro [`Threads.@Threads`](@ref). Esta macro está fijada delante de un bucle `for` para indicar a Julia que el bucle es una región con múltiples subprocesos:
 
 ```julia-repl
 julia> Threads.@threads for i = 1:10
@@ -1108,8 +1138,7 @@ julia> Threads.@threads for i = 1:10
        end
 ```
 
-The iteration space is split amongst the threads, after which each thread writes its thread ID
-to its assigned locations:
+El espacio de iteración se divide entre los hilos, después de lo cual cada hilo escribe su ID de hilo a sus ubicaciones asignadas:
 
 ```julia-repl
 julia> a
@@ -1126,7 +1155,7 @@ julia> a
  4.0
 ```
 
-Note that [`Threads.@threads`](@ref) does not have an optional reduction parameter like [`@parallel`](@ref).
+Tenga en cuenta que [`Threads.@threads`](@ref) no tiene un parámetro de reducción opcional como [`@parallel`](@ref).
 
 ## @threadcall (Experimental)
 
