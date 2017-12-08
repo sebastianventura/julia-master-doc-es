@@ -927,62 +927,41 @@ La mayoría de los campos en `WorkerConfig` son utilizados por los administrador
    * con `: interrupt` cuando se invoca `interrupt(workers)`. El `ClusterManager` debe señalar al *worker* apropiado con una señal de interrupción.
    * con `: finalize` para fines de limpieza.
 
-## Cluster Managers with Custom Transports
+## Administradores de Clúster con Transportes Personalizados
 
-Replacing the default TCP/IP all-to-all socket connections with a custom transport layer is a
-little more involved. Each Julia process has as many communication tasks as the workers it is
-connected to. For example, consider a Julia cluster of 32 processes in an all-to-all mesh network:
+Reemplazar las conexiones por defecto de socket TCP/IP con una capa de transporte personalizada es un poco más complicado. Cada proceso de Julia tiene tantas tareas de comunicación como los *workers* a los que está conectado. Por ejemplo, considere un clúster de Julia de 32 procesos en una red de malla todos contra todos:
 
-  * Each Julia process thus has 31 communication tasks.
-  * Each task handles all incoming messages from a single remote worker in a message-processing loop.
-  * The message-processing loop waits on an `IO` object (for example, a `TCPSocket` in the default
-    implementation), reads an entire message, processes it and waits for the next one.
-  * Sending messages to a process is done directly from any Julia task--not just communication tasks--again,
-    via the appropriate `IO` object.
+  * Cada proceso de Julia tiene 31 tareas de comunicación.
+  * Cada tarea maneja todos los mensajes entrantes desde un solo *worker* remoto en un bucle de procesamiento de mensajes.
+  * El bucle de procesamiento de mensajes espera en un objeto `IO` (por ejemplo, un` TCPSocket` en la implementación predeterminada), lee un mensaje completo, lo procesa y espera el siguiente.
+  * El envío de mensajes a un proceso se realiza directamente desde cualquier tarea Julia, no solo tareas de comunicación, nuevamente, a través del objeto `IO` apropiado.
 
-Replacing the default transport requires the new implementation to set up connections to remote
-workers and to provide appropriate `IO` objects that the message-processing loops can wait on.
-The manager-specific callbacks to be implemented are:
+Reemplazar el transporte predeterminado requiere que la nueva implementación establezca conexiones con *workers* remotos y que proporcione los objetos `IO` apropiados para que los lazos de procesamiento de mensajes puedan esperar. Las devoluciones de llamada específicas del administrador que se implementarán son:
 
 ```julia
 connect(manager::FooManager, pid::Integer, config::WorkerConfig)
 kill(manager::FooManager, pid::Int, config::WorkerConfig)
 ```
 
-The default implementation (which uses TCP/IP sockets) is implemented as `connect(manager::ClusterManager, pid::Integer, config::WorkerConfig)`.
+La implementación por defecto (que usa sockets TCP/IP) se implementa como `connect (manager::ClusterManager, pid::Integer, config::WorkerConfig)`.
 
-`connect` should return a pair of `IO` objects, one for reading data sent from worker `pid`, and
-the other to write data that needs to be sent to worker `pid`. Custom cluster managers can use
-an in-memory `BufferStream` as the plumbing to proxy data between the custom, possibly non-`IO`
-transport and Julia's in-built parallel infrastructure.
+`connect` debería devolver un par de objetos` IO`, uno para leer los datos enviados por el `pid` del *worker*, y el otro para escribir datos que deben ser enviados al `pid` del *worker*. Los administradores de clústeres personalizados pueden usar un `BufferStream` en memoria como la conexión de datos proxy entre el *worker* personalizado, posiblemente transporte no-`IO`y la infraestructura paralela incorporada de Julia.
 
-A `BufferStream` is an in-memory `IOBuffer` which behaves like an `IO`--it is a stream which can
-be handled asynchronously.
+Un `BufferStream` es un` IOBuffer` en memoria que se comporta como un `IO` - es un flujo que puede manejarse de forma asíncrona.
 
-Folder `examples/clustermanager/0mq` contains an example of using ZeroMQ to connect Julia workers
-in a star topology with a 0MQ broker in the middle. Note: The Julia processes are still all *logically*
-connected to each other--any worker can message any other worker directly without any awareness
-of 0MQ being used as the transport layer.
+La carpeta `examples/clustermanager/0MQ` contiene un ejemplo del uso de ZeroMQ para conectar *workers* Julia en una topología en estrella con un intermediario 0MQ en el medio. Nota: Los procesos de Julia todavía están todos *lógicamente* conectados entre sí: cualquier trabajador puede enviar mensajes a cualquier otro trabajador directamente sin que se tenga conocimiento de que se está usando 0MQ como capa de transporte.
 
-When using custom transports:
+Al usar transportes personalizados:
 
-  * Julia workers must NOT be started with `--worker`. Starting with `--worker` will result in the
-    newly launched workers defaulting to the TCP/IP socket transport implementation.
-  * For every incoming logical connection with a worker, `Base.process_messages(rd::IO, wr::IO)()`
-    must be called. This launches a new task that handles reading and writing of messages from/to
-    the worker represented by the `IO` objects.
-  * `init_worker(cookie, manager::FooManager)` MUST be called as part of worker process initialization.
-  * Field `connect_at::Any` in `WorkerConfig` can be set by the cluster manager when [`launch()`](@ref)
-    is called. The value of this field is passed in in all [`connect()`](@ref) callbacks. Typically,
-    it carries information on *how to connect* to a worker. For example, the TCP/IP socket transport
-    uses this field to specify the `(host, port)` tuple at which to connect to a worker.
+   * Los *workers* de Julia NO deben comenzar con `-worker`. Comenzar con `--worker` dará como resultado que los trabajadores recién lanzados adopten de forma predeterminada la implementación de transporte de socket TCP/IP.
+  * Para cada conexión lógica entrante con un *worker*, se deben llamar `Base.process_messages(rd::IO, wr::IO)()`. Esto inicia una nueva tarea que maneja la lectura y escritura de mensajes desde / hacia el trabajador representado por los objetos `IO`.
+  * `init_worker(cookie, manager::FooManager)` DEBE invocarse como parte de la inicialización del proceso de trabajo.
+  * El campo `connect_at::Any` en `WorkerConfig` puede ser configurado por el administrador del clúster cuando se invoca [`launch()`](@ref). El valor de este campo se transfiere en todas las devoluciones de llamada [`connect()`](@ref). Por lo general, transmite información sobre *cómo conectarse* a un *worker*. Por ejemplo, el transporte de socket TCP/IP utiliza este campo para especificar la tupla `(host, port)` en la que se conecta a un *worker*.
 
-`kill(manager, pid, config)` is called to remove a worker from the cluster. On the master process,
-the corresponding `IO` objects must be closed by the implementation to ensure proper cleanup.
-The default implementation simply executes an `exit()` call on the specified remote worker.
+`kill (manager, pid, config)` se llama para eliminar un *worker* del clúster. En el proceso maestro, los objetos `IO` correspondientes deben ser cerrados por la implementación para garantizar una limpieza adecuada. La implementación predeterminada simplemente ejecuta una llamada `exit()` en el *worker* remoto especificado.
 
-`examples/clustermanager/simple` is an example that shows a simple implementation using UNIX domain
-sockets for cluster setup.
+`examples/clustermanager/simple` es un ejemplo que muestra una implementación simple usando el dominio UNIX
+enchufes para la configuración del clúster.
 
 ## Network Requirements for LocalManager and SSHManager
 
