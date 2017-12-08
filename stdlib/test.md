@@ -1,4 +1,4 @@
-# Unit Testing
+# Haciendo Pruebas Unitarias
 
 ```@meta
 DocTestSetup = quote
@@ -6,31 +6,26 @@ DocTestSetup = quote
 end
 ```
 
-## Testing Base Julia
+## Probando Julia Base
 
-Julia is under rapid development and has an extensive test suite to verify functionality across
-multiple platforms. If you build Julia from source, you can run this test suite with `make test`.
-In a binary install, you can run the test suite using `Base.runtests()`.
+Julia está en rápido desarrollo y cuenta con un amplio conjunto de pruebas para verificar su funcionalidad en múltiples plataformas. Si compila Julia desde el origen, puede ejecutar este conjunto de pruebas con `make test`. En una instalación binaria, puede ejecutar el conjunto de pruebas utilizando `Base.runtests()`.
 
 ```@docs
 Base.runtests
 ```
 
-## Basic Unit Tests
+## Pruebas Unitarias Básicas
 
-The `Base.Test` module provides simple *unit testing* functionality. Unit testing is a way to
-see if your code is correct by checking that the results are what you expect. It can be helpful
-to ensure your code still works after you make changes, and can be used when developing as a way
-of specifying the behaviors your code should have when complete.
+El módulo `Base.Test` proporciona una funcionalidad simple de *realización de pruebas unitarias*. Las pruebas unitarias son una forma de ver si su código es correcto al verificar que los resultados sean los esperados. Puede ser útil asegurarse de que su código aún funcione después de realizar los cambios, y se puede usar al desarrollarlo como una forma de especificar los comportamientos que su código debería tener cuando se complete.
 
-Simple unit testing can be performed with the `@test()` and `@test_throws()` macros:
+Se pueden realizar pruebas unitarias simples con las macros `@test ()` y `@test_throws ()`:
 
 ```@docs
 Base.Test.@test
 Base.Test.@test_throws
 ```
 
-For example, suppose we want to check our new function `foo(x)` works as expected:
+Por ejemplo, supongamos que queremos comprobar que nuestra nueva función `foo(x)` funciona como se esperaba:
 
 ```jldoctest testfoo
 julia> using Base.Test
@@ -39,7 +34,7 @@ julia> foo(x) = length(x)^2
 foo (generic function with 1 method)
 ```
 
-If the condition is true, a `Pass` is returned:
+Si la condición es cierta, se devuelve un `Pass`:
 
 ```jldoctest testfoo
 julia> @test foo("bar") == 9
@@ -49,7 +44,7 @@ julia> @test foo("fizz") >= 10
 Test Passed
 ```
 
-If the condition is false, then a `Fail` is returned and an exception is thrown:
+Si la condición es falsa, se devuelve un `Fail` y se lanza una excepción:
 
 ```jldoctest testfoo
 julia> @test foo("f") == 20
@@ -59,9 +54,7 @@ Test Failed
 ERROR: There was an error during testing
 ```
 
-If the condition could not be evaluated because an exception was thrown, which occurs in this
-case because `length()` is not defined for symbols, an `Error` object is returned and an exception
-is thrown:
+Si la condición no pudo ser evaluada porque se lanzó una excepción, lo que ocurre en este caso porque `length()` no está definido para símbolos, se devuelve un objeto `Error` y se lanza una excepción:
 
 ```julia-repl
 julia> @test foo(:cat) == 1
@@ -79,8 +72,7 @@ Error During Test
 ERROR: There was an error during testing
 ```
 
-If we expect that evaluating an expression *should* throw an exception, then we can use `@test_throws()`
-to check that this occurs:
+Si esperamos que al evaluar una expresión *deberían* lanzarse una excepción, entonces podemos usar `@test_throws()` para comprobar que esto es lo que ocurre:
 
 ```jldoctest testfoo
 julia> @test_throws MethodError foo(:cat)
@@ -88,22 +80,17 @@ Test Passed
       Thrown: MethodError
 ```
 
-## Working with Test Sets
+## Trabajando con Conjuntos de Test
 
-Typically a large number of tests are used to make sure functions work correctly over a range
-of inputs. In the event a test fails, the default behavior is to throw an exception immediately.
-However, it is normally preferable to run the rest of the tests first to get a better picture
-of how many errors there are in the code being tested.
+Normalmente, se utiliza una gran cantidad de pruebas para garantizar que las funciones trabajan correctamente sobre distintas entradas. En el caso de que una prueba falle, el comportamiento predeterminado es lanzar una excepción de inmediato. Sin embargo, normalmente es preferible ejecutar el resto de las pruebas primero para obtener una mejor idea de cuántos errores hay en el código que se prueba.
 
-The `@testset()` macro can be used to group tests into *sets*. All the tests in a test set will
-be run, and at the end of the test set a summary will be printed. If any of the tests failed,
-or could not be evaluated due to an error, the test set will then throw a `TestSetException`.
+La macro `@testset()` se puede usar para agrupar las pruebas en *conjuntos*. En un conjunto de pruebas, se ejecutarán variasy al final de su realización se imprimirá un resumen. Si alguna de las pruebas falla o no se puede evaluar debido a un error, el conjunto de prueba arrojará una `TestSetException`.
 
 ```@docs
 Base.Test.@testset
 ```
 
-We can put our tests for the `foo(x)` function in a test set:
+Podemos poner nuestros tests para la función `foo(x)` en un conjuntos de tests:
 
 ```jldoctest testfoo
 julia> @testset "Foo Tests" begin
@@ -115,7 +102,7 @@ Test Summary: | Pass  Total
 Foo Tests     |    3      3
 ```
 
-Test sets can also be nested:
+Los conjuntos de pruebas pueden también anidarse:
 
 ```jldoctest testfoo
 julia> @testset "Foo Tests" begin
@@ -132,8 +119,7 @@ Test Summary: | Pass  Total
 Foo Tests     |    8      8
 ```
 
-In the event that a nested test set has no failures, as happened here, it will be hidden in the
-summary. If we do have a test failure, only the details for the failed test sets will be shown:
+En el caso de que un conjunto de pruebas anidado no tenga fallos, como pasa aquí, ello se ocultará en el resumen. Si tenemos un test que falle, sólo se mostrarán los detalles para este conjunto de tests que ha fallado:
 
 ```julia-repl
 julia> @testset "Foo Tests" begin
@@ -163,11 +149,9 @@ Foo Tests     |    3     1      4
 ERROR: Some tests did not pass: 3 passed, 1 failed, 0 errored, 0 broken.
 ```
 
-## Other Test Macros
+## Otras Macros para Tests
 
-As calculations on floating-point values can be imprecise, you can perform approximate equality
-checks using either `@test a ≈ b` (where `≈`, typed via tab completion of `\approx`, is the
-[`isapprox()`](@ref) function) or use [`isapprox()`](@ref) directly.
+Como los cálculos sobre valores en punto flotane pueden ser imprecisos, podemos realizar comprobaciones de igualdad aproximada usando `@test a ≈ b` (donde `≈`, se obtiene mediante terminación con tabulador de `\approx`, es la función [`isapprox()`](@ref)) o usar directamente [`isapprox()`](@ref).
 
 ```jldoctest
 julia> @test 1 ≈ 0.999999999
@@ -186,50 +170,40 @@ Base.Test.@test_warn
 Base.Test.@test_nowarn
 ```
 
-## Broken Tests
+## Tests Rotos
 
-If a test fails consistently it can be changed to use the `@test_broken()` macro. This will denote
-the test as `Broken` if the test continues to fail and alerts the user via an `Error` if the test
-succeeds.
+Si un test falla consistentemente puede ser cambiado para utilizar la macro `@test_broken()`. Esto denotará el test como Roto  (`Broken`) si el test continua fallando y alterta al usuaria a traves de un `Error` si el test tiene éxito.
+
 
 ```@docs
 Base.Test.@test_broken
 ```
 
-`@test_skip()` is also available to skip a test without evaluation, but counting the skipped test
-in the test set reporting. The test will not run but gives a `Broken` `Result`.
+`@test_skip()` está también disponible para saltar un test sin evaluación, pero contando el test que se ha saltado en el informe del conjunto de tests. El test no se ejecutará pero da un `Broken` `Result`.
 
 ```@docs
 Base.Test.@test_skip
 ```
 
-## Creating Custom `AbstractTestSet` Types
+## Creando Tipos `AbstractTestSet` Personalizados
 
-Packages can create their own `AbstractTestSet` subtypes by implementing the `record` and `finish`
-methods. The subtype should have a one-argument constructor taking a description string, with
-any options passed in as keyword arguments.
+Los paquetes pueden crear sus propios subtipos `AbstractTestSet` implementando los métodos `record` y `finish`. El subtipo debe tener un constructor de un argumento que tome una cadena de descripción, con todas las opciones pasadas como argumentos  palabra clave.
 
 ```@docs
 Base.Test.record
 Base.Test.finish
 ```
 
-`Base.Test` takes responsibility for maintaining a stack of nested testsets as they are executed,
-but any result accumulation is the responsibility of the `AbstractTestSet` subtype. You can access
-this stack with the `get_testset` and `get_testset_depth` methods. Note that these functions are
-not exported.
+`Base.Test` asume la responsabilidad de mantener una pila de conjuntos de pruebas anidados a medida que se ejecutan, pero cualquier acumulación de resultados es responsabilidad del subtipo` AbstractTestSet`. Puede acceder a esta pila con los métodos `get_testset` y` get_testset_depth`. Tenga en cuenta que estas funciones no se exportan.
 
 ```@docs
 Base.Test.get_testset
 Base.Test.get_testset_depth
 ```
 
-`Base.Test` also makes sure that nested `@testset` invocations use the same `AbstractTestSet`
-subtype as their parent unless it is set explicitly. It does not propagate any properties of the
-testset. Option inheritance behavior can be implemented by packages using the stack infrastructure
-that `Base.Test` provides.
+`Base.Test` también se asegura de que las invocaciones `@testset` anidadas utilicen el mismo subtipo `AbstractTestSet` que sus padres a menos que se establezca explícitamente. Él no propaga ninguna propiedad del conjunto de pruebas. El comportamiento de herencia de opciones se puede implementar mediante paquetes que usan la infraestructura de pila que proporciona `Base.Test`.
 
-Defining a basic `AbstractTestSet` subtype might look like:
+La definición de un subtipo básico de 'AbstractTestSet` podría verse así:
 
 ```julia
 import Base.Test: record, finish
@@ -254,7 +228,7 @@ function finish(ts::CustomTestSet)
 end
 ```
 
-And using that testset looks like:
+Y usar este conjunto de test tiene el siguiente aspecto:
 
 ```julia
 @testset CustomTestSet foo=4 "custom testset inner 2" begin
