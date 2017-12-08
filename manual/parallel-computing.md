@@ -947,7 +947,7 @@ La implementación por defecto (que usa sockets TCP/IP) se implementa como `conn
 
 `connect` debería devolver un par de objetos` IO`, uno para leer los datos enviados por el `pid` del *worker*, y el otro para escribir datos que deben ser enviados al `pid` del *worker*. Los administradores de clústeres personalizados pueden usar un `BufferStream` en memoria como la conexión de datos proxy entre el *worker* personalizado, posiblemente transporte no-`IO`y la infraestructura paralela incorporada de Julia.
 
-Un `BufferStream` es un` IOBuffer` en memoria que se comporta como un `IO` - es un flujo que puede manejarse de forma asíncrona.
+Un `BufferStream` es un `IOBuffer` en memoria que se comporta como un `IO` - es un flujo que puede manejarse de forma asíncrona.
 
 La carpeta `examples/clustermanager/0MQ` contiene un ejemplo del uso de ZeroMQ para conectar *workers* Julia en una topología en estrella con un intermediario 0MQ en el medio. Nota: Los procesos de Julia todavía están todos *lógicamente* conectados entre sí: cualquier trabajador puede enviar mensajes a cualquier otro trabajador directamente sin que se tenga conocimiento de que se está usando 0MQ como capa de transporte.
 
@@ -965,114 +965,45 @@ enchufes para la configuración del clúster.
 
 ## Requisitos de Red para LocalManager y SSHManager
 
-Los clústeres de Julia están diseñados para ejecutarse en entornos ya protegidos en infraestructura, como laptops locales, clusters departamentales o incluso en la nube. Esta sección cubre los requisitos de seguridad de red para los `LocalManager` y` SSHManager` incorporados:
+Los clústeres de Julia están diseñados para ejecutarse en entornos ya protegidos en infraestructura, como laptops locales, clusters departamentales o incluso en la nube. Esta sección cubre los requisitos de seguridad de red para los `LocalManager` y `SSHManager` incorporados:
 
-  * El proceso maestro no escucha en ningún puerto. Solo se conecta con los trabajadores.
-  * Cada trabajador se une a solo una de las interfaces locales y escucha en un número de puerto efímero asignado por el sistema operativo.
-  * `LocalManager`, usado por` addprocs (N) `, por defecto se une solo a la interfaz loopback. Esto significa que los trabajadores que comenzaron más adelante en los hosts remotos (o por cualquier persona con intenciones maliciosas) no pueden conectarse al clúster. Un `addprocs (4)` seguido de un `addprocs ([" remote_host "])` fallará.
-    Algunos usuarios pueden necesitar crear un clúster que comprenda su sistema local y algunos sistemas remotos.
-    Esto se puede hacer solicitando explícitamente que `LocalManager` se vincule a una interfaz de red externa mediante el argumento de la palabra clave` restrict`: `addprocs (4; restrict = false)`.
+  * El proceso maestro no escucha en ningún puerto. Solo se conecta con los *workers*.
+  * Cada *worker* se une a solo una de las interfaces locales y escucha en un número de puerto efímero asignado por el sistema operativo.
+  * `LocalManager`, usado por `addprocs(N)`, por defecto se une solo a la interfaz *loopback*. Esto significa que los trabajadores que comenzaron más adelante en los hosts remotos (o por cualquier persona con intenciones maliciosas) no pueden conectarse al clúster. Un `addprocs(4)` seguido de un `addprocs(["remote_host"])` fallará. Algunos usuarios pueden necesitar crear un clúster que comprenda su sistema local y algunos sistemas remotos.     Esto se puede hacer solicitando explícitamente que `LocalManager` se vincule a una interfaz de red externa mediante el argumento de la palabra clave` restrict`: `addprocs (4; restrict = false)`.
   * `SSHManager`, utilizado por` addprocs (list_of_remote_hosts) `, inicia trabajadores en hosts remotos a través de SSH.
     Por defecto, SSH solo se usa para iniciar los trabajadores de Julia. Las conexiones subsiguientes de maestro-trabajador y trabajador-trabajador usan conectores TCP / IP sin cifrar. Los hosts remotos deben tener habilitado el inicio de sesión sin contraseña. Se pueden especificar indicadores o credenciales SSH adicionales a través del argumento de palabra clave `sshflags`.
-  * `addprocs (list_of_remote_hosts; tunnel = true, sshflags = <ssh keys y otros flags>)` es útil cuando deseamos usar conexiones SSH para el maestro trabajador también. Un escenario típico para esto es una computadora portátil local que ejecuta el REPL de Julia (es decir, el maestro) con el resto del clúster en la nube, por ejemplo en Amazon EC2. En este caso, solo se debe abrir el puerto 22 en el clúster remoto junto con el cliente SSH autenticado a través de la infraestructura de clave pública (PKI). Las credenciales de autenticación se pueden suministrar a través de `sshflags`, por ejemplo` `` sshflags = `-e <keyfile>` `` `.
+  * `addprocs (list_of_remote_hosts; tunnel = true, sshflags = <ssh keys y otros flags>)` es útil cuando deseamos usar conexiones SSH para el maestro trabajador también. Un escenario típico para esto es una computadora portátil local que ejecuta el REPL de Julia (es decir, el maestro) con el resto del clúster en la nube, por ejemplo en Amazon EC2. En este caso, solo se debe abrir el puerto 22 en el clúster remoto junto con el cliente SSH autenticado a través de la infraestructura de clave pública (PKI). Las credenciales de autenticación se pueden suministrar a través de `sshflags`, por ejemplo ```sshflags =`-e <keyfile>` ```.
 
     En una topología general (el valor predeterminado), todos los trabajadores se conectan entre sí a través de sockets TCP simples.
     La política de seguridad en los nodos del clúster debe garantizar la conectividad gratuita entre los trabajadores para el rango de puertos efímeros (varía según el sistema operativo).
 
     Asegurar y encriptar todo el tráfico de trabajador-trabajador (a través de SSH) o encriptar mensajes individuales se puede hacer a través de un ClusterManager personalizado.
     
-    Julia clusters are designed to be executed on already secured environments on infrastructure such
-as local laptops, departmental clusters, or even the cloud. This section covers network security
-requirements for the inbuilt `LocalManager` and `SSHManager`:
-
-  * The master process does not listen on any port. It only connects out to the workers.
-  * Each worker binds to only one of the local interfaces and listens on an ephemeral port number
-    assigned by the OS.
-  * `LocalManager`, used by `addprocs(N)`, by default binds only to the loopback interface. This means
-    that workers started later on remote hosts (or by anyone with malicious intentions) are unable
-    to connect to the cluster. An `addprocs(4)` followed by an `addprocs(["remote_host"])` will fail.
-    Some users may need to create a cluster comprising their local system and a few remote systems.
-    This can be done by explicitly requesting `LocalManager` to bind to an external network interface
-    via the `restrict` keyword argument: `addprocs(4; restrict=false)`.
-  * `SSHManager`, used by `addprocs(list_of_remote_hosts)`, launches workers on remote hosts via SSH.
-    By default SSH is only used to launch Julia workers. Subsequent master-worker and worker-worker
-    connections use plain, unencrypted TCP/IP sockets. The remote hosts must have passwordless login
-    enabled. Additional SSH flags or credentials may be specified via keyword argument `sshflags`.
-  * `addprocs(list_of_remote_hosts; tunnel=true, sshflags=<ssh keys and other flags>)` is useful when
-    we wish to use SSH connections for master-worker too. A typical scenario for this is a local laptop
-    running the Julia REPL (i.e., the master) with the rest of the cluster on the cloud, say on Amazon
-    EC2. In this case only port 22 needs to be opened at the remote cluster coupled with SSH client
-    authenticated via public key infrastructure (PKI). Authentication credentials can be supplied
-    via `sshflags`, for example ```sshflags=`-e <keyfile>` ```.
-
-    In an all-to-all topology (the default), all workers connect to each other via plain TCP sockets.
-    The security policy on the cluster nodes must thus ensure free connectivity between workers for
-    the ephemeral port range (varies by OS).
-
-    Securing and encrypting all worker-worker traffic (via SSH) or encrypting individual messages
-    can be done via a custom ClusterManager.
-
 ## Cluster Cookie
 
 Todos los procesos en un clúster comparten la misma cookie que, de forma predeterminada, es una cadena generada aleatoriamente en el proceso maestro:
 
-  * [`Base.cluster_cookie ()`] (@ ref) devuelve la cookie, mientras `Base.cluster_cookie (cookie) ()` lo configura y devuelve la nueva cookie.
-  * Todas las conexiones están autenticadas en ambos lados para garantizar que solo los trabajadores iniciados por el maestro puedan conectarse entre sí.
-  * La cookie se puede pasar a los trabajadores al inicio mediante el argumento `--worker = <cookie>`. Si el argumento `--worker` se especifica sin la cookie, el trabajador intenta leer la cookie desde su entrada estándar (STDIN). STDIN se cierra inmediatamente después de recuperar la cookie.
-  * Los ClusterManagers pueden recuperar la cookie en el maestro llamando a [`Base.cluster_cookie ()`] (@ ref).
-    Los administradores de clusters que no usan el transporte TCP / IP predeterminado (y por lo tanto no especifican `-worker`) deben llamar` init_worker (cookie, manager) `con la misma cookie que en el maestro.
+  * [`Base.cluster_cookie()`](@ref) devuelve la cookie, mientras `Base.cluster_cookie(cookie)()` lo configura y devuelve la nueva cookie.
+  * Todas las conexiones están autenticadas en ambos lados para garantizar que solo los *workers* iniciados por el maestro puedan conectarse entre sí.
+  * La cookie se puede pasar a los *workers* al inicio mediante el argumento `--worker = <cookie>`. Si el argumento `--worker` se especifica sin la cookie, el trabajador intenta leer la cookie desde su entrada estándar (STDIN). STDIN se cierra inmediatamente después de recuperar la cookie.
+  * Los ClusterManagers pueden recuperar la cookie en el maestro llamando a [`Base.cluster_cookie()`](@ref). Los administradores de clusters que no usan el transporte TCP / IP predeterminado (y por lo tanto no especifican `-worker`) deben llamar` init_worker (cookie, manager) `con la misma cookie que en el maestro.
 
 Tenga en cuenta que los entornos que requieren mayores niveles de seguridad pueden implementar esto a través de un `ClusterManager` personalizado. Por ejemplo, las cookies se pueden compartir previamente y, por lo tanto, no se especifican como un argumento de inicio.
 
-All processes in a cluster share the same cookie which, by default, is a randomly generated string
-on the master process:
-
-  * [`Base.cluster_cookie()`](@ref) returns the cookie, while `Base.cluster_cookie(cookie)()` sets
-    it and returns the new cookie.
-  * All connections are authenticated on both sides to ensure that only workers started by the master
-    are allowed to connect to each other.
-  * The cookie may be passed to the workers at startup via argument `--worker=<cookie>`. If argument
-    `--worker` is specified without the cookie, the worker tries to read the cookie from its
-    standard input (STDIN). The STDIN is closed immediately after the cookie is retrieved.
-  * ClusterManagers can retrieve the cookie on the master by calling [`Base.cluster_cookie()`](@ref).
-    Cluster managers not using the default TCP/IP transport (and hence not specifying `--worker`)
-    must call `init_worker(cookie, manager)` with the same cookie as on the master.
-
-Note that environments requiring higher levels of security can implement this via a custom `ClusterManager`.
-For example, cookies can be pre-shared and hence not specified as a startup argument.
-
 ## Specifying Network Topology (Experimental)
 
-El argumento de palabra clave `topología 'pasado a` addprocs` se usa para especificar cómo los trabajadores deben estar conectados entre sí:
+El argumento de palabra clave `topología` pasado a `addprocs` se usa para especificar cómo los trabajadores deben estar conectados entre sí:
 
   * `: all_to_all`, el valor predeterminado: todos los trabajadores están conectados entre sí.
   * `: master_slave`: solo el proceso del controlador, es decir,` pid` 1, tiene conexiones con los trabajadores.
   * `: custom`: el método` launch` del administrador del clúster especifica la topología de conexión a través del
     campos `ident` y` connect_idents` en `WorkerConfig`. Un trabajador con un cluster-manager-provided
-    identidad `ident` se conectará a todos los trabajadores especificados en` connect_idents`.
+    identidad `ident` se conectará a todos los trabajadores especificados en `connect_idents`.
 
 El argumento de palabra clave `lazy = true | false` solo afecta a la opción` topology` `: all_to_all`. Si es 'verdadero', el clúster comienza con el maestro conectado a todos los trabajadores. Las conexiones específicas trabajador-trabajador se establecen en la primera invocación remota entre dos trabajadores. Esto ayuda a reducir los recursos iniciales asignados a la comunicación dentro del clúster. Las conexiones se configuran según los requisitos de tiempo de ejecución de un programa paralelo. El valor predeterminado para `lazy` es` true`.
 
-Actualmente, enviar un mensaje entre trabajadores desconectados genera un error. Este comportamiento, al igual que la funcionalidad y la interfaz, debe considerarse de naturaleza experimental y puede cambiar en versiones futuras.
+Actualmente, enviar un mensaje entre *workers* desconectados genera un error. Este comportamiento, al igual que la funcionalidad y la interfaz, debe considerarse de naturaleza experimental y puede cambiar en versiones futuras.
 
-The keyword argument `topology` passed to `addprocs` is used to specify how the workers must be
-connected to each other:
-
-  * `:all_to_all`, the default: all workers are connected to each other.
-  * `:master_slave`: only the driver process, i.e. `pid` 1, has connections to the workers.
-  * `:custom`: the `launch` method of the cluster manager specifies the connection topology via the
-    fields `ident` and `connect_idents` in `WorkerConfig`. A worker with a cluster-manager-provided
-    identity `ident` will connect to all workers specified in `connect_idents`.
-
-Keyword argument `lazy=true|false` only affects `topology` option `:all_to_all`. If `true`, the cluster
-starts off with the master connected to all workers. Specific worker-worker connections are established
-at the first remote invocation between two workers. This helps in reducing initial resources allocated for
-intra-cluster communication. Connections are setup depending on the runtime requirements of a parallel
-program. Default value for `lazy` is `true`.
-
-Currently, sending a message between unconnected workers results in an error. This behaviour,
-as with the functionality and interface, should be considered experimental in nature and may change
-in future releases.
 
 ## Multi-Threading (Experimental)
 
