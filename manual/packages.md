@@ -457,40 +457,27 @@ Si olvida hacer este paso hasta que haya realizado algunos cambios, no se preocu
 
 Un posible tipo de cambio que el propietario puede solicitar es que elimine sus compromisos. Ver [Squashing](@ref man-squashing-and-rebasing) a continuación.
     
-### Dirty packages
+### Paquetes Sucios
 
-If you can't change branches because the package manager complains that your package is dirty,
-it means you have some changes that have not been committed. From the shell, use `git diff` to
-see what these changes are; you can either discard them (`git checkout changedfile.jl`) or commit
-them before switching branches.  If you can't easily resolve the problems manually, as a last
-resort you can delete the entire `"Foo"` folder and reinstall a fresh copy with [`Pkg.add("Foo")`](@ref).
-Naturally, this deletes any changes you've made.
+Si no se pueden cambiar las ramas porque el administrador del paquete se queja de que su paquete está sucio, significa que tiene algunos cambios que no se han confirmado (enviado). Desde el shell, use `git diff` para ver cuáles son estos cambios; puede descartarlos (`git checkout changedfile.jl`) o confirmarlos antes de cambiar de rama. Si no puede resolver los problemas manualmente, como último recurso, puede eliminar toda la carpeta `"Foo"` y reinstalar una nueva copia con [`Pkg.add("Foo")`](@ref). Naturalmente, esto borra cualquier cambio que haya realizado.
 
-### [Making a branch *post hoc*](@id man-branch-post-hoc)
+### [Haciendo una Rama *post hoc*](@id man-branch-post-hoc)
 
-Especially for newcomers to git, one often forgets to create a new branch until after some changes
-have already been made. If you haven't yet staged or committed your changes, you can create a
-new branch with `git checkout -b <newbranch>` just as usual--git will kindly show you that some
-files have been modified and create the new branch for you. *Your changes have not yet been committed to this new branch*,
-so the normal work rules still apply.
+Especialmente para los recién llegados a git, uno a menudo se olvida de crear una nueva rama hasta después de que ya se hayan hecho algunos cambios. Si todavía no has organizado ni comprometido tus cambios, puedes crear una nueva rama con `git checkout -b <newbranch>` como siempre - git te mostrará amablemente que algunos archivos han sido modificados y creará la nueva rama para ti. *Sus cambios aún no se han comprometido a esta nueva rama*, por lo que las reglas de trabajo normales aún se aplican.
 
-However, if you've already made a commit to `master` but wish to go back to the official `master`
-(called `origin/master`), use the following procedure:
+Sin embargo, si ya has hecho un commit a `master` pero deseas volver al` master` oficial (llamado `origin/master`), utiliza el siguiente procedimiento:
 
-  * Create a new branch. This branch will hold your changes.
-  * Make sure everything is committed to this branch.
-  * `git checkout master`. If this fails, *do not* proceed further until you have resolved the problems,
-    or you may lose your changes.
-  * *Reset*`master` (your current branch) back to an earlier state with `git reset --hard origin/master`
-    (see [https://git-scm.com/blog/2011/07/11/reset.html](https://git-scm.com/blog/2011/07/11/reset.html)).
+  * Crea una nueva rama. Esta rama mantendrá tus cambios.
+  * Asegúrate de que todo esté comprometido con esta rama.
+  * `git checkout master`. Si esto no funciona, *no* continúes hasta que hayas resuelto los problemas, o puedes perder los cambios.
+  * *Restablece* `master` (tu rama actual) a un estado anterior con `git reset --hard origin/master`
+    (ver [https://git-scm.com/blog/2011/07/11/reset.html](https://git-scm.com/blog/2011/07/11/reset.html)).
 
-This requires a bit more familiarity with git, so it's much better to get in the habit of creating
-a branch at the outset.
+Esto requiere un poco más de familiaridad con git, por lo que es mucho mejor tener el hábito de crear una rama desde el principio.
 
 ### [Squashing and rebasing](@id man-squashing-and-rebasing)
 
-Depending on the tastes of the package owner (s)he may ask you to "squash" your commits. This
-is especially likely if your change is quite simple but your commit history looks like this:
+Dependiendo de los gustos del propietario(s) del paquete, él podrá pedirte que "squash" tus compromisos. Esto es especialmente probable si el cambio es bastante simple, pero su historial de compromiso se ve así:
 
 ```
 WIP: add new 1-line whizbang function (currently breaks package)
@@ -502,120 +489,76 @@ Rats, forgot to export the second function
 ...
 ```
 
-This gets into the territory of more advanced git usage, and you're encouraged to do some reading
-([https://git-scm.com/book/en/v2/Git-Branching-Rebasing](https://git-scm.com/book/en/v2/Git-Branching-Rebasing)).
- However, a brief summary of the procedure is as follows:
+Esto entra en el territorio del uso de git más avanzado, y se te anima a leer un poco ([https://git-scm.com/book/en/v2/Git-Branching-Rebasing]]https://git -scm.com/book/en/v2/Git-Branching-Rebasing)). Sin embargo, un breve resumen del procedimiento es el siguiente:
 
-  * To protect yourself from error, start from your `fixbar` branch and create a new branch with
-    `git checkout -b fixbar_backup`.  Since you started from `fixbar`, this will be a copy. Now go
-    back to the one you intend to modify with `git checkout fixbar`.
-  * From the shell, type `git rebase -i origin/master`.
-  * To combine commits, change `pick` to `squash` (for additional options, consult other sources).
-    Save the file and close the editor window.
-  * Edit the combined commit message.
+   * Para protegerse del error, comienza desde tu rama `fixbar` y crea una nueva rama con` git checkout -b fixbar_backup`. Como has comenzado desde `fixbar`, esta será una copia. Ahora vuelve a la que intentas modificar con `git checkout fixbar`.
+   * Desde el shell, escribe `git rebase -i origin/master`.
+   * Para combinar confirmaciones, cambia `pick` por `squash` (para opciones adicionales, consulta otras fuentes). Guarda el archivo y cierre la ventana del editor.
+   * Edita el mensaje de confirmación combinado.
 
-If the rebase goes badly, you can go back to the beginning to try again like this:
+Si la operación de rebase funciona mal, puedes volver al principio para intentarlo de nuevo de esta manera:
 
 ```
 git checkout fixbar
 git reset --hard fixbar_backup
 ```
 
-Now let's assume you've rebased successfully. Since your `fixbar` repository has now diverged
-from the one in your GitHub fork, you're going to have to do a *force push*:
+Ahora supongamos que has realizado la operación de rebase con éxito. Como el repositorio `fixbar` ahora se ha separado del que está en tu fork GitHub, vas a tener que hacer un *force push*:
 
-  * To make it easy to refer to your GitHub fork, create a "handle" for it with `git remote add myfork https://github.com/myaccount/Foo.jl.git`,
-    where the URL comes from the "clone URL" on your GitHub fork's page.
-  * Force-push to your fork with `git push myfork +fixbar`. The `+` indicates that this should replace
-    the `fixbar` branch found at `myfork`.
+   * Para que sea fácil referirse a tu rama GitHub, cree un "manejador" para ella con `git remote add myfork https://github.com/myaccount/Foo.jl.git`, donde la URL proviene de la "URL de clonación" en la página de tu bifurcación de GitHub.
+   * Para que sea fácil referirse a tu rama GitHub, cree un "manejador" para ella con `git remote add myfork https://github.com/myaccount/Foo.jl.git`,
+   * Fuerza el push a tu bifurcación con `git push myfork+fixbar`. El `+` indica que esto debería reemplazar la rama `fixbar` encontrada en` myfork`.
 
-## Creating a new Package
+## Creando un nuevo Paquete
 
-### REQUIRE speaks for itself
+### REQUIRE habla por sí mismo
 
-You should have a `REQUIRE` file in your package repository, with a bare minimum directive of
-what Julia version you expect your users to be running for the package to work. Putting a floor
-on what Julia version your package supports is done by simply adding `julia 0.x` in this file.
-While this line is partly informational, it also has the consequence of whether `Pkg.update()`
-will update code found in `.julia` version directories. It will not update code found in version
-directories beneath the floor of what's specified in your `REQUIRE`.
+Deberías tener un archivo `REQUIRE` en tu repositorio de paquetes, con una directiva mínima de la versión de Julia que esperas que los usuarios ejecuten para que el paquete funcione. Poniendo un piso en qué versión de Julia apoya tu paquete se hace simplemente agregando `julia 0.x` en este archivo. Si bien esta línea es parcialmente informativa, también tiene la consecuencia de si `Pkg.update ()` actualizará el código que se encuentra en los directorios de versiones `.julia`. No actualizará el código encontrado en los directorios de versiones debajo del piso de lo que se especifica en su 'REQUIRE'.
 
-As the development version `0.y` matures, you may find yourself using it more frequently, and
-wanting your package to support it. Be warned, the development branch of Julia is the land of
-breakage, and you can expect things to break. When you go about fixing whatever broke your package
-in the development `0.y` branch, you will likely find that you just broke your package on the
-stable version.
+A medida que la versión de desarrollo '0.y' madura, es posible que la utilices con más frecuencia y desees que su paquete la admita. Ten cuidado, la rama de desarrollo de Julia es "tierra de la rotura", y puede esperar que haya cosas que se rompan. Cuando vayas a arreglar lo que rompió tu paquete en la rama de desarrollo `0.y`, probablemente encontrarás que acaba de romper tu paquete en la versión estable.
 
-There is a mechanism found in the [Compat](https://github.com/JuliaLang/Compat.jl) package that
-will enable you to support both the stable version and breaking changes found in the development
-version. Should you decide to use this solution, you will need to add `Compat` to your `REQUIRE`
-file. In this case, you will still have `julia 0.x` in your `REQUIRE`. The `x` is the floor version
-of what your package supports.
+Hay un mecanismo que se encuentra en el paquete [Compat](https://github.com/JuliaLang/Compat.jl) que le permitirá admitir tanto la versión estable como los cambios de última hora que se encuentran en la versión de desarrollo. Si decide utilizar esta solución, deberá agregar `Compat` a su archivo` REQUIRE`. En este caso, todavía tendrá `julia 0.x` en su` REQUIRE`. La `x` es la versión de piso de lo que su paquete admite.
 
-You might also have no interest in supporting the development version of Julia. Just as you can
-add a floor to the version you expect your users to be on, you can set an upper bound. In this
-case, you would put `julia 0.x 0.y-` in your `REQUIRE` file. The `-` at the end of the version
-number means pre-release versions of that specific version from the very first commit. By setting
-it as the ceiling, you mean the code supports everything up to but not including the ceiling version.
+Es posible que tampoco tengas interés en apoyar la versión de desarrollo de Julia. Del mismo modo que puede agregar un piso a la versión que espera que tengan los usuarios, puede establecer un límite superior. En este caso, pondría `julia 0.x 0.y-` en su archivo `REQUIRE`. El `-` al final del número de versión se refiere a las versiones preliminares de esa versión específica desde el primer compromiso. Al establecerlo como techo, quiere decir que el código es compatible con todo pero no incluye la versión de techo.
 
-Another scenario is that you are writing the bulk of the code for your package with Julia `0.y`
-and do not want to support the current stable version of Julia. If you choose to do this, simply
-add `julia 0.y-` to your `REQUIRE`. Just remember to change the `julia 0.y-` to `julia 0.y` in
-your `REQUIRE` file once `0.y` is officially released. If you don't edit the dash cruft you are
-suggesting that you support both the development and stable versions of the same version number!
-That would be madness. See the [Requirements Specification](@ref) for the full format of `REQUIRE`.
+Otra situación es que está escribiendo la mayor parte del código para su paquete con Julia `0.y` y no desea admitir la versión estable actual de Julia. Si elige hacer esto, simplemente agregue `julia 0.y-` a su `REQUIRE`. Solo recuerda cambiar `julia 0.y-` a `julia 0.y` en tu archivo` REQUIRE` una vez que `0.y` sea lanzado oficialmente. Si no edita el dash cruft, estás sugiriendo que admita tanto el desarrollo como las versiones estables del mismo número de versión. Eso sería una locura. Consulte la [Especificación de requisitos](@ref) para obtener el formato completo de `REQUIRE`.
 
-Lastly, in many cases you may need extra packages for testing. Additional packages which
-are only required for tests should be specified in the `test/REQUIRE` file. This `REQUIRE`
-file has the same specification as the standard `REQUIRE` file.
+Por último, en muchos casos puede necesitar paquetes adicionales para las pruebas. Paquetes adicionales que solo son necesarios para las pruebas deben especificarse en el archivo `test/REQUIRE`. Este archivo `REQUIRE` tiene la misma especificación que el archivo `REQUIRE` estándar.
 
-### Guidelines for naming a package
+### Líneas Guía para Nombrar un Paquete
 
-Package names should be sensible to most Julia users, *even to those who are not domain experts*.
-When you submit your package to METADATA, you can expect a little back and forth about the package
-name with collaborators, especially if it's ambiguous or can be confused with something other
-than what it is. During this bike-shedding, it's not uncommon to get a range of *different* name
-suggestions. These are only suggestions though, with the intent being to keep a tidy namespace
-in the curated METADATA repository. Since this repository belongs to the entire community, there
-will likely be a few collaborators who care about your package name. Here are some guidelines
-to follow in naming your package:
+Los nombres de los paquetes deben ser sensatos para la mayoría de los usuarios de Julia, *incluso para aquellos que no son expertos en el dominio*. Cuando envíes tu paquete a METADATA, puedes esperar un poco de ida y vuelta sobre el nombre del paquete con tus colaboradores, especialmente si es ambiguo o puede confundirse con algo diferente de lo que es. Durante este intervalo de tiempo, no es raro obtener una variedad de *diferentes* sugerencias de nombres. Sin embargo, estas son solo sugerencias, con la intención de mantener un espacio de nombres ordenado en el repositorio de METADATA seleccionado. Como este repositorio pertenece a toda la comunidad, es probable que haya algunos colaboradores a los que les importe el nombre de su paquete. Aquí hay algunas pautas a seguir para nombrar su paquete:
 
-1. Avoid jargon. In particular, avoid acronyms unless there is minimal possibility of confusion.
+1. Evita la jerga. En particular, evita los acrónimos a menos que haya una mínima posibilidad de confusión.
 
-     * It's ok to say `USA` if you're talking about the USA.
-     * It's not ok to say `PMA`, even if you're talking about positive mental attitude.
-2. Avoid using `Julia` in your package name.
+     * Está bien decir `USA` si estás hablando de USA.
+     * No está bien decir `PMA`, incluso si estás hablando de una actitud mental positiva.
+2. Evite usar `Julia` en el nombre de su paquete.
 
-     * It is usually clear from context and to your users that the package is a Julia package.
-     * Having Julia in the name can imply that the package is connected to, or endorsed by, contributors
-       to the Julia language itself.
-3. Packages that provide most of their functionality in association with a new type should have pluralized
-   names.
+     * Por lo general, es claro, por contexto y para sus usuarios, que el paquete es un paquete Julia.
+     * Tener a Julia en el nombre puede implicar que el paquete está conectado a, o avalado por, colaboradores del propio lenguaje Julia.
+3. Los paquetes que proporcionan la mayor parte de su funcionalidad en asociación con un nuevo tipo deberían tener nombres pluralizados.
 
-     * `DataFrames` provides the `DataFrame` type.
-     * `BloomFilters` provides the `BloomFilter` type.
-     * In contrast, `JuliaParser` provides no new type, but instead new functionality in the `JuliaParser.parse()`
-       function.
-4. Err on the side of clarity, even if clarity seems long-winded to you.
+     * `DataFrames` proporciona el tipo` DataFrame`.
+     * `BloomFilters` proporciona el tipo` BloomFilter`.
+     * Por el contrario, `JuliaParser` no proporciona ningún tipo nuevo, sino una nueva funcionalidad en la función `JuliaParser.parse()`.
+4. Err del lado de la claridad, incluso si la claridad te parece larga.
 
-     * `RandomMatrices` is a less ambiguous name than `RndMat` or `RMT`, even though the latter are shorter.
-5. A less systematic name may suit a package that implements one of several possible approaches to
-   its domain.
+     * `RandomMatrices` es un nombre menos ambiguo que`RndMat` o `RMT`, aunque estos últimos sean más cortos.
+5. Un nombre menos sistemático puede adaptarse a un paquete que implemente uno de varios enfoques posibles para su dominio.
 
-     * Julia does not have a single comprehensive plotting package. Instead, `Gadfly`, `PyPlot`, `Winston`
-       and other packages each implement a unique approach based on a particular design philosophy.
-     * In contrast, `SortingAlgorithms` provides a consistent interface to use many well-established
-       sorting algorithms.
-6. Packages that wrap external libraries or programs should be named after those libraries or programs.
+     * Julia no tiene un solo paquete completo de graficación. En cambio, `Gadfly`,` PyPlot`, `Winston`
+       y otros paquetes implementan cada uno un enfoque único basado en una filosofía de diseño particular.
+     * Por el contrario, `SortingAlgorithms` proporciona una interfaz coherente para usar muchos sistemas bien establecidos
+       de algoritmos de clasificación.
+6. Los paquetes que envuelven bibliotecas externas o programas deben tener el nombre de esas bibliotecas o programas.
 
-     * `CPLEX.jl` wraps the `CPLEX` library, which can be identified easily in a web search.
-     * `MATLAB.jl` provides an interface to call the MATLAB engine from within Julia.
+     * `CPLEX.jl` envuelve la biblioteca` CPLEX`, -que se puede identificar fácilmente en una búsqueda web.
+     * `MATLAB.jl` proporciona una interfaz para llamar al motor de MATLAB desde dentro de Julia.
+     
+### Generando el paquete
 
-### Generating the package
-
-Suppose you want to create a new Julia package called `FooBar`. To get started, do `PkgDev.generate(pkg,license)`
-where `pkg` is the new package name and `license` is the name of a license that the package generator
-knows about:
+Supongamos que quiere crear un nuevo paquete de Julia llamado `FooBar`. Para comenzar, haga `PkgDev.generate(pkg,license)` donde `pkg` es el nuevo nombre del paquete y` license` es el nombre de una licencia que el generador de paquetes conoce:
 
 ```julia-repl
 julia> PkgDev.generate("FooBar","MIT")
@@ -632,8 +575,7 @@ INFO: Generating .gitignore
 INFO: Committing FooBar generated files
 ```
 
-This creates the directory `~/.julia/v0.6/FooBar`, initializes it as a git repository, generates
-a bunch of files that all packages should have, and commits them to the repository:
+Esto crea el directorio `~/.julia/v0.6/FooBar`, lo inicializa como un repositorio de git, genera un grupo de archivos que todos los paquetes deben tener y los envía al repositorio:
 
 ```
 $ cd ~/.julia/v0.6/FooBar && git show --stat
@@ -662,26 +604,13 @@ Date:   Wed Oct 16 17:57:58 2013 -0400
  8 files changed, 85 insertions(+)
 ```
 
-At the moment, the package manager knows about the MIT "Expat" License, indicated by `"MIT"`,
-the Simplified BSD License, indicated by `"BSD"`, and version 2.0 of the Apache Software License,
-indicated by `"ASL"`. If you want to use a different license, you can ask us to add it to the
-package generator, or just pick one of these three and then modify the `~/.julia/v0.6/PACKAGE/LICENSE.md`
-file after it has been generated.
+Por el momento, el administrador del paquete conoce la licencia "Expat" del MIT, indicada por `"MIT"`, la licencia simplificada BSD, indicada por `"BSD"`, y la versión 2.0 de la licencia del software Apache, indicada por `"ASL"`. Si desea utilizar una licencia diferente, puede solicitarnos que la agreguemos al generador de paquetes, o simplemente seleccione una de estas tres y luego modifique el archivo `~/.julia/v0.6/PACKAGE/LICENSE.md` después de haberlo generado.
 
-If you created a GitHub account and configured git to know about it, `PkgDev.generate()` will
-set an appropriate origin URL for you. It will also automatically generate a `.travis.yml` file
-for using the [Travis](https://travis-ci.org) automated testing service, and an `appveyor.yml`
-file for using [AppVeyor](https://www.appveyor.com). You will have to enable testing on the Travis
-and AppVeyor websites for your package repository, but once you've done that, it will already
-have working tests. Of course, all the default testing does is verify that `using FooBar` in Julia
-works.
+Si creó una cuenta de GitHub y configuró git para saber sobre ello, `PkgDev.generate()` establecerá una URL de origen adecuada para usted. También generará automáticamente un archivo `.travis.yml` para usar el servicio de prueba automatizado [Travis] (https://travis-ci.org), y un archivo `appveyor.yml` para usar [AppVeyor](https://www.appveyor.com). Deberá habilitar las pruebas en los sitios web de Travis y AppVeyor para su repositorio de paquetes, pero una vez que lo haya hecho, ya tendrá pruebas de funcionamiento. Por supuesto, todas las pruebas predeterminadas hacen es verificar que `usando FooBar` en Julia funciona.
 
-### Loading Static Non-Julia Files
+### Cargando ficheros estáticos No-Julia
 
-If your package code needs to load static files which are not Julia code, e.g. an external library
-or data files, and are located within the package directory, use the `@__DIR__` macro to determine
-the directory of the current source file. For example if `FooBar/src/FooBar.jl` needs to load
-`FooBar/data/foo.csv`, use the following code:
+Si su código de paquete necesita cargar archivos estáticos que no son código Julia, p. una biblioteca externa o archivos de datos, y se encuentran dentro del directorio del paquete, use la macro `@__DIR__` para determinar el directorio del archivo fuente actual. Por ejemplo, si `FooBar/src/FooBar.jl` necesita cargar  `FooBar/data/foo.csv`, use el siguiente código:
 
 ```julia
 datapath = joinpath(@__DIR__, "..", "data")
@@ -874,20 +803,14 @@ link.
 
 ## Fixing Package Requirements
 
-If you need to fix the registered requirements of an already-published package version, you can
-do so just by editing the metadata for that version, which will still have the same commit hash
-– the hash associated with a version is permanent:
-
+Si necesita corregir los requisitos registrados de una versión de paquete ya publicada, puede hacerlo simplemente editando los metadatos de esa versión, que seguirá teniendo el mismo hash de confirmación: el hash asociado a una versión es permanente:
 ```
 $ cd ~/.julia/v0.6/METADATA/FooBar/versions/0.0.1 && cat requires
 julia 0.3-
 $ vi requires
 ```
 
-Since the commit hash stays the same, the contents of the `REQUIRE` file that will be checked
-out in the repo will **not** match the requirements in `METADATA` after such a change; this is
-unavoidable. When you fix the requirements in `METADATA` for a previous version of a package,
-however, you should also fix the `REQUIRE` file in the current version of the package.
+Como el hash de confirmación (*commit*) permanece igual, el contenido del archivo `REQUIRE` que se retirará en el repositorio **no** coincidirá con los requisitos en `METADATA` después de dicho cambio; esto es inevitable. Sin embargo, cuando se fijan los requisitos en `METADATA` para una versión anterior de un paquete, también se debe corregir el archivo` REQUIRE` en la versión actual del paquete.
 
 ## Especificación de Requerimientos
 
