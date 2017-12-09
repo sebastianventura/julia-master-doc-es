@@ -1,11 +1,6 @@
-# Embedding Julia
+# Embebiendo Julia
 
-As we have seen in [Calling C and Fortran Code](@ref), Julia has a simple and efficient way to
-call functions written in C. But there are situations where the opposite is needed: calling Julia
-function from C code. This can be used to integrate Julia code into a larger C/C++ project, without
-the need to rewrite everything in C/C++. Julia has a C API to make this possible. As almost all
-programming languages have some way to call C functions, the Julia C API can also be used to build
-further language bridges (e.g. calling Julia from Python or C#).
+Como hemos visto en [Llamando a Código C y Fortran](@ref), Julia tiene una forma simple y eficiente de llamar a las funciones escritas en C. Pero hay situaciones en las que se necesita lo contrario: llamar a la función Julia desde el código C. Esto se puede usar para integrar el código Julia en un proyecto C/C++ más grande, sin la necesidad de reescribir todo en C/C++. Julia tiene una API C para que esto sea posible. Como casi todos los lenguajes de programación tienen alguna manera de llamar a las funciones C, la API Julia C también se puede usar para construir más puentes con otros lenguajes (por ejemplo, llamar a Julia desde Python o C #).
 
 ## High-Level Embedding
 
