@@ -617,21 +617,15 @@ datapath = joinpath(@__DIR__, "..", "data")
 foo = readcsv(joinpath(datapath, "foo.csv"))
 ```
 
-### Making Your Package Available
+### Haciendo Disponible tu Paquete
 
-Once you've made some commits and you're happy with how `FooBar` is working, you may want to get
-some other people to try it out. First you'll need to create the remote repository and push your
-code to it; we don't yet automatically do this for you, but we will in the future and it's not
-too hard to figure out [^3]. Once you've done this, letting people try out your code is as simple
-as sending them the URL of the published repo – in this case:
+Una vez que haya realizado algunos commits y esté satisfecho con el funcionamiento de `FooBar`, es posible que desee conseguir que otras personas lo prueben. Primero tendrá que crear el repositorio remoto e insertar su código; todavía no hacemos esto automáticamente por usted, pero lo haremos en el futuro y no es demasiado difícil de entender [^3]. Una vez que haya hecho esto, dejar que la gente pruebe su código es tan simple como enviarles la URL del repositorio publicado, en este caso:
 
 ```
 git://github.com/StefanKarpinski/FooBar.jl.git
 ```
 
-For your package, it will be your GitHub user name and the name of your package, but you get the
-idea. People you send this URL to can use [`Pkg.clone()`](@ref) to install the package and try
-it out:
+Para su paquete, será su nombre de usuario GitHub y el nombre de su paquete, pero se entiende la idea. Las personas a las que envíes esta URL pueden usar [`Pkg.clone()`](@ref) para instalar el paquete y probarlo:
 
 ```julia-repl
 julia> Pkg.clone("git://github.com/StefanKarpinski/FooBar.jl.git")
@@ -639,18 +633,17 @@ INFO: Cloning FooBar from git@github.com:StefanKarpinski/FooBar.jl.git
 ```
 
 [^3]:
-    Installing and using GitHub's ["hub" tool](https://github.com/github/hub) is highly recommended.
-    It allows you to do things like run `hub create` in the package repo and have it automatically
-    created via GitHub's API.
+    Se recomienda encarecidamente instalar y usar la [herramienta "hub" de GitHub](https://github.com/github/hub). 
+    Esta herramienta permite hacer cosas como ejecutar `hub create` en el repositorio del paquete y hacer que se 
+    cree automáticamente a través de la API de GitHub.
 
 ### Tagging and Publishing Your Package
 
 !!! tip
-    If you are hosting your package on GitHub, you can use the [attobot integration](https://github.com/attobot/attobot)
-    to handle package registration, tagging and publishing.
+    Si aloja su paquete en GitHub, puede usar la [integración attobot](https://github.com/attobot/attobot) 
+    para gestionar el registro, etiquetado y publicación de paquetes.
 
-Once you've decided that `FooBar` is ready to be registered as an official package, you can add
-it to your local copy of `METADATA` using `PkgDev.register()`:
+Una vez que haya decidido que `FooBar` está listo para registrarse como paquete oficial, puede agregarlo a su copia local de` METADATA` usando `PkgDev.register ()`:
 
 ```julia-repl
 julia> PkgDev.register("FooBar")
@@ -658,7 +651,7 @@ INFO: Registering FooBar at git://github.com/StefanKarpinski/FooBar.jl.git
 INFO: Committing METADATA for FooBar
 ```
 
-This creates a commit in the `~/.julia/v0.6/METADATA` repo:
+Esto crea un commit en el repositorio `~/.julia/v0.6/METADATA`:
 
 ```
 $ cd ~/.julia/v0.6/METADATA && git show
@@ -678,10 +671,8 @@ index 0000000..30e525e
 +git://github.com/StefanKarpinski/FooBar.jl.git
 ```
 
-This commit is only locally visible, however. To make it visible to the Julia community, you
-need to merge your local `METADATA` upstream into the official repo. The `PkgDev.publish()` command
-will fork the `METADATA` repository on GitHub, push your changes to your fork, and open a pull
-request:
+Sin embargo, este compromiso sólo es visible localmente. Para que sea visible para la comunidad Julia, debe fusionar su `METADATA` local en el repositorio oficial. El comando `PkgDev.publish()` bifurca el repositorio `METADATA` en GitHub, inserta los cambios en su bifurcación, y abre una solicitud de extracción:
+
 
 ```julia-repl
 julia> PkgDev.publish()
@@ -696,22 +687,17 @@ INFO: To create a pull-request open:
 ```
 
 !!! tip
-    If `PkgDev.publish()` fails with error:
+    Si `PkgDev.publish()` falla con error:
 
     ```
     ERROR: key not found: "token"
     ```
 
-    then you may have encountered an issue from using the GitHub API on multiple systems. The solution
-    is to delete the "Julia Package Manager" personal access token [from your Github account](https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2Fsettings%2Ftokens)
-    and try again.
+entonces puede que hayas encontrado un problema al usar la API de GitHub en múltiples sistemas. La solución es eliminar el token de acceso personal "*Julia Package Manager*" [de tu cuenta Github](https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2Fsettings%2Ftokens) e intentarlo de nuevo.
 
-    Other failures may require you to circumvent `PkgDev.publish()` by [creating a pull request on GitHub](https://help.github.com/articles/creating-a-pull-request/).
-    See: [Publishing METADATA manually](@ref) below.
+Otros fallos pueden requerir que evites `PkgDev.publish ()` al [crear una solicitud de extracción en GitHub] (https://help.github.com/articles/creating-a-pull-request/). Ver: [Publicación de METADATA manualmente](@ref) a continuación.
 
-Once the package URL for `FooBar` is registered in the official `METADATA` repo, people know where
-to clone the package from, but there still aren't any registered versions available. You can tag
-and register it with the `PkgDev.tag()` command:
+Una vez que la URL del paquete para `FooBar` se registra en el repositorio oficial de` METADATA`, las personas saben de dónde clonar el paquete, pero todavía no hay ninguna versión registrada disponible. Puede etiquetarlo y registrarlo con el comando `PkgDev.tag()`:
 
 ```julia-repl
 julia> PkgDev.tag("FooBar")
@@ -719,14 +705,14 @@ INFO: Tagging FooBar v0.0.1
 INFO: Committing METADATA for FooBar
 ```
 
-This tags `v0.0.1` in the `FooBar` repo:
+Esto etiqueta el reppositorio en `FooBar` con `v0.0.1`:
 
 ```
 $ cd ~/.julia/v0.6/FooBar && git tag
 v0.0.1
 ```
 
-It also creates a new version entry in your local `METADATA` repo for `FooBar`:
+También crea una nueva entrada de versión en su repositorio `METADATA` local para` FooBar`:
 
 ```
 $ cd ~/.julia/v0.6/FooBar && git show
@@ -745,21 +731,13 @@ index 0000000..c1cb1c1
 +84b8e266dae6de30ab9703150b3bf771ec7b6285
 ```
 
-The `PkgDev.tag()` command takes an optional second argument that is either an explicit version
-number object like `v"0.0.1"` or one of the symbols `:patch`, `:minor` or `:major`. These increment
-the patch, minor or major version number of your package intelligently.
+El mandato `PkgDev.tag()` toma un segundo argumento opcional que es un objeto de número de versión explícito como `v"0.0.1"` o uno de los símbolos `:patch`,`:minor` o `:major` . Estos incrementan el parche, el número de versión menor o mayor de su paquete de forma inteligente.
 
-Adding a tagged version of your package will expedite the official registration into METADATA.jl
-by collaborators. It is strongly recommended that you complete this process, regardless if your
-package is completely ready for an official release.
+Agregar una versión etiquetada de su paquete agilizará el registro oficial en METADATA.jl por parte de los colaboradores. Se recomienda enfáticamente que complete este proceso, independientemente de si su paquete está completamente listo para una versión oficial.
 
-As a general rule, packages should be tagged `0.0.1` first. Since Julia itself hasn't achieved
-`1.0` status, it's best to be conservative in your package's tagged versions.
+Como regla general, los paquetes deben etiquetarse como `0.0.1` primero. Como Julia no ha alcanzado el estado '1.0', es mejor ser conservador en las versiones etiquetadas de su paquete.
 
-As with `PkgDev.register()`, these changes to `METADATA` aren't available to anyone else until
-they've been included upstream. Again, use the `PkgDev.publish()` command, which first makes sure
-that individual package repos have been tagged, pushes them if they haven't already been, and
-then opens a pull request to `METADATA`:
+Al igual que con `PkgDev.register()`, estos cambios en `METADATA` no están disponibles para nadie más hasta que se hayan incluido en la versión anterior. De nuevo, use el comando `PkgDev.publish()`, que primero se asegura de que los repos individuales de paquetes hayan sido etiquetados, los empuja si no han sido ya, y luego abre una solicitud de extracción a `METADATA`:
 
 ```julia-repl
 julia> PkgDev.publish()
@@ -775,31 +753,27 @@ INFO: To create a pull-request open:
 
 #### Publishing METADATA manually
 
-If `PkgDev.publish()` fails you can follow these instructions to manually publish your package.
+Si `PkgDev.publish()` falla, puede seguir estas instrucciones para publicar su paquete manualmente.
 
-By "forking" the main METADATA repository, you can create a personal copy (of METADATA.jl) under
-your GitHub account. Once that copy exists, you can push your local changes to your copy (just
-like any other GitHub project).
+Al "bifurcar" el repositorio principal de METADATA, puede crear una copia personal (de METADATA.jl) en su cuenta de GitHub. Una vez que existe esa copia, puede enviar sus cambios locales a su copia (al igual que cualquier otro proyecto de GitHub).
 
-1. go to [https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2FJuliaLang%2FMETADATA.jl%2Ffork](https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2FJuliaLang%2FMETADATA.jl%2Ffork)
-and create your own fork.
+1. Vaya a [https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2FJuliaLang%2FMETADATA.jl%2Ffork](https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2FJuliaLang%2FMETADATA.jl%2Ffork)
+y cree su propia bifurcación.
 
-2. add your fork as a remote repository for the METADATA repository on your local computer (in
-the terminal where USERNAME is your github username):
+2. Agregue su bifurcación como un repositorio remoto para el repositorio METADATA en su computadora local (en la terminal donde USERNAME es su nombre de usuario github)::
 
 ```
 cd ~/.julia/v0.6/METADATA
 git remote add USERNAME https://github.com/USERNAME/METADATA.jl.git
 ```
 
-1. push your changes to your fork:
+1. empuja tus cambios a tu bifurcación:
 
    ```
    git push USERNAME metadata-v2
    ```
 
-4. If all of that works, then go back to the GitHub page for your fork, and click the "pull request"
-link.
+4. Si todo eso funciona, regrese a la página de GitHub para su tenedor y haga clic en el enlace "solicitar solicitud".
 
 ## Fixing Package Requirements
 
