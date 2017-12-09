@@ -62,12 +62,7 @@ julia> (Cstring,)
 (Cstring,)
 ```
 
-In practice, especially when providing reusable functionality, one generally wraps [`ccall`](@ref)
-uses in Julia functions that set up arguments and then check for errors in whatever manner the
-C or Fortran function indicates them, propagating to the Julia caller as exceptions. This is especially
-important since C and Fortran APIs are notoriously inconsistent about how they indicate error
-conditions. For example, the `getenv` C library function is wrapped in the following Julia function,
-which is a simplified version of the actual definition from [`env.jl`](https://github.com/JuliaLang/julia/blob/master/base/env.jl):
+En la práctica, especialmente cuando se proporciona funcionalidad reutilizable, generalmente se envuelve el usp de  [`ccall`](@ref) en funciones de Julia que configuran argumentos y luego se comprueban los errores de cualquier forma que la función C o Fortran los indique, propagándose al código que llama desde Julia como excepciones. Esto es especialmente importante ya que las API de C y Fortran son notoriamente inconsistentes sobre cómo indican las condiciones de error. Por ejemplo, la función de biblioteca C `getenv` está envuelta en la siguiente función Julia, que es una versión simplificada de la definición real de [`env.jl`](https://github.com/JuliaLang/julia/blob/master/base/env.jl):
 
 ```julia
 function getenv(var::AbstractString)
@@ -80,10 +75,7 @@ function getenv(var::AbstractString)
 end
 ```
 
-The C `getenv` function indicates an error by returning `NULL`, but other standard C functions
-indicate errors in various different ways, including by returning -1, 0, 1 and other special values.
-This wrapper throws an exception clearly indicating the problem if the caller tries to get a non-existent
-environment variable:
+La función C `getenv` indica un error al devolver` NULL`, pero otras funciones C estándar indican errores de varias maneras diferentes, incluyendo al devolver -1, 0, 1 y otros valores especiales. Este contenedor arroja una excepción que indica claramente el problema si la persona que llama intenta obtener una variable de entorno inexistente:
 
 ```julia-repl
 julia> getenv("SHELL")
@@ -93,7 +85,7 @@ julia> getenv("FOOBAR")
 getenv: undefined variable: FOOBAR
 ```
 
-Here is a slightly more complex example that discovers the local machine's hostname:
+Aquí hay un ejemplo ligeramente ms complejo que descubre el nombre de host de la máquina local:
 
 ```julia
 function gethostname()
@@ -106,15 +98,7 @@ function gethostname()
 end
 ```
 
-This example first allocates an array of bytes, then calls the C library function `gethostname`
-to fill the array in with the hostname, takes a pointer to the hostname buffer, and converts the
-pointer to a Julia string, assuming that it is a NUL-terminated C string. It is common for C libraries
-to use this pattern of requiring the caller to allocate memory to be passed to the callee and
-filled in. Allocation of memory from Julia like this is generally accomplished by creating an
-uninitialized array and passing a pointer to its data to the C function. This is why we don't
-use the `Cstring` type here: as the array is uninitialized, it could contain NUL bytes. Converting
-to a `Cstring` as part of the [`ccall`](@ref) checks for contained NUL bytes and could therefore
-throw a conversion error.
+Este ejemplo primero asigna un array de bytes, luego llama a la función de biblioteca C `gethostname` para llenar el array con el nombre de host, toma un puntero al buffer de nombre de host, y convierte el puntero a una cadena Julia, asumiendo que es una cadena C terminada en NUL. Es común que las bibliotecas C usen este patrón de requerir al llamador que asigne memoria para que la pase al llamado y la complete. La asignación de la memoria de Julia se logra generalmente creando un array no inicializada y pasando un puntero a sus datos a la función C. Es por eso que no usamos el tipo `Cstring` aquí: como la matriz no está inicializada, podría contener bytes NUL. Convertir a `Cstring` como parte de [`ccall`](@ref) comprueba si hay bytes NUL contenidos y, por lo tanto, puede arrojar un error de conversión.
 
 ## Creating C-Compatible Julia Function Pointers
 
@@ -929,28 +913,22 @@ on the element types of pointers.
 
 ## Thread-safety
 
-Some C libraries execute their callbacks from a different thread, and since Julia isn't thread-safe
-you'll need to take some extra precautions. In particular, you'll need to set up a two-layered
-system: the C callback should only *schedule* (via Julia's event loop) the execution of your "real"
-callback. To do this, create a `AsyncCondition` object and wait on it:
+Some C libraries execute their callbacks from a different thread, and since Julia isn't thread-safe you'll need to take some extra precautions. In particular, you'll need to set up a two-layered system: the C callback should only *schedule* (via Julia's event loop) the execution of your "real" callback. To do this, create a `AsyncCondition` object and wait on it:
 
 ```julia
 cond = Base.AsyncCondition()
 wait(cond)
 ```
 
-The callback you pass to C should only execute a [`ccall`](@ref) to `:uv_async_send`, passing
-`cond.handle` as the argument, taking care to avoid any allocations or other interactions with the
-Julia runtime.
+The callback you pass to C should only execute a [`ccall`](@ref) to `:uv_async_send`, passing `cond.handle` as the argument, taking care to avoid any allocations or other interactions with the Julia runtime.
 
 Note that events may be coalesced, so multiple calls to `uv_async_send` may result in a single wakeup
 notification to the condition.
 
 ## More About Callbacks
 
-For more details on how to pass callbacks to C libraries, see this [blog post](https://julialang.org/blog/2013/05/callback).
+Para obtener más detalles sobre cómo pasar devoluciones de llamada a bibliotecas de C, consulte esta [publicación de blog](https://julialang.org/blog/2013/05/callback).
 
 ## C++
 
-For direct C++ interfacing, see the [Cxx](https://github.com/Keno/Cxx.jl) package. For tools to create C++
-bindings, see the [CxxWrap](https://github.com/JuliaInterop/CxxWrap.jl) package.
+Para la interfaz directa de C ++, consulte el paquete [Cxx](https://github.com/Keno/Cxx.jl). Para obtener herramientas para crear enlaces C++, consulte el paquete [CxxWrap](https://github.com/JuliaInterop/CxxWrap.jl).
