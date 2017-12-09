@@ -329,63 +329,36 @@ Después de esto, el paquete `Stats` es gestionado nuevamente por el administrad
     Los paquetes que no están en las ramas también se marcarán como sucios si realiza cambios en el repositorio, 
     pero eso es menos común.
 
-## Custom METADATA Repository
+## Repositorio METADATA Personalizado
 
-By default, Julia assumes you will be using the [official METADATA.jl](https://github.com/JuliaLang/METADATA.jl)
-repository for downloading and installing packages. You can also provide a different metadata
-repository location. A common approach is to keep your `metadata-v2` branch up to date with the
-Julia official branch and add another branch with your custom packages. You can initialize your
-local metadata repository using that custom location and branch and then periodically rebase your
-custom branch with the official `metadata-v2` branch. In order to use a custom repository and
-branch, issue the following command:
+Por defecto, Julia supone que utilizará el [repositorio oficial METADATA.jl](https://github.com/JuliaLang/METADATA.jl) para descargar e instalar paquetes. También podemos proporcionar una ubicación de repositorio de metadatos diferente. Un enfoque común es mantener nuestra rama `metadata-v2` actualizada con la rama oficial de Julia y agregar otra rama con sus paquetes personalizados. Puede inicializar su repositorio de metadatos local utilizando esa ubicación y rama personalizadas y luego volver a establecer la base de nuestra rama personalizada con la rama oficial `metadata-v2`. Para utilizar un repositorio y una sucursal personalizados, utilice el siguiente mandato:
 
 ```julia-repl
 julia> Pkg.init("https://me.example.com/METADATA.jl.git", "branch")
 ```
 
-The branch argument is optional and defaults to `metadata-v2`. Once initialized, a file named
-`META_BRANCH` in your `~/.julia/vX.Y/` path will track the branch that your METADATA repository
-was initialized with. If you want to change branches, you will need to either modify the `META_BRANCH`
-file directly (be careful!) or remove the `vX.Y` directory and re-initialize your METADATA repository
-using the `Pkg.init` command.
+El argumento de la rama es opcional y se predetermina a `metadata-v2`. Una vez inicializado, un archivo llamado `META_BRANCH` en su ruta `~/.julia/vX.Y/` hará un seguimiento de la rama con la que se inicializó su repositorio METADATA. Si desea cambiar de rama, necesitará modificar el archivo `META_BRANCH` directamente (¡tenga cuidado!) O elimine el directorio` vX.Y` y reinicie su repositorio METADATA utilizando el mandato `Pkg.init`.
 
-# Package Development
+# Desarrollo de Paquetes
 
-Julia's package manager is designed so that when you have a package installed, you are already
-in a position to look at its source code and full development history. You are also able to make
-changes to packages, commit them using git, and easily contribute fixes and enhancements upstream.
-Similarly, the system is designed so that if you want to create a new package, the simplest way
-to do so is within the infrastructure provided by the package manager.
+El administrador de paquetes de Julia está diseñado para que cuando tenga un paquete instalado, ya pueda ver su código fuente y el historial completo de desarrollo. También puede realizar cambios en los paquetes, enviarlos por git y contribuir fácilmente a las correcciones y mejoras en el flujo ascendente. Del mismo modo, el sistema está diseñado para que, si desea crear un nuevo paquete, la forma más sencilla de hacerlo sea dentro de la infraestructura proporcionada por el administrador de paquetes.
 
 ## [Initial Setup](@id man-initial-setup)
 
-Since packages are git repositories, before doing any package development you should setup the
-following standard global git configuration settings:
+Dado que los paquetes son repositorios de git, antes de realizar cualquier desarrollo de paquete, tenemos que fijar los siguientes ajustes de configuración de git global estándar:
 
 ```
 $ git config --global user.name "FULL NAME"
 $ git config --global user.email "EMAIL"
 ```
 
-where `FULL NAME` is your actual full name (spaces are allowed between the double quotes) and
-`EMAIL` is your actual email address. Although it isn't necessary to use [GitHub](https://github.com/)
-to create or publish Julia packages, most Julia packages as of writing this are hosted on GitHub
-and the package manager knows how to format origin URLs correctly and otherwise work with the
-service smoothly. We recommend that you create a [free account](https://github.com/join) on GitHub
-and then do:
+donde `FULL NAME` es su nombre completo actual (se permiten espacios entre las comillas dobles) y` EMAIL` es su dirección de correo electrónico real. Aunque no es necesario usar [GitHub](https://github.com/) para crear o publicar paquetes de Julia, la mayoría de los paquetes de Julia al momento de escribir esto están alojados en GitHub y el administrador de paquetes sabe cómo formatear correctamente las URL de origen. y de lo contrario trabajar con el servicio sin problemas. Le recomendamos que cree una [cuenta gratuita](https://github.com/join) en GitHub y luego haga lo siguiente:
 
 ```
 $ git config --global github.user "USERNAME"
 ```
 
-where `USERNAME` is your actual GitHub user name. Once you do this, the package manager knows
-your GitHub user name and can configure things accordingly. You should also [upload](https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2Fsettings%2Fssh)
-your public SSH key to GitHub and set up an [SSH agent](https://linux.die.net/man/1/ssh-agent)
-on your development machine so that you can push changes with minimal hassle. In the future, we
-will make this system extensible and support other common git hosting options like [BitBucket](https://bitbucket.org)
-and allow developers to choose their favorite. Since the package development functions has been
-moved to the [PkgDev](https://github.com/JuliaLang/PkgDev.jl) package, you need to run `Pkg.add("PkgDev"); import PkgDev`
-to access the functions starting with `PkgDev.` in the document below.
+donde `USERNAME` es nuestro nombre real de usuario en GitHub. Una vez que hace esto, el administrador de paquetes reconoce el nombre de usuario GitHub y puede configurar las cosas en consecuencia. También debemos [cargar](https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2Fsettings%2Fssh) nuestra clave pública SSH a GitHub y configurar un [agente SSH](https: //linux.die.net/man/1/ssh-agent) en nuestra máquina de desarrollo para que pueda realizar cambios con una molestia mínima. En el futuro, haremos que este sistema sea extensible y admitiremos otras opciones comunes de alojamiento git como [BitBucket] (https://bitbucket.org) y permitiremos a los desarrolladores elegir su favorito. Como las funciones de desarrollo del paquete se han movido al paquete [PkgDev](https://github.com/JuliaLang/PkgDev.jl), debe ejecutar `Pkg.add ("PkgDev"); import PkgDev` para acceder a las funciones que comienzan con `PkgDev` en el documento siguiente.
 
 ## Making changes to an existing package
 
