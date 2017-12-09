@@ -360,28 +360,19 @@ $ git config --global github.user "USERNAME"
 
 donde `USERNAME` es nuestro nombre real de usuario en GitHub. Una vez que hace esto, el administrador de paquetes reconoce el nombre de usuario GitHub y puede configurar las cosas en consecuencia. También debemos [cargar](https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2Fsettings%2Fssh) nuestra clave pública SSH a GitHub y configurar un [agente SSH](https: //linux.die.net/man/1/ssh-agent) en nuestra máquina de desarrollo para que pueda realizar cambios con una molestia mínima. En el futuro, haremos que este sistema sea extensible y admitiremos otras opciones comunes de alojamiento git como [BitBucket] (https://bitbucket.org) y permitiremos a los desarrolladores elegir su favorito. Como las funciones de desarrollo del paquete se han movido al paquete [PkgDev](https://github.com/JuliaLang/PkgDev.jl), debe ejecutar `Pkg.add ("PkgDev"); import PkgDev` para acceder a las funciones que comienzan con `PkgDev` en el documento siguiente.
 
-## Making changes to an existing package
+## Hacer cambios a un paquete existente
 
-### Documentation changes
+### Cambios en la Documentación
 
-If you want to improve the online documentation of a package, the easiest approach (at least for
-small changes) is to use GitHub's online editing functionality. First, navigate to the repository's
-GitHub "home page," find the file (e.g., `README.md`) within the repository's folder structure,
-and click on it. You'll see the contents displayed, along with a small "pencil" icon in the upper
-right hand corner. Clicking that icon opens the file in edit mode. Make your changes, write a
-brief summary describing the changes you want to make (this is your *commit message*), and then
-hit "Propose file change." Your changes will be submitted for consideration by the package owner(s)
-and collaborators.
+Si desea mejorar la documentación en línea de un paquete, el enfoque más fácil (al menos para pequeños cambios) es utilizar la funcionalidad de edición en línea de GitHub. Primero, vaya a la "página de inicio" de GitHub del repositorio, busque el archivo (por ejemplo, `README.md`) dentro de la estructura de carpetas del repositorio y haga clic en él. Verá el contenido que se muestra, junto con un pequeño icono de "lápiz" en la esquina superior derecha. Al hacer clic en ese icono, se abre el archivo en modo de edición. Realice los cambios, escriba un breve resumen que describa los cambios que desea realizar (este es su *mensaje de confirmación*), y luego presione "Proponer cambio de archivo". Sus cambios serán enviados para su consideración por el propietario (s) del paquete y sus colaboradores.
 
-For larger documentation changes--and especially ones that you expect to have to update in response
-to feedback--you might find it easier to use the procedure for code changes described below.
+Para cambios de documentación más grandes, y especialmente aquellos que espera tener que actualizar en respuesta a los comentarios, puede que le resulte más fácil utilizar el procedimiento para los cambios de código que se describe a continuación.
 
-### Code changes
+### Caambios en el Código
 
-#### Executive summary
+#### Resumen Ejecutivo
 
-Here we assume you've already set up git on your local machine and have a GitHub account (see
-above). Let's imagine you're fixing a bug in the Images package:
+Aquí suponemos que ya ha configurado git en su máquina local y tiene una cuenta de GitHub (consulte más arriba). Imaginemos que está solucionando un error en el paquete `Images`:
 
 ```
 Pkg.checkout("Images")           # check out the master branch
@@ -395,23 +386,14 @@ using PkgDev
 PkgDev.submit("Images")
 ```
 
-The last line will present you with a link to submit a pull request to incorporate your changes.
+La última línea le presentará un enlace para enviar una solicitud de extracción para incorporar sus cambios.
 
-#### Detailed description
+#### Descripción Detallada
 
-If you want to fix a bug or add new functionality, you want to be able to test your changes before
-you submit them for consideration. You also need to have an easy way to update your proposal in
-response to the package owner's feedback. Consequently, in this case the strategy is to work locally
-on your own machine; once you are satisfied with your changes, you submit them for consideration.
- This process is called a *pull request* because you are asking to "pull" your changes into the
-project's main repository. Because the online repository can't see the code on your private machine,
-you first *push* your changes to a publicly-visible location, your own online *fork* of the package
-(hosted on your own personal GitHub account).
+Si desea corregir un error o agregar una nueva funcionalidad, desea poder probar los cambios antes de enviarlos para su consideración. También debe tener una manera fácil de actualizar su propuesta en respuesta a los comentarios del propietario del paquete. En consecuencia, en este caso, la estrategia es trabajar localmente en su propia máquina; una vez que esté satisfecho con sus cambios, los envía para su consideración. Este proceso se llama *solicitud de extracción* porque usted está solicitando "extraer" sus cambios en el repositorio principal del proyecto. Debido a que el repositorio en línea no puede ver el código en su máquina privada, primero * envía * sus cambios a una ubicación visible públicamente, su propio * fork * en línea del paquete (alojado en su propia cuenta personal de GitHub).
 
-Let's assume you already have the `Foo` package installed. In the description below, anything
-starting with `Pkg.` or `PkgDev.` is meant to be typed at the Julia prompt; anything starting
-with `git` is meant to be typed in [julia's shell mode](@ref man-shell-mode) (or using the shell that comes with
-your operating system). Within Julia, you can combine these two modes:
+Supongamos que ya tiene instalado el paquete `Foo`. En la siguiente descripción, todo lo que comience con `Pkg` o` PkgDev` debe escribirse en el prompt de Julia; cualquier cosa que comience con `git` debe escribirse en [modo de shell de julia](@ref man-shell-mode) (o usando el shell que viene con su sistema operativo). Dentro de Julia, puedes combinar estos dos modos:
+
 
 ```julia-repl
 julia> cd(Pkg.dir("Foo"))          # go to Foo's folder
@@ -419,58 +401,62 @@ julia> cd(Pkg.dir("Foo"))          # go to Foo's folder
 shell> git command arguments...    # command will apply to Foo
 ```
 
-Now suppose you're ready to make some changes to `Foo`. While there are several possible approaches,
-here is one that is widely used:
+Ahora supongamos que está listo para hacer algunos cambios en `Foo`. Si bien hay varios enfoques posibles, aquí hay uno que se utiliza ampliamente:
 
-  * From the Julia prompt, type [`Pkg.checkout("Foo")`](@ref). This ensures you're running the latest
-    code (the `master` branch), rather than just whatever "official release" version you have installed.
-    (If you're planning to fix a bug, at this point it's a good idea to check again whether the bug
-    has already been fixed by someone else. If it has, you can request that a new official release
-    be tagged so that the fix gets distributed to the rest of the community.) If you receive an error
-    `Foo is dirty, bailing`, see [Dirty packages](@ref) below.
-  * Create a branch for your changes: navigate to the package folder (the one that Julia reports from
-    [`Pkg.dir("Foo")`](@ref)) and (in shell mode) create a new branch using `git checkout -b <newbranch>`,
-    where `<newbranch>` might be some descriptive name (e.g., `fixbar`). By creating a branch, you
-    ensure that you can easily go back and forth between your new work and the current `master` branch
-    (see [https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell)).
+  * Desde el prompt de Julia, escriba [`Pkg.checkout (" Foo ")`] (@ ref). Esto garantiza que está ejecutando 
+    el último código (la rama `master`), en lugar de cualquier copia de la "versión oficial" que haya instalado. 
+    (Si planea corregir un error, en este punto es una buena idea verificar nuevamente si el error ya ha sido 
+    corregido por otra persona. Si lo ha hecho, puede solicitar que se etiquete un nuevo lanzamiento oficial 
+    para que la corrección se distribuya al resto de la comunidad). Si recibe un error `Foo is dirty, bailing`, 
+    consulte [Paquetes sucios](@ref) a continuación.
+  * Crea una rama para tus cambios: navega a la carpeta del paquete (la que Julia informa desde 
+    [`Pkg.dir("Foo")`](@ref)) y (en modo shell) crea una nueva rama usando `git checkout -b <newbranch>`, 
+    donde `<newbranch>` podría ser un nombre descriptivo (por ejemplo,`fixbar`). Al crear una rama, se 
+    asegura de que pueda moverse fácilmente entre su nuevo trabajo y la rama actual 'principal' (consulte 
+    [https://git-scm.com/book/es/v2/Git-Branching-Branches-in-a-Nutshell](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell)).
 
-    If you forget to do this step until after you've already made some changes, don't worry: see
-    [more detail about branching](@ref man-branch-post-hoc) below.
-  * Make your changes. Whether it's fixing a bug or adding new functionality, in most cases your change
-    should include updates to both the `src/` and `test/` folders. If you're fixing a bug, add your
-    minimal example demonstrating the bug (on the current code) to the test suite; by contributing
-    a test for the bug, you ensure that the bug won't accidentally reappear at some later time due
-    to other changes. If you're adding new functionality, creating tests demonstrates to the package
-    owner that you've made sure your code works as intended.
-  * Run the package's tests and make sure they pass. There are several ways to run the tests:
+Si olvida hacer este paso hasta que haya realizado algunos cambios, no se preocupe: consulte [más detalles sobre la bifurcación] (@ ref man-branch-post-hoc) a continuación.
 
-      * From Julia, run [`Pkg.test("Foo")`](@ref): this will run your tests in a separate (new) `julia`
-        process.
-      * From Julia, `include("runtests.jl")` from the package's `test/` folder (it's possible the file
-        has a different name, look for one that runs all the tests): this allows you to run the tests
-        repeatedly in the same session without reloading all the package code; for packages that take
-        a while to load, this can be much faster. With this approach, you do have to do some extra work
-        to make [changes in the package code](@ref man-workflow-tips).
-      * From the shell, run `julia ../test/runtests.jl` from within the package's `src/` folder.
-  * Commit your changes: see [https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository](https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository).
-  * Submit your changes: From the Julia prompt, type `PkgDev.submit("Foo")`. This will push your changes
-    to your GitHub fork, creating it if it doesn't already exist. (If you encounter an error, [make sure you've set up your SSH keys](@ref man-initial-setup).)
-    Julia will then give you a hyperlink; open that link, edit the message, and then click "submit."
-    At that point, the package owner will be notified of your changes and may initiate discussion.
-    (If you are comfortable with git, you can also do these steps manually from the shell.)
-  * The package owner may suggest additional improvements. To respond to those suggestions, you can
-    easily update the pull request (this only works for changes that have not already been merged;
-    for merged pull requests, make new changes by starting a new branch):
+   * Haz tus cambios. Ya sea para corregir un error o agregar una nueva funcionalidad, en la mayoría de los casos tu 
+     cambio debería incluir actualizaciones para las carpetas `src/` y `test/`. Si estás solucionando un error, agrega 
+     un ejemplo mínimo que demuestre el error (en el código actual) al conjunto de pruebas; al contribuir con una 
+     prueba para el error, te aseguras de que el error no vuelva a aparecer accidentalmente en algún momento posterior 
+     debido a otros cambios. Si agregas una nueva funcionalidad, la creación de pruebas le demuestra al propietario 
+     del paquete que te has asegurado de que el código funcione según lo previsto.
+   * Ejecuta las pruebas del paquete y asegúrate de que pasen. Hay varias formas de ejecutar las pruebas:
 
-      * If you've changed branches in the meantime, make sure you go back to the same branch with `git checkout fixbar`
-        (from shell mode) or [`Pkg.checkout("Foo", "fixbar")`](@ref) (from the Julia prompt).
-      * As above, make your changes, run the tests, and commit your changes.
-      * From the shell, type `git push`.  This will add your new commit(s) to the same pull request; you
-        should see them appear automatically on the page holding the discussion of your pull request.
+      * Desde Julia, ejecuta [`Pkg.test (" Foo ")`] (@ ref): esto ejecutará tus pruebas en un proceso 
+        separado (nuevo) `julia`.
+      * Desde Julia, `include("runtests.jl")` desde la carpeta `test/` del paquete (es posible que el 
+        archivo tenga un nombre diferente, busque uno que ejecute todas las pruebas): esto te permite 
+        ejecutar las pruebas repetidamente en la misma sesión sin volver a cargar todo el código del 
+        paquete; para paquetes que tardan un poco en cargarse, esto puede ser mucho más rápido. Con 
+        este enfoque, debes hacer un trabajo adicional para realizar 
+        [cambios en el código del paquete](@ref man-workflow-tips).
+      * Desde el shell, ejecute `julia ../test / runtests.jl` desde dentro de la carpeta` src / `del 
+        paquete.
 
-    One potential type of change the owner may request is that you squash your commits. See [Squashing](@ref man-squashing-and-rebasing)
-    below.
+   * Confirma tus cambios: consulte [https://git-scm.com/book/es/v2/Git-Basics-Recording-Changes-to-the-Repository](https://git-scm.com/book/es/v2/Git-Basics-Recording-Changes-to-the-Repository).
+   * Envía tus cambios: desde el prompt de Julia, escribe `PkgDev.submit("Foo")`. Esto impulsará los 
+     cambios a la bifurcacion de GitHub y la creará si aún no existe. (Si encuentras un error, 
+     [asegúrate de haber configurado tus claves SSH](@ref man-initial-setup).) Julia le dará un 
+     hipervínculo; abra ese enlace, edite el mensaje y luego haga clic en "enviar". En ese momento, 
+     se notificará al propietario del paquete de sus cambios y podrá iniciar el debate. 
+     (Si te sientes cómodo con git, también puedes hacer estos pasos manualmente desde el shell).
+   * El propietario del paquete puede sugerir mejoras adicionales. Para responder a esas sugerencias, 
+     puede actualizar fácilmente la solicitud de extracción (esto solo funciona para cambios que aún 
+     no se han fusionado, para solicitudes de extracción fusionadas, realice nuevos cambios iniciando 
+     una nueva rama):
+     
+      * Si ha cambiado ramas mientras tanto, asegúrese de volver a la misma rama con `git checkout fixbar` 
+      (del modo shell) o [`Pkg.checkout("Foo", "fixbar")`](@ref) (del prompt de Julia).
+      * Como arriba, haga sus cambios, ejecute las pruebas y comprometa sus cambios.
+      * Desde el shell, escribe `git push`. Esto agregará sus nuevas confirmaciones a la misma solicitud 
+        de extracción; debería verlos aparecer automáticamente en la página que contiene la discusión de 
+        su solicitud de extracción.
 
+Un posible tipo de cambio que el propietario puede solicitar es que elimine sus compromisos. Ver [Squashing](@ref man-squashing-and-rebasing) a continuación.
+    
 ### Dirty packages
 
 If you can't change branches because the package manager complains that your package is dirty,
@@ -903,56 +889,44 @@ out in the repo will **not** match the requirements in `METADATA` after such a c
 unavoidable. When you fix the requirements in `METADATA` for a previous version of a package,
 however, you should also fix the `REQUIRE` file in the current version of the package.
 
-## Requirements Specification
+## Especificación de Requerimientos
 
-The `~/.julia/v0.6/REQUIRE` file, the `REQUIRE` file inside packages, and the `METADATA` package
-`requires` files use a simple line-based format to express the ranges of package versions which
-need to be installed. Package `REQUIRE` and `METADATA requires` files should also include the
-range of versions of `julia` the package is expected to work with. Additionally, packages can
-include a `test/REQUIRE` file to specify additional packages which are only required for testing.
+El archivo `~/.julia/v0.6/REQUIRE`, el archivo` REQUIRE` dentro de los paquetes y los archivos `require` del paquete `METADATA` utilizan un formato simple basado en línea para expresar los rangos de las versiones del paquete que necesitan estar instalados. Los archivos `REQUIRE` y `METADATA requires` también deben incluir el rango de versiones de `julia` con las que se espera que funcione el paquete. Además, los paquetes pueden incluir un archivo `test/REQUIRE` para especificar paquetes adicionales que solo son necesarios para la prueba.
 
-Here's how these files are parsed and interpreted.
+Así es cómo se analizan e interpretan estos archivos.
 
-  * Everything after a `#` mark is stripped from each line as a comment.
-  * If nothing but whitespace is left, the line is ignored.
-  * If there are non-whitespace characters remaining, the line is a requirement and the is split on
-    whitespace into words.
+   * Todo lo que haya después de que una marca `#` se elimina de cada línea como un comentario.
+   * Si solo queda espacio en blanco, la línea se ignorará.
+   * Si quedan caracteres que no sean espacios en blanco, la línea es un requisito y el espacio en blanco se 
+     divide en palabras.
 
-The simplest possible requirement is just the name of a package name on a line by itself:
+El requisito más simple posible es simplemente el nombre del nombre de un paquete en una línea por sí mismo:
 
 ```julia
 Distributions
 ```
 
-This requirement is satisfied by any version of the `Distributions` package. The package name
-can be followed by zero or more version numbers in ascending order, indicating acceptable intervals
-of versions of that package. One version opens an interval, while the next closes it, and the
-next opens a new interval, and so on; if an odd number of version numbers are given, then arbitrarily
-large versions will satisfy; if an even number of version numbers are given, the last one is an
-upper limit on acceptable version numbers. For example, the line:
+Este requisito se satisface con cualquier versión del paquete `Distributions`. El nombre del paquete puede ir seguido de cero o más números de versión en orden ascendente, lo que indica intervalos aceptables de versiones de ese paquete. Una versión abre un intervalo, la siguiente la cierra y la siguiente abre un nuevo intervalo, y así sucesivamente; si se da un número impar de números de versión, las versiones arbitrariamente grandes satisfarán; si se proporciona un número par de números de versión, el último es un límite superior para los números de versión aceptables. Por ejemplo, la línea:
 
 ```
 Distributions 0.1
 ```
 
-is satisfied by any version of `Distributions` greater than or equal to `0.1.0`. Suffixing a version
-with `-` allows any pre-release versions as well. For example:
+se satisface con cualquier versión de `Distribuciones` superior o igual a` 0.1.0`. El sufijo de una versión con `-` también permite versiones preliminares. Por ejemplo:
 
 ```
 Distributions 0.1-
 ```
 
-is satisfied by pre-release versions such as `0.1-dev` or `0.1-rc1`, or by any version greater
-than or equal to `0.1.0`.
+se satisface con las versiones preliminares tales como `0.1-dev` o` 0.1-rc1`, o con cualquier versión mayor o igual a `0.1.0`.
 
-This requirement entry:
+Esta entrada de requisito:
 
 ```
 Distributions 0.1 0.2.5
 ```
 
-is satisfied by versions from `0.1.0` up to, but not including `0.2.5`. If you want to indicate
-that any `0.1.x` version will do, you will want to write:
+se satisface con versiones desde '0.1.0' hasta, pero sin incluir, '0.2.5'. Si quiere indicar que cualquier versión de `0.1.x` va a funcionar, querrá escribir:
 
 ```
 Distributions 0.1 0.2-
@@ -963,17 +937,13 @@ If you want to start accepting versions after `0.2.7`, you can write:
 ```
 Distributions 0.1 0.2- 0.2.7
 ```
-
-If a requirement line has leading words that begin with `@`, it is a system-dependent requirement.
-If your system matches these system conditionals, the requirement is included, if not, the requirement
-is ignored. For example:
+Si una línea de requisitos tiene palabras iniciales que comienzan con `@`, es un requisito dependiente del sistema. Si su sistema coincide con estos condicionales del sistema, se incluye el requisito, de lo contrario, se ignora el requisito. Por ejemplo:
 
 ```
 @osx Homebrew
 ```
 
-will require the `Homebrew` package only on systems where the operating system is OS X. The system
-conditions that are currently supported are (hierarchically):
+requerirá el paquete `Homebrew` solo en los sistemas donde el sistema operativo es OS X. Las condiciones del sistema que actualmente son compatibles son (jerárquicamente):
 
   * `@unix`
 
@@ -983,20 +953,16 @@ conditions that are currently supported are (hierarchically):
           * `@osx`
   * `@windows`
 
-The `@unix` condition is satisfied on all UNIX systems, including Linux and BSD. Negated system
-conditionals are also supported by adding a `!` after the leading `@`. Examples:
+La condición `@unix` se cumple en todos los sistemas UNIX, incluidos Linux y BSD. Los condicionales de sistema negados también son compatibles al agregar un `!` Después del `@` inicial. Ejemplos:
 
 ```
 @!windows
 @unix @!osx
 ```
 
-The first condition applies to any system but Windows and the second condition applies to any
-UNIX system besides OS X.
+La primera condición se aplica a cualquier sistema excepto Windows y la segunda condición se aplica a cualquier sistema UNIX además de OS X.
 
-Runtime checks for the current version of Julia can be made using the built-in `VERSION` variable,
-which is of type `VersionNumber`. Such code is occasionally necessary to keep track of new or
-deprecated functionality between various releases of Julia. Examples of runtime checks:
+Los controles de tiempo de ejecución para la versión actual de Julia se pueden realizar utilizando la variable incorporada `VERSION`, que es de tipo `VersionNumber`. Dicho código ocasionalmente es necesario para realizar un seguimiento de la funcionalidad nueva o obsoleta entre varias versiones de Julia. Ejemplos de controles de tiempo de ejecución:
 
 ```julia
 VERSION < v"0.3-" #exclude all pre-release versions of 0.3
