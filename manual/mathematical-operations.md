@@ -128,7 +128,7 @@ julia> [1,2,3] .^ 3
  27
 ```
 
-Más específicamente, `a .^ b` es analizado como la [llamada vectorizada ( o *"dot" call*)](@ref man-vectorized) `(^).(a,b)`, que realiza una operación de [retransmisión (*broadcast*)](@ref Broadcasting): ella puede combinar arrays y escalares, arrays del mismo tamaño (realizando la operación elemento a elemento), o incluso arrays de diferentes formas (por ejemplo, combinar vectores fila y columna para producir una matriz). Además, como todas las llamadas vectorizadas, estos operadores son *fusing*. Por ejemplo, si calculas `2 .* A.^2 .+ sin.(A)` (o, equivalentemente `@. 2A^2 + sin(A)`, usando la macro [`@.`](@ref @__dot__)) para un array `A`, se realiza un *único* bucle sobre `A`, computando `2a^2 + sin(a)` para cada elemento de `A`. En particular, las llamadas vectorizadas anidadas como `f.(g.(x))` son *fused*, y los operadores binarios adyacentes como `x .+ 3 .* x.^2` son equivalentes a llamadas vectorizadas anidadas `(+).(x, (*).(3, (^).(x, 2)))`.
+Más específicamente, `a .^ b` es analizado como la [llamada vectorizada (o *"dot" call*)](@ref man-vectorized) `(^).(a,b)`, que realiza una operación de [retransmisión (*broadcast*)](@ref Broadcasting): ella puede combinar arrays y escalares, arrays del mismo tamaño (realizando la operación elemento a elemento), o incluso arrays de diferentes formas (por ejemplo, combinar vectores fila y columna para producir una matriz). Además, como todas las llamadas vectorizadas, estos operadores son *fusing*. Por ejemplo, si calculas `2 .* A.^2 .+ sin.(A)` (o, equivalentemente `@. 2A^2 + sin(A)`, usando la macro [`@.`](@ref @__dot__)) para un array `A`, se realiza un *único* bucle sobre `A`, computando `2a^2 + sin(a)` para cada elemento de `A`. En particular, las llamadas vectorizadas anidadas como `f.(g.(x))` son *fused*, y los operadores binarios adyacentes como `x .+ 3 .* x.^2` son equivalentes a llamadas vectorizadas anidadas `(+).(x, (*).(3, (^).(x, 2)))`.
 
 Además, los operadores de actualización "vectorizados" como `a .+= b` (o `@. a += b`) son transformados en `a .= a .+ b`, donde `.=` es un opeador de asignación *fused* *in-place* (ver la [documentación de la sintaxis vectorizada](@ref man-vectorized)).
 
@@ -417,7 +417,7 @@ Ver [Conversión y Promoción](@ref conversion-and-promotion) para ver cómo def
 | [`abs2(x)`](@ref)       | El cuadrado de la magnitud de `x`                          |
 | [`sign(x)`](@ref)       | Indica el signo de `x`, devolviendo -1, 0, o +1            |
 | [`signbit(x)`](@ref)    | Indica que si el bit de signo está en **on** (`true`) o en **off** (`false`)|
-| [`copysign(x,y)`](@ref) | Indica un valor con la magnitud de `x` y el signo de `y    |
+| [`copysign(x,y)`](@ref) | Indica un valor con la magnitud de `x` y el signo de `y    |
 | [`flipsign(x,y)`](@ref) |  Indica un valor con la magnitud de `x` y el signo de `x*y`|
 
 ### Potencias, logaritmos y raíces
