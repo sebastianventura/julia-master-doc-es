@@ -117,7 +117,7 @@ Como de costumbre, el valor absoluto ([`abs()`](@ref)) de un número complejo es
 [`abs2()`](@ref) da el cuadrado del valor absoluto, y es de uso particular para los números complejos 
 donde se evita tomar una raíz cuadrada. [`angle()`](@ref) devuelve el ángulo de fase en radianes 
 (también conocido como *argumento* o función *arg*). La gama completa de otras [Funciones Elementales](@ref)
-is also defined for complex numbers:
+está también definida para los números complejos:
 
 ```jldoctest
 julia> sqrt(1im)
