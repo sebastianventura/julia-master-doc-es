@@ -209,11 +209,12 @@ julia> str[6:6]
 ","
 ```
 
-La primera es un valor carácter de tipo `Char`, mientras que la segunda es un valor cadena que tiene un único carácter. En Julia se trata de cosas muy diferentes.happens to contain only a single character. In Julia these are very different things.
+La primera es un valor carácter de tipo `Char`, mientras que la segunda es un valor cadena que tiene un único carácter. En Julia se trata de cosas muy diferentes.happens to contain only a single character.
 
 ## Unicode y UTF-8
 
 Julia soporta totalmente caracteres y cadenas Unicode. Como se ha [comentado anteriormente](@ref man-characters), en literales de caracteres, los puntos de código Unicode se pueden representar usando las secuencias de escape Unicode `\u` y `\U`, así como todas las secuencias de escape C estándar. Éstos también se pueden utilizar para escribir literales de cadena:
+
 ```jldoctest unicodestring
 
 julia> s = "\u2200 x \u2203 y"
@@ -454,7 +455,6 @@ Closest candidates are:
 
 Este último error es debido a que 'o'  es un literal carácter, y [`contains()`](@ref) es una función genérica que busca subsecuencias. Para buscar un elemento en una secuencia, debemos usar la función [`in()`](@ref) en lugra de la anterior.
 
-instead.
 [`repeat()`](@ref) y  [`join()`](@ref) son otras dos funciones de cadena muy útiles:
 
 ```jldoctest
@@ -707,9 +707,7 @@ julia> b"\uff"
 
 En los literales de caracteres, esta distinción se pasa por alto y `\xff` está autorizado a  representar el punto de código 255, porque los caracteres *siempre* representan puntos de código. En las cadenas, sin embargo, los escapes `\x` siempre representan bytes, no puntos de código, mientras que los escapes `\u` y `\U` siempre representan puntos de código, que están codificados en uno o más bytes. Para los puntos de código inferiores a `\u80`, ocurre que la codificación UTF-8 de cada punto de código es sólo el byte producido por el escape `\x` correspondiente, por lo que la distinción puede ignorarse con seguridad. Sin embargo, para los escapes `\x80` a `\xff` en comparación con `\u80` a `\uff`, existe una diferencia importante: el primero escapa a todos los bytes sencillos de codificación, los cuales -a menos que sean seguidos por bytes de continuación muy específicos- no forman UTF-8 válido, mientras que los últimos escapes representan puntos de código Unicode con codificaciones de dos bytes.
 
-Si todo esto es muy confuso, intente leer ["The Absolute Minimum Every
-Software Developer Absolutely, Positively Must Know About Unicode and Character 
-Sets"](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/). Es una excelente introducción a Unicode y UTF-8, y puede ayudar a aliviar cierta confusión sobre el asunto.
+Si todo esto es muy confuso, intente leer ["The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and Character Sets"](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/). Es una excelente introducción a Unicode y UTF-8, y puede ayudar a aliviar cierta confusión sobre el asunto.
 
 ## [Literales Número de Versión](@id man-version-number-literals)
 
