@@ -34,8 +34,7 @@ julia> f(2,3)
 5
 ```
 
-Sin usar paréntesis, la expresión `f` se refiere al objeto función, y puede ser tratada como 
-cualquier otro valor:
+Sin usar paréntesis, la expresión `f` se refiere al objeto función, y puede ser tratada como cualquier otro valor:
 
 ```jldoctest fofxy
 julia> g = f;
@@ -79,8 +78,7 @@ function g(x,y)
 end
 ```
 
-Como las definiciones a función pueden ser introducidas en una sesión interactiva, es muy sencillo 
-comparar estas definiciones:
+Como las definiciones a función pueden ser introducidas en una sesión interactiva, es muy sencillo comparar estas definiciones:
 
 ```jldoctest
 julia> f(x,y) = x + y
@@ -242,16 +240,14 @@ julia> function foo(a,b)
 foo (generic function with 1 method)
 ```
 
-Si invocamos esta función en una sesión interactiva sin asignar los valores en ningún sitio, 
-comprobaremos que la función devuelve una tupla:
+Si invocamos esta función en una sesión interactiva sin asignar los valores en ningún sitio, comprobaremos que la función devuelve una tupla:
 
 ```jldoctest foofunc
 julia> foo(2,3)
 (5, 6)
 ```
 
-Un uso típico de tal par de valores devueltos es extraer cada valor en una variable. Julia 
-soporta la "desestructuración" simple de una tupla que facilita esto:
+Un uso típico de tal par de valores devueltos es extraer cada valor en una variable. Julia soporta la "desestructuración" simple de una tupla que facilita esto:
 
 ```jldoctest foofunc
 julia> x, y = foo(2,3)
@@ -273,7 +269,7 @@ function foo(a,b)
 end
 ```
 
-Esto tiene exactamente el mismo efecto que la definicin anterior de `foo`.
+Esto tiene exactamente el mismo efecto que la definición anterior de `foo`.
 
 ## Funciones con argumentos variables (varargs)
 
@@ -286,9 +282,7 @@ julia> bar(a,b,x...) = (a,b,x)
 bar (generic function with 1 method)
 ```
 
-Las variables `a` y `b` están asociadas a los dos primeros argumentos como es natural, y la variable 
-`x` se asocia a una colección, iterable de cero o más valores pasados a la función `bar` después de 
-estos dos argumentos:
+Las variables `a` y `b` están asociadas a los dos primeros argumentos como es natural, y la variable `x` se asocia a una colección, iterable de cero o más valores pasados a la función `bar` después de estos dos argumentos:
 
 ```jldoctest barfunc
 julia> bar(1,2)
@@ -306,12 +300,9 @@ julia> bar(1,2,3,4,5,6)
 
 En todos los casos, `x` es asociada a una tupla con el resto de valores pasados a la función.
 
-Es posible restringir el número de argumentos pasados como argumento variable. Esto se discutirá 
-más adelante en la sección [métodos *vararg* restringidos paramétricamente](@ref).
+Es posible restringir el número de argumentos pasados como argumento variable. Esto se discutirá más adelante en la sección [métodos *vararg* restringidos paramétricamente](@ref).
 
-Como contraposición, es frecuente manejar la división de los valores contenidos en una colección 
-iterable en una llamada a función como argumentos individuales. Para hacer eso, se utilizará la 
-notación de puntos suspensivos, pero esta vez en la llamada a función.
+Como contraposición, es frecuente manejar la división de los valores contenidos en una colección iterable en una llamada a función como argumentos individuales. Para hacer eso, se utilizará la notación de puntos suspensivos, pero esta vez en la llamada a función.
 
 ```jldoctest barfunc
 julia> x = (3, 4)
@@ -321,8 +312,7 @@ julia> bar(1,2,x...)
 (1, 2, (3, 4))
 ```
 
-En este caso hay una tupla que se divide en una llamada *vararg* precisamente donde está el 
-número de argumentos variable. Esa necesidad no tiene por qué ser el caso:
+En este caso hay una tupla que se divide en una llamada *vararg* precisamente donde está el número de argumentos variable. Esa necesidad no tiene por qué ser el caso:
 
 ```jldoctest barfunc
 julia> x = (2, 3, 4)
@@ -360,8 +350,7 @@ julia> bar(x...)
 (1, 2, (3, 4))
 ```
 
-También, la función cuyos argumentos son divididos no tiene por qué ser una función *vararg* 
-(aunque frecuentemente lo sea):
+También, la función cuyos argumentos son divididos no tiene por qué ser una función *vararg* (aunque frecuentemente lo sea):
 
 ```jldoctest
 julia> baz(a,b) = a + b;
@@ -404,8 +393,7 @@ function parse(T, num, base=10)
 end
 ```
 
-Con esta definición, la función puede ser llamada con dos o tres argumentos y, cuando no se pase 
-el tercer argumento, la función asignara el valor por defecto de `10` al parámetro `base`.
+Con esta definición, la función puede ser llamada con dos o tres argumentos y, cuando no se pase el tercer argumento, la función asignara el valor por defecto de `10` al parámetro `base`.
 
 ```jldoctest
 julia> parse(Int,"12",10)
@@ -468,25 +456,15 @@ function f(x; y=0, kwargs...)
 end
 ```
 
-Dentro de `f`, `kwargs` será una colección de tuplas `(clave,valor)`, donde cada `clave` es un 
-símbolo. Tales colecciones pueden ser pasadas como argumentos *keyword* usando un punto y coma en 
-la llamada. Por ejemplo: `f(x, z=1; kwargs...)`. Los diccionarios pueden ser también usados para 
-este propósito.
+Dentro de `f`, `kwargs` será una colección de tuplas `(clave,valor)`, donde cada `clave` es un símbolo. Tales colecciones pueden ser pasadas como argumentos *keyword* usando un punto y coma en la llamada. Por ejemplo: `f(x, z=1; kwargs...)`. Los diccionarios pueden ser también usados para este propósito.
 
-Uno puede también pasar tuplas `(clave, valor)` o cualquier expresión iterable (tal como un par `=>`) 
-que puede ser asignado a una tupla, explícitamente después de un punto y coma. Por ejemplo, 
-`plot(x, y; (:width,2))` y `plot(x, y; :width => 2)` son equivalentes a `plot(x, y, width=2)`. 
-Esto es útil en situaciones donde el nombre de la palabra clave se calcula en tiempo de ejecución.
+Uno puede también pasar tuplas `(clave, valor)` o cualquier expresión iterable (tal como un par `=>`) que puede ser asignado a una tupla, explícitamente después de un punto y coma. Por ejemplo, `plot(x, y; (:width,2))` y `plot(x, y; :width => 2)` son equivalentes a `plot(x, y, width=2)`. Esto es útil en situaciones donde el nombre de la palabra clave se calcula en tiempo de ejecución.
 
-La naturaleza de los argumentos *keyword*  le hace posible especificar el mismo argumento más de una vez.
-Por ejemplo, en la llamada `plot(x, y; options..., width=2)` es posible que la estructura `options` 
-contenga también un valor para `width`. En tal caso la ocurrencia más a la derecha toma precedencia; en
-este ejemplo `width` tendrá el valor `2`.
+La naturaleza de los argumentos *keyword*  le hace posible especificar el mismo argumento más de una vez. Por ejemplo, en la llamada `plot(x, y; options..., width=2)` es posible que la estructura `options` contenga también un valor para `width`. En tal caso la ocurrencia más a la derecha toma precedencia; en este ejemplo `width` tendrá el valor `2`.
 
 ## Ámbito de evaluación de Valores por defecto
 
-Cuando se evalúan expresiones en argumentos opcionales y *keyword* sólo los argumentos *previos* están
-en el ámbito. Por ejemplo, dada esta definición:
+Cuando se evalúan expresiones en argumentos opcionales y *keyword* sólo los argumentos *previos* están en el ámbito. Por ejemplo, dada esta definición:
 
 ```julia
 function f(x, a=b, b=1)
@@ -498,10 +476,7 @@ la `b` en `a=b` se refiere a la `b` de un ámbito más externo, no el siguiente 
 
 ## Sintaxis Bloque Do para Argumentos Function
 
-Pasar funciones como argumentos a otras funciones es una técnica muy potente, pero su sintaxs no es 
-siempre conveniente. Estas llamadas son especialmente incómodas de escribir cuando la función 
-argumento necesita varias líneas. Por ejemplo, consideremos llamar a  [`map()`](@ref) sobre una 
-función con varios casos:
+Pasar funciones como argumentos a otras funciones es una técnica muy potente, pero su sintaxis no es siempre conveniente. Estas llamadas son especialmente incómodas de escribir cuando la función argumento necesita varias líneas. Por ejemplo, consideremos llamar a  [`map()`](@ref) sobre una función con varios casos:
 
 ```julia
 map(x->begin
@@ -530,18 +505,11 @@ map([A, B, C]) do x
 end
 ```
 
-La sintaxis `do x` crea una función anónima con argumento `x` y la pasa como primer argumento a 
-[`map()`](@ref). Similarmente, `do a,b` crearía una función anónima de dos argumentos, y un `do` 
-solo sería una función anónima de la forma `() -> ...`.
+La sintaxis `do x` crea una función anónima con argumento `x` y la pasa como primer argumento a [`map()`](@ref). Similarmente, `do a,b` crearía una función anónima de dos argumentos, y un `do` solo sería una función anónima de la forma `() -> ...`.
 
-Cómo se inicializan estos argumentos depende de la función más externa; aquí `map()` fijará 
-secuencialmente `x` a `A,B,C` llamando a la función anónima sobre cada uno de ellos, tal y 
-como pasa en la sintaxis `map(func, [A,B,C])`.
+Cómo se inicializan estos argumentos depende de la función más externa; aquí `map()` fijará secuencialmente `x` a `A,B,C` llamando a la función anónima sobre cada uno de ellos, tal y como pasa en la sintaxis `map(func, [A,B,C])`.
 
-Esta sintaxis hace más fácil usar funciones para extender el lenguaje de forma efectiva, ya que 
-las llamadas tiene el aspecto de códigos de bloque normales. Hay muchos usos posibles diferentes 
-al de [`map()`](@ref), tal como la gestión del estado del sistema. Por ejemplo, hay una versión 
-de  [`open()`](@ref) que ejecuta código asegurando que el fichero abierto es cerrado eventualmente:
+Esta sintaxis hace más fácil usar funciones para extender el lenguaje de forma efectiva, ya que las llamadas tiene el aspecto de códigos de bloque normales. Hay muchos usos posibles diferentes al de [`map()`](@ref), tal como la gestión del estado del sistema. Por ejemplo, hay una versión de  [`open()`](@ref) que ejecuta código asegurando que el fichero abierto es cerrado eventualmente:
 
 ```julia
 open("outfile", "w") do io
@@ -562,29 +530,15 @@ function open(f::Function, args...)
 end
 ```
 
-Here, [`open()`](@ref) primero abre el fichero para escritura y luego pasa el flujo de salida 
-resultante a la función anónima que se define en el bloque `do...end`.  Después de que la 
-función exista, [`open()`](@ref) asegurará que el flujo ha sido cerrado apropiadamente, sin 
-preocuparse de si la función salió normalmente o lanzó una excepción (la construcción 
+Aquí, [`open()`](@ref) primero abre el fichero para escritura y luego pasa el flujo de salida resultante a la función anónima que se define en el bloque `do...end`.  Después de que la función exista, [`open()`](@ref) asegurará que el flujo ha sido cerrado apropiadamente, sin preocuparse de si la función salió normalmente o lanzó una excepción (la construcción 
 `try/finally` será descrita en  [Control de Flujo](@ref).)
 
-Con la sintaxis de bloque `do` se ayuda a chequear la documentación o implementaciones para 
-saber cómo se inicializan los argumentos de la función de usuario.
+Con la sintaxis de bloque `do` se ayuda a chequear la documentación o implementaciones para saber cómo se inicializan los argumentos de la función de usuario.
 
 ## [Sintaxis Punto para funciones Vectorizadas](@id man-vectorized)
 
-En los lenguajes de computación técnicos es común tener versiones "vectorizadas" de funciones, 
-las cuales aplican una función dada `f(x)` a cada elemento de un array `A` para producir un 
-nuevo array vía `f(A)`. Esta clase de sintaxis es conveniente para procesamiento de datos, 
-pero en otros lenguajes la vectorización es también requerida en aras de mejor rendimiento: 
-si los bucles son lentos, la versión "vectorizada" de una función podría llamar al código 
-de librería rápido en un lenguaje de bajo nivel. En Julia, las funciones actualizadas 
-*no son requeridas por motivos de vencimiento*; de hecho, suele ser beneficioso que el 
-usuario escriba sus propios bucles (ver [Consejos de rendimiento](@ref man-performance-tips)), 
-a veces incluso conveniente. Por tanto *cualquier* función Julia `f` puede ser aplicada 
-elemento a elemento a cualquier array (u otra colección) con la sintaxis `f.(A)`.
-
-Por ejemplo `sin` puede ser aplicado a todos los elementos del vector `A` de esta forma:
+En los lenguajes de computación técnicos es común tener versiones "vectorizadas" de funciones, las cuales aplican una función dada `f(x)` a cada elemento de un array `A` para producir un nuevo array vía `f(A)`. Esta clase de sintaxis es conveniente para procesamiento de datos, pero en otros lenguajes la vectorización es también requerida en aras de mejorar el rendimiento: 
+si los bucles son lentos, la versión "vectorizada" de una función podría llamar al código de librería rápido en un lenguaje de bajo nivel. En Julia, las funciones actualizadas *no son requeridas por motivos de vencimiento*; de hecho, suele ser beneficioso que el usuario escriba sus propios bucles (ver [Consejos de rendimiento](@ref man-performance-tips)), a veces incluso conveniente. Por tanto *cualquier* función Julia `f` puede ser aplicada elemento a elemento a cualquier array (u otra colección) con la sintaxis `f.(A)`. Por ejemplo `sin` puede ser aplicado a todos los elementos del vector `A` de esta forma:
 
 ```jldoctest
 julia> A = [1.0, 2.0, 3.0]
@@ -600,17 +554,9 @@ julia> sin.(A)
  0.14112
 ```
 
-Por supuesto, uno puede omitir el punto si escrive un método especial para vectores de 
-`f` por ejemplo, vía `f(A::AbstractArray) = map(f, A)` y esto es tan eficiente como 
-`f.(A)`. Pero este enfoque necesitaría que decidas a priori qué funciones quieres 
-vectorizar.
+Por supuesto, uno puede omitir el punto si escribe un método especial para vectores de `f` por ejemplo, vía `f(A::AbstractArray) = map(f, A)` y esto es tan eficiente como `f.(A)`. Pero este enfoque necesitaría que decidas a priori qué funciones quieres vectorizar.
 
-Más generalmente, `f.(args...)` es de hecho equivalente a `broadcast(f, args...)`, 
-que te permite operar sobre múltiples arrays (incluso de formas distintas) o una mezcla 
-de arrays y escalares (ver [Broadcasting](@ref)). Por ejemplo, si tenemos `f(x,y) = 3x + 4y`, 
-entonces `f.(pi,A)` devolverá un nuevo array consistente en `f(pi,a)`para cada `a` en `A`, 
-y `f.(vector1,vector2)` devolverá un nuevo vector que consiste en `f(vector1[i],vector2[i])` 
-para cada índice `i` (lanzando una excepción si los vectores tienen diferente longitud).
+Más generalmente, `f.(args...)` es de hecho equivalente a `broadcast(f, args...)`, que te permite operar sobre múltiples arrays (incluso de formas distintas) o una mezcla de arrays y escalares (ver [Broadcasting](@ref)). Por ejemplo, si tenemos `f(x,y) = 3x + 4y`, entonces `f.(pi,A)` devolverá un nuevo array consistente en `f(pi,a)`para cada `a` en `A`, y `f.(vector1,vector2)` devolverá un nuevo vector que consiste en `f(vector1[i],vector2[i])` para cada índice `i` (lanzando una excepción si los vectores tienen diferente longitud).
 
 ```jldoctest
 julia> f(x,y) = 3x + 4y;
@@ -632,30 +578,11 @@ julia> f.(A, B)
  33.0
 ```
 
-Además, las llamadas anidadas `f.(args...)`se funden en un solo `broadcast`. Por ejemplo 
-`sin.(cos.(X))` es equivalent a `broadcast(x->sin(cos(x)), X)`, lo cuál es similar a 
-`[sin(cos(x)) for x in X]`. Hay un solo bucle sobre `X`, y se asigna un solo array para el 
-resultado. En contraste, `sin(cos(X))` en un lenguaje vectorizado típio asignaría primero 
-un array temporal `tmp = cos(X)` y luego calcularía `sin(tmp)` en un bucle separado, asignando 
-un segundo array. Esta fusión de bucles no es una optimización del compilador que puede 
-ocurrir o no, sino que es una *garantía sintáctica*  cuando se encuentran llamadas `f.(array...)` 
-anidadas. Técnicamente, la fusión se para en cuanto se encuentr una función sin punto, por
-ejemplo, en `sin.(srt(cos.(X)))` los bucles de `sin` y `cos` no pueden mezclarse debido a la 
-intervención de la función `sort`.
+Además, las llamadas anidadas `f.(args...)`se funden en un solo `broadcast`. Por ejemplo `sin.(cos.(X))` es equivalent a `broadcast(x->sin(cos(x)), X)`, lo cuál es similar a `[sin(cos(x)) for x in X]`. Hay un solo bucle sobre `X`, y se asigna un solo array para el resultado. En contraste, `sin(cos(X))` en un lenguaje vectorizado típio asignaría primero un array temporal `tmp = cos(X)` y luego calcularía `sin(tmp)` en un bucle separado, asignando un segundo array. Esta fusión de bucles no es una optimización del compilador que puede ocurrir o no, sino que es una *garantía sintáctica*  cuando se encuentran llamadas `f.(array...)` anidadas. Técnicamente, la fusión se para en cuanto se encuentr una función sin punto, por ejemplo, en `sin.(srt(cos.(X)))` los bucles de `sin` y `cos` no pueden mezclarse debido a la intervención de la función `sort`.
 
-Finalmente, la eficiencia máxima suele conseguirse cuando el array de salida de una operación 
-vectorizada es *pre-asignado*, por lo que las llamadas repetidas no asignarán nuevos arrays 
-una y otra vez para los resultados (ver [Preasignando salidas(@ref)). Una sintaxis conveniente 
-para esto es `X .= ...` que es equivalente a `broadcast!(identity, X, ...)` excepto que, como 
-antes, el bucle `broadcast!` es fusionado con cualquier llamada con punto anidada. Por ejemplo, 
-`X .= sin.(Y)` es equivalente a `broadcast!(sin, X, Y)`, sobreescribiendo `X` con `sin.(Y)` en 
-su lugar. Si el miembro izquierdo de la expresión es una expresión de indexación de un array, 
-como `X[2:end] .= sin.(Y)` entonces ella se traduce a `broadcast!` sobre una vista, por ejemplo 
-`broadcast!(sin, view(X, 2:endof(X)), Y)`.
+Finalmente, la eficiencia máxima suele conseguirse cuando el array de salida de una operación vectorizada es *pre-asignado*, por lo que las llamadas repetidas no asignarán nuevos arrays una y otra vez para los resultados (ver [Preasignando salidas](@ref)). Una sintaxis conveniente para esto es `X .= ...` que es equivalente a `broadcast!(identity, X, ...)` excepto que, como antes, el bucle `broadcast!` es fusionado con cualquier llamada con punto anidada. Por ejemplo, `X .= sin.(Y)` es equivalente a `broadcast!(sin, X, Y)`, sobreescribiendo `X` con `sin.(Y)` en su lugar. Si el miembro izquierdo de la expresión es una expresión de indexación de un array, como `X[2:end] .= sin.(Y)` entonces ella se traduce a `broadcast!` sobre una vista, por ejemplo `broadcast!(sin, view(X, 2:endof(X)), Y)`.
 
-Como añadir puntos a muchas operaciones y llamadas a función puede resultar tedioso y conducir 
-a código difícil de leer, se proporciona la macro `@.` para convertir cada llamada a función, 
-operación y asignación en una expresion en su versión "con puntos".
+Como añadir puntos a muchas operaciones y llamadas a función puede resultar tedioso y conducir a código difícil de leer, se proporciona la macro `@.` para convertir cada llamada a función, operación y asignación en una expresion en su versión "con puntos".
 
 ```jldoctest
 julia> Y = [1.0, 2.0, 3.0, 4.0];
@@ -670,17 +597,8 @@ julia> @. X = sin(cos(Y)) # equivalent to X .= sin.(cos.(Y))
  -0.608083
 ```
 
-Los operadores binarios (o unarios) como `.+` se manejan con el mismo mecanismo: son equivalentes 
-a llamadas retransmitidas (broadcast) y son fundidas con otras llamadas que tiene puntos. 
-`X .+= Y etcetera` es equivalente a `X .= X .+ Y` y dan como resultado una asignación fusionada. 
-Ver (@ref man-dot-operators).
+Los operadores binarios (o unarios) como `.+` se manejan con el mismo mecanismo: son equivalentes a llamadas retransmitidas (broadcast) y son fundidas con otras llamadas que tiene puntos. `X .+= Y etcetera` es equivalente a `X .= X .+ Y` y dan como resultado una asignación fusionada. Ver también [dot operators](@ref man-dot-operators).
 
 ## Otras Lecturas
 
-Deberíamos mencionar que esto está lejos de ser una visión completa de las definiciones de 
-función. Julia tiene un sistema de tipos sofisticado y permite despacho múltiple sobre los 
-tipos de argumento. Ninguno de los ejemplos dados aquí proporciona anotaciones de tipo sobre 
-sus argmentos, lo que significa que son aplicables a cualquier tipo de argumento. El sistema 
-de tipos es descrito en [Tipos](@ref man-types) definir una función en términos de métodos 
-elegidos mediante despacho múltiple sobre los tpos de argumento en tiempo de ejecucoión 
-se describe en el capítulo [Methods](@ref).
+Deberíamos mencionar que esto está lejos de ser una visión completa de las definiciones de función. Julia tiene un sistema de tipos sofisticado y permite despacho múltiple sobre los tipos de argumento. Ninguno de los ejemplos dados aquí proporciona anotaciones de tipo sobre sus argmentos, lo que significa que son aplicables a cualquier tipo de argumento. El sistema de tipos es descrito en [Tipos](@ref man-types) definir una función en términos de métodos elegidos mediante despacho múltiple sobre los tpos de argumento en tiempo de ejecucoión se describe en el capítulo [Methods](@ref methods).
