@@ -160,10 +160,6 @@ Los algoritmos de clasificación por defecto se eligen sobre la base de que son 
 
 El mecanismo por el cual Julia selecciona los algoritmos de clasificación predeterminados se implementa a través de la función `Base.Sort.defalg`. Permite que un algoritmo particular se registre como el predeterminado en todas las funciones de ordenación para arrays específicos. Por ejemplo, aquí están los dos métodos predeterminados de [`sort.jl`] (https://github.com/JuliaLang/julia/blob/master/base/sort.jl):
 
-The mechanism by which Julia picks default sorting algorithms is implemented via the `Base.Sort.defalg`
-function. It allows a particular algorithm to be registered as the default in all sorting functions
-for specific arrays. For example, here are the two default methods from [`sort.jl`](https://github.com/JuliaLang/julia/blob/master/base/sort.jl):
-
 ```julia
 defalg(v::AbstractArray) = MergeSort
 defalg(v::AbstractArray{<:Number}) = QuickSort
