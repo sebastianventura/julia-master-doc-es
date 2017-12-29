@@ -226,7 +226,7 @@ sería imposible hacer que los valores  [`Bool`](@ref) se comportaran de forma d
 
 [Los tipos compuestos](https://en.wikipedia.org/wiki/Composite_data_type) se llaman registros, estructuras (*structs*) u objetos en distintos lenguajes. Un tipo compuesto es una colección de campos nombrados, una instancia de los cuales puede ser tratada como un único valor. En muchos lenguajes, los tiempos compuestos sos la única clase de tipos definidos por el usuario, y ellos son de lejos el tiempo definido por el usuario  que se usa mas comúnmente en el lenguaje Julia.
 
-En el mundo de los lenguajes orientados a objetos tales como C++, Java, Python o Rubi, los tiempos compuestos también tienen funciones nombrados asociados con ellos, y la combinación se denomina "objeto". En los lenguajes orientados a objetos puros, tales como Ruby o SmallTalk, todo los valores son objetos sean compuestos uno. En lenguajes orientados objetos menos puros incuyendo C++ y Java, algunos valores tales como los enteros no se consideran objetos, mientras que las instancias de los tipos compuestos definidos por el usuario son verdaderos objetos con métodos asociados. En Julia, todos los valores son objetos, pero las funciones no están ligadas a los objetos sobre los que opera. Esto es necesario ya que Julia exige que método de una función usar mediante despacho múltiple, lo que significa que los tipos de todos los argumentos de una función son considerados cuando se selecciona un método en lugar de sólo el primero (ver la sección [Métodos](@ref) para más información). Por tanto, sería inapropiado para las funciones pertenecer a su primer argumento solo. Organizar métodos en objetos función en lugar de tener bolsas de métodos nombrados "dentro" de cada objeto termina por ser un aspecto muy beneficioso de diseño del lenguaje.
+En el mundo de los lenguajes orientados a objetos tales como C++, Java, Python o Ruby, los tipos compuestos también tienen funciones asociadas a ellos, y esa combinación se denomina "objeto". En los lenguajes orientados a objetos más puros, tales como Ruby o SmallTalk, todo los valores son objetos sean compuestos o no. En lenguajes orientados objetos menos puros incuyendo C++ y Java, algunos valores tales como los enteros no se consideran objetos, mientras que las instancias de los tipos compuestos definidos por el usuario son verdaderos objetos con métodos asociados. En Julia, todos los valores son objetos, pero no hay funciones a los objetos sobre los que se opera. Esto es necesario ya que Julia elige qué método de una función usar mediante despacho múltiple, lo que significa que cuando se selecciona un método se consideran los tipos de todos los argumentos de la función y no sólo el primero (ver la sección [Métodos](@ref) para más información). Por tanto, sería inapropiado para las funciones "pertenecer" sólo a su primer argumento (el objeto que la posee). Organizar métodos en objetos función en lugar de tener bolsas de métodos nombrados "dentro" de cada objeto termina por ser un aspecto muy beneficioso de diseño del lenguaje.
 
 Los tipos compuestos son introducidos por la palabra clave `struct` seguida por un bloque de nombres de campos, opcionalmente anotados con tipos usando el operador `::`
 
@@ -420,8 +420,6 @@ julia> Point{AbstractString} <: Point
 true
 ```
 
-Otros tipos, por supuesto, no son subtipos de él:
-
 ```jldoctest pointtype
 julia> Float64 <: Point
 false
@@ -430,7 +428,7 @@ julia> AbstractString <: Point
 false
 ```
 
-Tipos `Point` concretos con valores diferentes de `T` no son nunca subtipos uno de otro:
+Los tipos `Point` concretos con valores diferentes de `T` no son nunca subtipos uno de otro:
 
 ```jldoctest pointtype
 julia> Point{Float64} <: Point{Int64}
@@ -471,11 +469,11 @@ end
 
 (Equivalentemente, uno podría definir `function norm{T<:Real}(p::Point{T})` o `function norm(p::Point{T} where T<:Real)`; ver [tipos UnionAll](@ref).)
 
-Más ejemplos se discutirán después en [Métodos](@ref).
+Más ejemplos se discutirán después en [Métodos](@ref methods).
 
 ¿Cómo construye uno un objeto `Point`? Es posible definir constructores personalizados para tipos compuestos, que serán discutidos en detalle en el capítulo [Constructores](@ref man-constructors), pero en ausencia de ninguna declaración especial de constructor, hay dos formas por defecto de crear nuevos objetos compuestos, uno en el que se dan explícitamente los parámetros de tipo y otro en el que ellos son implicados por los argumentos al objeto constructor.
 
-Como el tipo `Point{Float64}` es un tipo concreto equivalente a `Point` declarado con `Float64` en lugar de `T`, se puede aplicar como un constructor ede acuerdo a ésto:
+Como el tipo `Point{Float64}` es un tipo concreto equivalente a `Point` declarado con [`Float64`](@ref) en lugar de `T`, se puede aplicar como un constructor ede acuerdo a ésto:
 
 ```jldoctest pointtype
 julia> Point{Float64}(1.0, 2.0)
@@ -606,7 +604,7 @@ julia> struct DiagPoint{T} <: Pointy{T}
        end
 ```
 
-Ahora tanto `Point{Float64}` como `DiagPoint{Float64}` son implementaciones de la abstracción `Pointy{Float64}` y, similarmente, para cada otra posible elección del tipo `T`. Esto permite programar a un interfaz común compartido por todos los objetos `Pointy`, implementedo tanto por `Point`como por `DiagPoint`. Esto no puede ser totalmente demostrado, sin embargo, hasta que no hayamos introducidos los métodos y el despacho en la siguiente sección, [Methods](@ref).
+Ahora tanto `Point{Float64}` como `DiagPoint{Float64}` son implementaciones de la abstracción `Pointy{Float64}` y, similarmente, para cada otra posible elección del tipo `T`. Esto permite programar a un interfaz común compartido por todos los objetos `Pointy`, implementedo tanto por `Point`como por `DiagPoint`. Esto no puede ser totalmente demostrado, sin embargo, hasta que no hayamos introducidos los métodos y el despacho en la siguiente sección, [Methods](@ref methods).
 
 Hay situaciones donde puede no tener sentido para los parámetros de tipo varíen libremente sobre todos los tipos posibles. En tales situaciones, uno puede restringir el rango de `T` como aquí:
 
@@ -928,8 +926,7 @@ Si en lugar de usar este modo de presentacin preferimos que su presentación sea
 julia> Base.show(io::IO, z::Polar) = print(io, z.r, " * exp(", z.Θ, "im)")
 ```
 
-Es posible un control de grano más fino sobre la visualizacin de los objetos `Polar`. En particular, algunas veces uno desea 
-un formato de impresión detallado multilínea, utilizado para mostrar un solo objeto en REPL y otros entornos interactivos, y también un formato de línea única más compacto utilizado para [`print ()`] @ref) o para mostrar el objeto como parte de otro objeto (por ejemplo, en una matriz). Aunque de forma predeterminada se llama a la función `show (io, z)` en ambos casos, puede definir un formato multilínea *diferente* para mostrar un objeto sobrecargando una forma de tres argumentos de `show` que toma el tipo MIME `text/plain` como su segundo argumento (consulte [E/S multimedia](@ref)), por ejemplo:
+Es posible un control de grano más fino sobre la visualizacin de los objetos `Polar`. En particular, algunas veces uno desea un formato de impresión detallado multilínea, utilizado para mostrar un solo objeto en REPL y otros entornos interactivos, y también un formato de línea única más compacto utilizado para [`print ()`] @ref) o para mostrar el objeto como parte de otro objeto (por ejemplo, en una matriz). Aunque de forma predeterminada se llama a la función `show (io, z)` en ambos casos, puede definir un formato multilínea *diferente* para mostrar un objeto sobrecargando una forma de tres argumentos de `show` que toma el tipo MIME `text/plain` como su segundo argumento (consulte [E/S multimedia](@ref)), por ejemplo:
 
 ```jldoctest polartype
 julia> Base.show(io::IO, ::MIME"text/plain", z::Polar{T}) where{T} =
@@ -1170,8 +1167,7 @@ julia> root(a::Real, b::Real, c::Real) = (-b + √(b^2 - 4a*c)) / 2a
 root (generic function with 1 method)
 ```
 
-Podemos verificar que el resultado de `root (1, -9, 20)` es `5.0` como esperamos,
-ya que `5.0` es la mayor de dos raíces reales de la ecuación cuadrática.
+Podemos verificar que el resultado de `root (1, -9, 20)` es `5.0` como esperamos, ya que `5.0` es la mayor de dos raíces reales de la ecuación cuadrática.
 
 Supongamos ahora que queremos encontrar la mayor raíz real de una ecuación cuadrática donde los coeficientes pueden ser valores perdidos. Tener valores perdidos en los conjuntos de datos es una ocurrencia común en los datos del mundo real, por lo que es importante poder tratar con ellos. Pero no podemos encontrar las raíces de una ecuación si no conocemos todos los coeficientes. La mejor solución para esto dependerá del caso de uso particular; quizás deberíamos arrojar un error. Sin embargo, para este ejemplo, asumiremos que la mejor solución es propagar los valores perdidos; es decir, si falta alguna entrada, simplemente producimos una salida faltante.
 
