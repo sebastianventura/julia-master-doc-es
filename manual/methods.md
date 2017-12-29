@@ -643,7 +643,7 @@ genera ambigüedades para cualquiera que defina un método
 El mejor enfoque es evitar definir *cualquiera* de estos métodos: en su lugar, confíe en un método genérico `-(A::AbstractArray, b)` y haga Asegúrese de que este método se implemente con llamadas genéricas (como `similar` y
 `-`) que hacen lo correcto para cada tipo de contenedor y tipo de elemento *por separado*. Esta es solo una variante más compleja de los consejos para [ortogonalize](@ ref man-methods-ortogonalize) sus métodos.
 
-Cuando este enfoque no es posible, puede valer la pena comenzar un discusión con otros desarrolladores sobre la resolución de la ambigüedad; sólo porque un método se definió primero no necesariamente significa que no puede ser modificado o eliminado Como último recurso, un desarrollador puede definir el método de "curita"
+Cuando este enfoque no es posible, puede valer la pena comenzar un discusión con otros desarrolladores sobre la resolución de la ambigüedad; sólo porque un método se definió primero no necesariamente significa que no puede ser modificado o eliminado Como último recurso, un desarrollador puede definir el método de "tirita"
 
 ```julia
 - (A :: MyArrayType {T}, b :: Date) donde {T <: Date} = ...
