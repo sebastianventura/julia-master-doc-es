@@ -4,13 +4,13 @@ Julia proporciona una variedad de construcciones para control de flujo:
 
   * [Expresiones Compuestas](@ref man-compound-expressions): `begin` and `(;)`.
   * [Evaluación Condicional](@ref man-conditional-evaluation): `if`-`elseif`-`else` and `?:` (ternary operator).
-  * [Evaluación en Cortocircuito](@ref): `&&`, `||` and chained comparisons. 
+  * [Evaluación en Cortocircuito](@ref short-circuit-evaluation): `&&`, `||` and chained comparisons. 
   * [Evaluación Repetida: Bucles](@ref man-loops): `while` and `for`.
   * [Manejo de Excepciones](@ref): `try`-`catch`, [`error()`](@ref) and [`throw()`](@ref).
   * [Tareas (también denominadas Coroutinas)](@ref man-tasks): [`yieldto()`](@ref).
 
 Los cinco primeros mecanismos de control de flujo son estándar en los lenguajes de programación 
-de alto nivel. Las tareas no son un mecanismo tan estándar: ellas proporcionan control de flujo 
+de alto nivel. Las [tareas](@ref tasks) no son un mecanismo tan estándar: ellas proporcionan control de flujo 
 no local, haciendo posible conmutar entre cálculos suspendidos temporalmente. Esta es una  
 construcción potente: tanto el manejo de excepciones como la multitarea cooperativa se 
 implementan en Julia usando tareas. La programación diaria no suele requerir el uso de tareas, 
@@ -32,8 +32,7 @@ julia> z = begin
 3
 ```
 
-Como estas expresiones son bastante pequeñas, podrían ponerse con facilidad en una sola línea. 
-Esta es precisamente la finalidad del `;`
+Como estas expresiones son bastante pequeñas, podrían ponerse con facilidad en una sola línea, que es donde la sintaxis encadenada `(;)` es más útil
 
 ```jldoctest
 julia> z = (x = 1; y = 2; x + y)
@@ -177,10 +176,7 @@ julia> if 1
 ERROR: TypeError: non-boolean (Int64) used in boolean context
 ```
 
-This error indicates that the conditional was of the wrong type: [`Int64`](@ref) rather
-than the required [`Bool`](@ref).
-
-Este error indica que el condicional fue de un tipo incorrecto. 
+Este error indica que el condicional era de un tipo incorrecto: [`Int64`](@ref) en lugar del requerido [`Bool`](@ref).
 
 El llamado *operador ternario* (`?`) está muy relacionado con la sintaxis de `if-elsif-else`, 
 pero se usa donde hay que hacer una elección condicional entre expresiones sencillas, a 
@@ -593,6 +589,7 @@ Stacktrace:
 ```
 
 Uno puede definir sus propias excepciones de la siguiente manera:
+
 ```jldoctest
 julia> struct MyCustomException <: Exception end
 ```
