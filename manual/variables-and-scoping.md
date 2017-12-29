@@ -441,7 +441,7 @@ externa local `x`.
 Los bucles `for` y las [comprensiones](@ref) tiene el siguiente comportamiento: cualquier nueva 
 variable introducida en sus ámbitos se reservan de nuevo para cada nueva iteración del bucle. 
 Esto contrasta con los bucles `while` que reservan las variables para todas las iteraciones. 
-or tanto, estas construcciones son similares a bucles `while` con bloques `let` dentro de ellos:
+Por tanto, estas construcciones son similares a bucles `while` con bloques `let` dentro de ellos:
 
 ```jldoctest
 julia> Fs = Array{Any}(2);
