@@ -1,8 +1,6 @@
 # Guía de Estilo
 
-Las siguientes secciones Explica unos cuantos aspectos del estilo de codificación idiomático de 
-Julia. Ninguna de estas reglas son absolutas; sólo son sugerencias para ayudar a familiarizarte 
-con el lenguaje y ayudarte a elegir entre diseños alternativos.
+Las siguientes secciones explican unos cuantos aspectos del estilo de codificación idiomático de Julia. Ninguna de estas reglas son absolutas; sólo son sugerencias para ayudar a familiarizarte con el lenguaje y ayudarte a elegir entre diseños alternativos.
 
 ## Escribe funciones, no sólo *scripts*
 
