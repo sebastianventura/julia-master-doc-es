@@ -28,6 +28,7 @@ El REPL tiene cuatro modos principales de operación. El primero y más común e
 julia> string(1 + 2)
 "3"
 ```
+
 Hay varias funciones útiles únicas para el trabajo interactivo. Además de mostrar el resultado, el REPL también vincula el resultado a la variable `ans`. Un punto y coma final en la línea se puede utilizar como un indicador para suprimir mostrar el resultado.
 
 ```jldoctest
@@ -264,7 +265,7 @@ julia> split("","")[1].[TAB]
 endof  offset  string
 ```
 
-La accin de completar campos para la salida de funciones usa inferencia de tipos, y sólo puede sugerir campos si la función es estable en los tipos.
+La acción de completar campos para la salida de funciones usa inferencia de tipos, y sólo puede sugerir campos si la función es estable en los tipos.
 
 ## Customizing Colors
 
