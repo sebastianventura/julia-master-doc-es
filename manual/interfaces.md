@@ -16,8 +16,8 @@ Un montón de la potencia y extensibilidad de Julia viene de una colección de i
 | `length(iter)`                 | (*indefinido*)          | El número de ítems, si es conocido                                                        |
 | `size(iter, [dim...])`         | (*indefinido*)          | El número de ítems en cada dimensión, si es conocido                                      |
 
-| Valro devuelto por `iteratorsize(IterType)` | Métodos requeridos |
-|:------------------------------------------ |:------------------------------------------ |
+| Valor devuelto por `iteratorsize(IterType)` | Métodos requeridos |
+|:------------------------------------------- |:------------------------------------------ |
 | `HasLength()`                              | `length(iter)`                             |
 | `HasShape()`                               | `length(iter)`  and `size(iter, [dim...])` |
 | `IsInfinite()`                             | (*ninguno*)                                   |
@@ -163,8 +163,8 @@ Aunque que esto está comenzando a soportar más de las [operaciones de indexaci
 
 ## [Abstract Arrays](@id man-interface-array)
 
-| Methods to implement                            |                                          | Brief description                                                                     |
-|:----------------------------------------------- |:---------------------------------------- |:------------------------------------------------------------------------------------- |
+| Metodos a implementar                           |                                          | Breve descripción                                                                   |
+|:----------------------------------------------- |:---------------------------------------- |:--------------------------------------------------------------------------- |
 | `size(A)`                                       |                                          | Devuelve una tupla que contiene las dimensiones de `A`                                      |
 | `getindex(A, i::Int)`                           |                                          | (if `IndexLinear`) Linear scalar indexing                                              |
 | `getindex(A, I::Vararg{Int, N})`                |                                          | (if `IndexCartesian`, where `N = ndims(A)`) N-dimensional scalar indexing                 |
